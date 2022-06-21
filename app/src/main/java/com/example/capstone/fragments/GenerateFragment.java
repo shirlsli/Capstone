@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 /**
@@ -39,6 +40,7 @@ public class GenerateFragment extends Fragment {
     private EditText etUserInput;
     private Button bGenerate;
     private LinearLayout linearLayout;
+    private Line poemLine;
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -107,10 +109,10 @@ public class GenerateFragment extends Fragment {
                                 @Override
                                 public void onClick(View v) {
                                     try {
-                                        Line poemLine = new Line();
+                                        poemLine = new Line();
                                         poemLine.setPoemLine(textView.getText().toString());
                                         poemLine.setAuthor(ParseUser.getCurrentUser());
-                                        Log.i("poem_line_creation_test", "poem line creation success!");
+                                        Log.i("poem_line_creation_test", "poem line creation success! " + poemLine.getPoemLine());
                                     } catch (Exception exception) {
                                         Log.i("poem_line_creation_test", "poem line creation failed :(");
                                     }

@@ -1,6 +1,9 @@
 package com.example.capstone;
 
+import com.example.capstone.models.Line;
 import com.parse.Parse;
+import com.parse.ParseObject;
+
 import android.app.Application;
 
 public class CapstoneApplication extends Application {
@@ -9,6 +12,9 @@ public class CapstoneApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Register your parse models
+        ParseObject.registerSubclass(Line.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("xuknWkvt9Z69KS72mu4ZoGt3AzBQnPwL52eQSiQ0")
