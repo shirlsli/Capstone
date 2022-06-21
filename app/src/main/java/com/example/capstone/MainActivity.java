@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 //                        fragment = fragment3;
                         break;
                 }
+                // Temporary default fragment
                 fragment = fragment2;
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;

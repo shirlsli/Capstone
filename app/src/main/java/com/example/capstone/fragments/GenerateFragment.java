@@ -6,13 +6,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.capstone.R;
+import com.example.capstone.models.Line;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +38,7 @@ public class GenerateFragment extends Fragment {
 
     private EditText etUserInput;
     private Button bGenerate;
+    private LinearLayout linearLayout;
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -76,5 +83,52 @@ public class GenerateFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         etUserInput = view.findViewById(R.id.etUserInput);
         bGenerate = view.findViewById(R.id.bGenerate);
+        linearLayout = view.findViewById(R.id.linearLayout);
+
+        bGenerate.setOnClickListener(new View.OnClickListener() {
+            // need to identify if the word is a real word
+            @Override
+            public void onClick(View v) {
+                if (etUserInput.getText().toString().length() > 0) {
+                    // skeleton: generate hello world
+                    String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
+
+                    if (linearLayout.getVisibility() != View.VISIBLE) {
+                        linearLayout.setVisibility(View.VISIBLE);
+                        for( int i = 0; i < textArray.length; i++ )
+                        {
+                            TextView textView = new TextView(v.getContext());
+                            textView.setText(textArray[i]);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            params.setMargins(0,0,0,20);
+                            textView.setLayoutParams(params);
+                            textView.setTextSize(20);
+                            textView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    try {
+                                        Line poemLine = new Line();
+                                        poemLine.setPoemLine(textView.getText().toString());
+                                        poemLine.setAuthor(ParseUser.getCurrentUser());
+                                        Log.i("poem_line_creation_test", "poem line creation success!");
+                                    } catch (Exception exception) {
+                                        Log.i("poem_line_creation_test", "poem line creation failed :(");
+                                    }
+
+                                }
+                            });
+                            linearLayout.addView(textView);
+                        }
+                        // if user taps on generated textview, go to next screen
+                    }
+                } else {
+                    linearLayout.setVisibility(View.GONE);
+                    linearLayout.removeAllViews();
+                }
+                // Calls open ai on inputted word
+
+            }
+        });
     }
+
 }
