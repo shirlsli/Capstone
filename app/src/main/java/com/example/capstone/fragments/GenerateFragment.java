@@ -24,19 +24,11 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link GenerateFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class GenerateFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -50,15 +42,6 @@ public class GenerateFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment GenerateFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static GenerateFragment newInstance(String param1, String param2) {
         GenerateFragment fragment = new GenerateFragment();
         Bundle args = new Bundle();
@@ -96,74 +79,85 @@ public class GenerateFragment extends Fragment {
             // need to identify if the word is a real word
             @Override
             public void onClick(View v) {
-                if (etUserInput.getText().toString().length() > 0) {
-                    // skeleton: generate hello world
-                    String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
-
-                    if (linearLayout.getVisibility() != View.VISIBLE) {
-                        linearLayout.setVisibility(View.VISIBLE);
-                        for( int i = 0; i < textArray.length; i++ )
-                        {
-                            TextView textView = new TextView(v.getContext());
-                            textView.setText(textArray[i]);
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                            params.setMargins(0,0,0,20);
-                            textView.setLayoutParams(params);
-                            textView.setTextSize(20);
-                            textView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    try {
-                                        poemLine = new Line();
-                                        poemLine.setPoemLine(textView.getText().toString());
-                                        poemLine.setAuthor(ParseUser.getCurrentUser());
-                                        bPublish.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                try {
-                                                    // if user is the first friend to post poem line, create a new poem
-                                                    poemLine.saveInBackground(new SaveCallback() {
-                                                        @Override
-                                                        public void done(ParseException e) {
-                                                            if (e != null) {
-                                                                Log.e("line_saved_test", "Poem line has not been saved", e);
-                                                            } else {
-                                                                Log.i("line_saved_test", "Poem line has been saved!");
-                                                            }
-                                                        }
-                                                    });
-
-                                                    Poem poem = new Poem();
-                                                    // else fetch poem created for today and add to that
-                                                    // current issue: poem is null, cannot add to a null object
-
-                                                    poem.addAuthor(poemLine.getAuthor());
-                                                    poem.setPoemLines(poemLine);
-                                                    Log.i("poem_creation_test", "Poem created success!");
-                                                } catch (Exception e) {
-                                                    Log.e("poem_creation_test", "Poem created failed :(", e);
-                                                }
-                                            }
-                                        });
-                                        Log.i("poem_line_creation_test", "poem line creation success! " + poemLine.getPoemLine());
-                                    } catch (Exception exception) {
-                                        Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
-                                    }
-
-                                }
-                            });
-                            linearLayout.addView(textView);
-                        }
-                        // if user taps on generated textview, go to next screen
-                    }
-                } else {
-                    linearLayout.setVisibility(View.GONE);
-                    linearLayout.removeAllViews();
-                }
-                // Calls open ai on inputted word
-
+               generatePrompts(v);
             }
         });
+    }
+
+    public void generatePrompts(View view) {
+        if (etUserInput.getText().toString().length() > 0) {
+            // skeleton: generate hello world
+            String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
+
+            if (linearLayout.getVisibility() != View.VISIBLE) {
+                linearLayout.setVisibility(View.VISIBLE);
+                for( int i = 0; i < textArray.length; i++ )
+                {
+                    TextView textView = new TextView(view.getContext());
+                    textView.setText(textArray[i]);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.setMargins(0,0,0,20);
+                    textView.setLayoutParams(params);
+                    textView.setTextSize(20);
+                    // if user taps on generated textview, go to next screen
+                    textView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            createPoemLine(textView);
+
+                        }
+                    });
+                    linearLayout.addView(textView);
+                }
+            }
+        } else {
+            linearLayout.setVisibility(View.GONE);
+            linearLayout.removeAllViews();
+        }
+        // Calls open ai on inputted word
+    }
+
+    public void createPoemLine(TextView textView) {
+        try {
+            poemLine = new Line();
+            poemLine.setPoemLine(textView.getText().toString());
+            poemLine.setAuthor(ParseUser.getCurrentUser());
+            bPublish.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    savePoemLine();
+                }
+            });
+            Log.i("poem_line_creation_test", "poem line creation success! " + poemLine.getPoemLine());
+        } catch (Exception exception) {
+            Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
+        }
+    }
+
+    public void savePoemLine() {
+        try {
+            // if user is the first friend to post poem line, create a new poem
+            poemLine.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e("line_saved_test", "Poem line has not been saved", e);
+                    } else {
+                        Log.i("line_saved_test", "Poem line has been saved!");
+                    }
+                }
+            });
+
+            Poem poem = new Poem();
+            // else fetch poem created for today and add to that
+            // current issue: poem is null, cannot add to a null object
+
+            poem.addAuthor(poemLine.getAuthor());
+            poem.setPoemLines(poemLine);
+            Log.i("poem_creation_test", "Poem created success!");
+        } catch (Exception e) {
+            Log.e("poem_creation_test", "Poem created failed :(", e);
+        }
     }
 
 }

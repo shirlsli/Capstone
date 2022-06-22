@@ -28,10 +28,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // click generate button to take user input for a java class to do stuff to it
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        // define your fragments here
+        // two of three fragments currently commented out because they haven't been made yet
 //        final Fragment fragment1 = new FeedFragment();
         final Fragment fragment2 = new GenerateFragment();
 //        final Fragment fragment3 = new ThirdFragment();

@@ -30,9 +30,7 @@ public class SignupActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         bSignup = findViewById(R.id.bSignup);
 
-        // Create the ParseUser
         ParseUser user = new ParseUser();
-// Invoke signUpInBackground
         bSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,11 +41,8 @@ public class SignupActivity extends AppCompatActivity {
                 user.signUpInBackground(new SignUpCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
-                            // Hooray! Let them use the app now.
                             Log.i("sign_up_success", "Sign up success!");
                         } else {
-                            // Sign up didn't succeed. Look at the ParseException
-                            // to figure out what went wrong
                             Log.i("sign_up_fail", "Sign up went wrong :(");
                         }
                     }
