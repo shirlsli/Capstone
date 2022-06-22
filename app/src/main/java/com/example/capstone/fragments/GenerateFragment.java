@@ -24,6 +24,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GenerateFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
@@ -135,7 +138,6 @@ public class GenerateFragment extends Fragment {
     }
 
     public void savePoemLine() {
-        try {
             // if user is the first friend to post poem line, create a new poem
             poemLine.saveInBackground(new SaveCallback() {
                 @Override
@@ -147,17 +149,25 @@ public class GenerateFragment extends Fragment {
                     }
                 }
             });
+            createPoem();
+    }
 
-            Poem poem = new Poem();
-            // else fetch poem created for today and add to that
-            // current issue: poem is null, cannot add to a null object
-
-            poem.addAuthor(poemLine.getAuthor());
-            poem.setPoemLines(poemLine);
-            Log.i("poem_creation_test", "Poem created success!");
-        } catch (Exception e) {
-            Log.e("poem_creation_test", "Poem created failed :(", e);
-        }
+    public void createPoem() {
+        Poem poem = new Poem();
+        // else fetch poem created for today and add to that
+        // current issue: poem is null, cannot add to a null object
+        poem.addAuthor(poemLine.getAuthor());
+        poem.setPoemLines(poemLine);
+        poem.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.i("poem_creation_test", "Poem created success!");
+                } else {
+                    Log.e("poem_creation_test", "Poem created failed :(", e);
+                }
+            }
+        });
     }
 
 }

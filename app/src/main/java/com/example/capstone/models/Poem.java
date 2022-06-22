@@ -4,6 +4,8 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,20 @@ public class Poem extends ParseObject {
     public static final String KEY_AUTHORS = "authors";
     public static final String KEY_POEM_LINES = "poemLines";
 
-    public List<ParseUser> getAuthors() { return getList(KEY_AUTHORS); }
+    private List<ParseUser> authors;
+    private List<Line> poemLines;
 
-    public void addAuthor(ParseUser user) { put(KEY_AUTHORS, getAuthors().add(user)); }
+    public Poem() {
+        authors = new ArrayList<>();
+        poemLines = new ArrayList<>();
+    }
+
+    public JSONArray getAuthors() { return getJSONArray(KEY_AUTHORS); }
+
+    public void addAuthor(ParseUser user) {
+        authors.add(user);
+        put(KEY_AUTHORS, authors);
+    }
 
     public List<Line> getPoem() { return getList(KEY_POEM_LINES); }
 
@@ -30,11 +43,7 @@ public class Poem extends ParseObject {
     // skeleton: time zone PDT
     // for now, just add it to the end of the poem
     public void setPoemLines(Line poemLine) {
-        List<Line> poem = getPoem();
-        if (poem == null) {
-//            poem.
-        }
-        poem.add(poemLine);
-        put(KEY_POEM_LINES, poem);
+        poemLines.add(poemLine);
+        put(KEY_POEM_LINES, poemLines);
     }
 }
