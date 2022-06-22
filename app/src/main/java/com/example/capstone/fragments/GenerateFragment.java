@@ -17,9 +17,12 @@ import android.widget.TextView;
 
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
+import com.example.capstone.models.Poem;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +44,7 @@ public class GenerateFragment extends Fragment {
     private Button bGenerate;
     private LinearLayout linearLayout;
     private Line poemLine;
+    private Button bPublish;
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -86,6 +90,7 @@ public class GenerateFragment extends Fragment {
         etUserInput = view.findViewById(R.id.etUserInput);
         bGenerate = view.findViewById(R.id.bGenerate);
         linearLayout = view.findViewById(R.id.linearLayout);
+        bPublish = view.findViewById(R.id.bPublish);
 
         bGenerate.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
@@ -112,9 +117,37 @@ public class GenerateFragment extends Fragment {
                                         poemLine = new Line();
                                         poemLine.setPoemLine(textView.getText().toString());
                                         poemLine.setAuthor(ParseUser.getCurrentUser());
+                                        bPublish.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                try {
+                                                    // if user is the first friend to post poem line, create a new poem
+                                                    poemLine.saveInBackground(new SaveCallback() {
+                                                        @Override
+                                                        public void done(ParseException e) {
+                                                            if (e != null) {
+                                                                Log.e("line_saved_test", "Poem line has not been saved", e);
+                                                            } else {
+                                                                Log.i("line_saved_test", "Poem line has been saved!");
+                                                            }
+                                                        }
+                                                    });
+
+                                                    Poem poem = new Poem();
+                                                    // else fetch poem created for today and add to that
+                                                    // current issue: poem is null, cannot add to a null object
+
+                                                    poem.addAuthor(poemLine.getAuthor());
+                                                    poem.setPoemLines(poemLine);
+                                                    Log.i("poem_creation_test", "Poem created success!");
+                                                } catch (Exception e) {
+                                                    Log.e("poem_creation_test", "Poem created failed :(", e);
+                                                }
+                                            }
+                                        });
                                         Log.i("poem_line_creation_test", "poem line creation success! " + poemLine.getPoemLine());
                                     } catch (Exception exception) {
-                                        Log.i("poem_line_creation_test", "poem line creation failed :(");
+                                        Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
                                     }
 
                                 }

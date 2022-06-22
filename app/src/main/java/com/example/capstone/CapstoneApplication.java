@@ -1,6 +1,7 @@
 package com.example.capstone;
 
 import com.example.capstone.models.Line;
+import com.example.capstone.models.Poem;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -15,6 +16,7 @@ public class CapstoneApplication extends Application {
 
         // Register your parse models
         ParseObject.registerSubclass(Line.class);
+        ParseObject.registerSubclass(Poem.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("xuknWkvt9Z69KS72mu4ZoGt3AzBQnPwL52eQSiQ0")
