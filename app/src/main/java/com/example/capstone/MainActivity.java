@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.capstone.fragments.GenerateFragment;
+import com.example.capstone.fragments.PoemDetailsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.elevation.SurfaceColors;
 import com.parse.ParseUser;
@@ -32,8 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
         // two of three fragments currently commented out because they haven't been made yet
 //        final Fragment fragment1 = new FeedFragment();
-        final Fragment fragment2 = new GenerateFragment();
+        final Fragment generateFragment = new GenerateFragment();
 //        final Fragment fragment3 = new ThirdFragment();
+        final Fragment poemDetailsFragment = new PoemDetailsFragment();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
@@ -45,14 +47,14 @@ public class MainActivity extends AppCompatActivity {
 //                        fragment = fragment1;
                         break;
                     case R.id.action_generate:
-                        fragment = fragment2;
+                        fragment = generateFragment;
                         break;
                     case R.id.action_archive:
 //                        fragment = fragment3;
                         break;
                 }
                 // Temporary default fragment
-                fragment = fragment2;
+                fragment = generateFragment;
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;
             }
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
 
-//        Logout code
+//        Logout code; currently don't have a good place to put the button
 //        // Handle presses on the action bar items
 //        if (item.getItemId() == R.id.miLogout) {
 //            ParseUser.logOutInBackground();

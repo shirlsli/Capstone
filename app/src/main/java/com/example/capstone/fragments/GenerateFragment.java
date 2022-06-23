@@ -1,5 +1,6 @@
 package com.example.capstone.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.capstone.MainActivity;
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
@@ -23,6 +26,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,21 +101,21 @@ public class GenerateFragment extends Fragment {
                 linearLayout.setVisibility(View.VISIBLE);
                 for( int i = 0; i < textArray.length; i++ )
                 {
-                    TextView textView = new TextView(view.getContext());
-                    textView.setText(textArray[i]);
+                    TextView tvTestString = new TextView(view.getContext());
+                    tvTestString.setText(textArray[i]);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     params.setMargins(0,0,0,20);
-                    textView.setLayoutParams(params);
-                    textView.setTextSize(20);
+                    tvTestString.setLayoutParams(params);
+                    tvTestString.setTextSize(20);
                     // if user taps on generated textview, go to next screen
-                    textView.setOnClickListener(new View.OnClickListener() {
+                    tvTestString.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            createPoemLine(textView);
+                            createPoemLine(tvTestString);
 
                         }
                     });
-                    linearLayout.addView(textView);
+                    linearLayout.addView(tvTestString);
                 }
             }
         } else {
@@ -120,10 +125,10 @@ public class GenerateFragment extends Fragment {
         // Calls open ai on inputted word
     }
 
-    public void createPoemLine(TextView textView) {
+    public void createPoemLine(TextView tvTestString) {
         try {
             poemLine = new Line();
-            poemLine.setPoemLine(textView.getText().toString());
+            poemLine.setPoemLine(tvTestString.getText().toString());
             poemLine.setAuthor(ParseUser.getCurrentUser());
             bPublish.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -138,33 +143,39 @@ public class GenerateFragment extends Fragment {
     }
 
     public void savePoemLine() {
-            // if user is the first friend to post poem line, create a new poem
             poemLine.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if (e != null) {
-                        Log.e("line_saved_test", "Poem line has not been saved", e);
+                    if (e == null) {
+                        Log.i("line_saved_test", "Poem line has been saved", e);
+                        createPoem();
                     } else {
-                        Log.i("line_saved_test", "Poem line has been saved!");
+                        Log.e("line_saved_test", "Poem line has not been saved!");
                     }
                 }
             });
-            createPoem();
     }
 
     public void createPoem() {
+        // if user is the first friend to post poem line, create a new poem (for now, just creates a poem everytime)
         Poem poem = new Poem();
-        // else fetch poem created for today and add to that
-        // current issue: poem is null, cannot add to a null object
-        poem.addAuthor(poemLine.getAuthor());
-        poem.setPoemLines(poemLine);
+        // otherwise just update poem
+        poem.updatePoem(poemLine);
+
         poem.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Log.i("poem_creation_test", "Poem created success!");
+                    Toast.makeText(getActivity(), "Your poem line was added to today's poem!",
+                            Toast.LENGTH_LONG).show();
+                    Log.i("after_toast_success", "does this get reached?");
+                    Fragment poemDetailsFragment = new PoemDetailsFragment();
+                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
                 } else {
                     Log.e("poem_creation_test", "Poem created failed :(", e);
+                    Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
