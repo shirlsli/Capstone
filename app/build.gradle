@@ -5,6 +5,9 @@ plugins {
 android {
     compileSdk 32
 
+    def localProperties = new Properties()
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
     defaultConfig {
         applicationId "com.example.capstone"
         minSdk 29
@@ -13,6 +16,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "API_KEY",localProperties['apiKey']
     }
 
     buildTypes {
