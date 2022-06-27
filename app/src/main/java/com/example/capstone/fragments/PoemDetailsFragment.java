@@ -31,8 +31,8 @@ public class PoemDetailsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private LinearLayout poem;
-    private Poem p;
+    private LinearLayout poemLayout;
+    private Poem poem;
 
     public PoemDetailsFragment() {
         // Required empty public constructor
@@ -65,20 +65,20 @@ public class PoemDetailsFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // You are displaying one poem
-        // which is made up of poem lines
-        poem = view.findViewById(R.id.poemLayout);
-        // call poem class aka get today's poem
-        ParseQuery<Poem> query = ParseQuery.getQuery(Poem.class);
+        poemLayout = view.findViewById(R.id.poemLayout);
         // Skeleton: everyone's poem lines get broken into stanzas (one giant poem a day)
         // Stretch: want to query poem containing all of user's friends
         // maybe mark a poem with boolean signifying today?
-
-        // what way to get lines faster? Not the skeleton's problem
-//        for (int i = 0; i < poemLines.size(); i++) {
-//            TextView tvNewLine = new TextView(view.getContext());
-//            tvNewLine.setText(poemLines.get(i).getPoemLine());
-//            poem.addView(tvNewLine);
-//        }
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            poem = bundle.getParcelable("Poem");
+        } else {
+            Log.i("bundle_null", "Bundle is null");
+        }
+        for (int i = 0; i < poem.getPoemLines().size(); i++) {
+            TextView tvNewLine = new TextView(view.getContext());
+            tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
+            poemLayout.addView(tvNewLine);
+        }
     }
 }

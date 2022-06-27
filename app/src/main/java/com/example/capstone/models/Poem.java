@@ -1,5 +1,7 @@
 package com.example.capstone.models;
 
+import android.os.Parcelable;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.parse.ParseClassName;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ParseClassName("Poem")
-public class Poem extends ParseObject {
+public class Poem extends ParseObject implements Parcelable {
 
     public static final String KEY_AUTHORS = "authors";
     public static final String KEY_POEM_LINES = "poemLines";
@@ -28,24 +30,14 @@ public class Poem extends ParseObject {
     }
 
     public List<ParseUser> getAuthors() {
-//        for (int i = 0; i < jsonArray.length(); i++) {
-//            authors.add(fromJson(jsonArray.getJSONObject(i)));
-//        }
-        return authors;
+        return getList(KEY_AUTHORS);
     }
 
     public void addAuthor(ParseUser user) {
-        put(KEY_AUTHORS, user);
+        add(KEY_AUTHORS, user);
     }
 
     public List<Line> getPoemLines() {
-        JSONArray pL = getJSONArray(KEY_POEM_LINES);
-        // very inefficient when scaling
-//        if (pL != null) {
-//            for (int i = 0; i < pL.length(); i++) {
-//                authors.set(i, pL.getLine(i));
-//            }
-//        }
         return getList(KEY_POEM_LINES);
     }
 
@@ -59,7 +51,6 @@ public class Poem extends ParseObject {
     // skeleton: time zone PDT
     // for now, just add it to the end of the poem
     public void updatePoem(Line poemLine) {
-        poemLines.add(poemLine);
-        put(KEY_POEM_LINES, poemLine);
+        add(KEY_POEM_LINES, poemLine);
     }
 }

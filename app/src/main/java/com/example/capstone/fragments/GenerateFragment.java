@@ -160,17 +160,18 @@ public class GenerateFragment extends Fragment {
         // if user is the first friend to post poem line, create a new poem (for now, just creates a poem everytime)
         Poem poem = new Poem();
         // otherwise just update poem
+        poem.addAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(poemLine);
-
         poem.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Log.i("poem_creation_test", "Poem created success!");
                     Toast.makeText(getActivity(), "Your poem line was added to today's poem!",
                             Toast.LENGTH_LONG).show();
-                    Log.i("after_toast_success", "does this get reached?");
                     Fragment poemDetailsFragment = new PoemDetailsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("Poem", poem);
+                    poemDetailsFragment.setArguments(bundle);
                     getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
                 } else {
                     Log.e("poem_creation_test", "Poem created failed :(", e);
