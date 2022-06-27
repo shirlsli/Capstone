@@ -21,6 +21,9 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class PoemDetailsFragment extends Fragment {
@@ -72,13 +75,28 @@ public class PoemDetailsFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             poem = bundle.getParcelable("Poem");
+            TextView tvDate = new TextView(view.getContext());
+            Date date = poem.getCreatedAt();
+            DateFormat df = DateFormat.getDateInstance();
+            String reportDate = df.format(date);
+            tvDate.setText(reportDate);
+            setLayoutFormat(tvDate, 30, 30, 20, 0, 0);
+            poemLayout.addView(tvDate);
+            for (int i = 0; i < poem.getPoemLines().size(); i++) {
+                TextView tvNewLine = new TextView(view.getContext());
+                tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
+                setLayoutFormat(tvNewLine, 20, 40, 20, 0, 0);
+                poemLayout.addView(tvNewLine);
+            }
         } else {
             Log.i("bundle_null", "Bundle is null");
         }
-        for (int i = 0; i < poem.getPoemLines().size(); i++) {
-            TextView tvNewLine = new TextView(view.getContext());
-            tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
-            poemLayout.addView(tvNewLine);
-        }
+    }
+
+    private void setLayoutFormat(TextView textview, int textSize, int left, int top, int right, int bottom) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(left, top, right, bottom);
+        textview.setLayoutParams(params);
+        textview.setTextSize(textSize);
     }
 }

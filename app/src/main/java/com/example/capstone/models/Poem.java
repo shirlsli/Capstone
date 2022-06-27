@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @ParseClassName("Poem")
@@ -20,14 +21,6 @@ public class Poem extends ParseObject implements Parcelable {
 
     public static final String KEY_AUTHORS = "authors";
     public static final String KEY_POEM_LINES = "poemLines";
-
-    private List<ParseUser> authors;
-    private List<Line> poemLines;
-
-    public Poem() {
-        authors = new ArrayList<>();
-        poemLines = new ArrayList<>();
-    }
 
     public List<ParseUser> getAuthors() {
         return getList(KEY_AUTHORS);
