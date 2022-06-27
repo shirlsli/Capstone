@@ -21,6 +21,7 @@ public class Poem extends ParseObject implements Parcelable {
 
     public static final String KEY_AUTHORS = "authors";
     public static final String KEY_POEM_LINES = "poemLines";
+    private String poemString;
 
     public List<ParseUser> getAuthors() {
         return getList(KEY_AUTHORS);
@@ -32,6 +33,14 @@ public class Poem extends ParseObject implements Parcelable {
 
     public List<Line> getPoemLines() {
         return getList(KEY_POEM_LINES);
+    }
+
+    public String getPoemString() {
+        List<Line> poem = getPoemLines();
+        for (int i = 0; i < poem.size(); i++) {
+            poemString += poem.get(i).getPoemLine();
+        }
+        return poemString;
     }
 
     // we want the user to have the ability to edit their poem line

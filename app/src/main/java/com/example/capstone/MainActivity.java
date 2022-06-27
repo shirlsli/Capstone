@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.capstone.fragments.FeedFragment;
 import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.fragments.PoemDetailsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         // two of three fragments currently commented out because they haven't been made yet
-//        final Fragment fragment1 = new FeedFragment();
+        final Fragment feedFragment = new FeedFragment();
         final Fragment generateFragment = new GenerateFragment();
 //        final Fragment fragment3 = new ThirdFragment();
         final Fragment poemDetailsFragment = new PoemDetailsFragment();
@@ -44,17 +45,17 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_feed:
-//                        fragment = fragment1;
+                        fragment = feedFragment;
                         break;
                     case R.id.action_generate:
                         fragment = generateFragment;
                         break;
                     case R.id.action_archive:
-//                        fragment = fragment3;
+                        fragment = generateFragment;
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
-                // Temporary default fragment
-                fragment = generateFragment;
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;
             }
