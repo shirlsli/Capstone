@@ -1,7 +1,6 @@
 package com.example.capstone;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,11 +21,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.fragments.PoemDetailsFragment;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
-import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.SaveCallback;
 
-import org.parceler.Parcels;
+import org.json.JSONArray;
 
 import java.util.List;
 
@@ -91,8 +88,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Uri uri = Uri.parse(profile.getUrl());
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
+
             Poem poem = (Poem) post.getPoem();
-            tvPoem.setText(poem.getPoemString());
+            JSONArray jsonArray = poem.getJSONArray("poemLines");
+            Log.i("jsonArray", "JSONArray: " + jsonArray);
             tvTimeStamp.setText(post.getRelativeTimeAgo(post.getCreatedAt().toString()));
         }
 
@@ -106,6 +105,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Fragment poemDetailsFragment = new PoemDetailsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("Poem", post.getPoem());
+                Log.i("bundle_post_poem", "Parcelled item: " + post.getPoem());
                 poemDetailsFragment.setArguments(bundle);
                 fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
             }

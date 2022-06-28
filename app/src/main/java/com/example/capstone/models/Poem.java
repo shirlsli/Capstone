@@ -1,6 +1,7 @@
 package com.example.capstone.models;
 
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -9,6 +10,8 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -31,17 +34,7 @@ public class Poem extends ParseObject implements Parcelable {
         add(KEY_AUTHORS, user);
     }
 
-    public List<Line> getPoemLines() {
-        return getList(KEY_POEM_LINES);
-    }
-
-    public String getPoemString() {
-        List<Line> poem = getPoemLines();
-        for (int i = 0; i < poem.size(); i++) {
-            poemString += poem.get(i).getPoemLine();
-        }
-        return poemString;
-    }
+    public List<String> getPoemLines() { return getList(KEY_POEM_LINES); }
 
     // we want the user to have the ability to edit their poem line
     // need to save index of poem line in poem somewhere
@@ -52,7 +45,7 @@ public class Poem extends ParseObject implements Parcelable {
     // that means from 12:00 am to 11:59 pm
     // skeleton: time zone PDT
     // for now, just add it to the end of the poem
-    public void updatePoem(Line poemLine) {
+    public void updatePoem(String poemLine) {
         add(KEY_POEM_LINES, poemLine);
     }
 }

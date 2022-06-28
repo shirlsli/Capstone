@@ -69,15 +69,13 @@ public class FeedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rvPosts = view.findViewById(R.id.rvPosts);
-        // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(view.getContext(), allPosts);
 
-        // set the adapter on the recycler view
         rvPosts.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
         rvPosts.setLayoutManager(linearLayoutManager);
-
+        queryPosts();
     }
 
     private void queryPosts() {

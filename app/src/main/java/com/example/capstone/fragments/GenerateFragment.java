@@ -1,6 +1,5 @@
 package com.example.capstone.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,20 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.capstone.MainActivity;
 import com.example.capstone.R;
-import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import org.parceler.Parcels;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GenerateFragment extends Fragment {
 
@@ -43,7 +33,7 @@ public class GenerateFragment extends Fragment {
     private EditText etUserInput;
     private Button bGenerate;
     private LinearLayout linearLayout;
-    private Line poemLine;
+    private String poemLine;
     private Button bPublish;
 
     public GenerateFragment() {
@@ -127,33 +117,18 @@ public class GenerateFragment extends Fragment {
 
     public void createPoemLine(TextView tvTestString) {
         try {
-            poemLine = new Line();
-            poemLine.setPoemLine(tvTestString.getText().toString());
-            poemLine.setAuthor(ParseUser.getCurrentUser());
+            poemLine = "";
+            poemLine += tvTestString.getText().toString();
             bPublish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    savePoemLine();
+                    createPoem();
                 }
             });
-            Log.i("poem_line_creation_test", "poem line creation success! " + poemLine.getPoemLine());
+            Log.i("poem_line_creation_test", "poem line creation success! " + poemLine);
         } catch (Exception exception) {
             Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
         }
-    }
-
-    public void savePoemLine() {
-            poemLine.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        Log.i("line_saved_test", "Poem line has been saved", e);
-                        createPoem();
-                    } else {
-                        Log.e("line_saved_test", "Poem line has not been saved!");
-                    }
-                }
-            });
     }
 
     public void createPoem() {

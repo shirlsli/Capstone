@@ -10,21 +10,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.capstone.R;
-import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
-import com.parse.ParseQuery;
+import com.example.capstone.models.Post;
+import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import org.parceler.Parcels;
+import com.parse.SaveCallback;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class PoemDetailsFragment extends Fragment {
 
@@ -75,22 +74,58 @@ public class PoemDetailsFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             poem = bundle.getParcelable("Poem");
-            TextView tvDate = new TextView(view.getContext());
-            Date date = poem.getCreatedAt();
-            DateFormat df = DateFormat.getDateInstance();
-            String reportDate = df.format(date);
-            tvDate.setText(reportDate);
-            setLayoutFormat(tvDate, 30, 30, 20, 0, 0);
-            poemLayout.addView(tvDate);
+            Log.i("bundle_received_poem", "Parcel received item: " + poem);
+            poemLayout.addView(createDateTextView(view, poem));
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 TextView tvNewLine = new TextView(view.getContext());
-                tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
+                tvNewLine.setText(poem.getPoemLines().get(i));
                 setLayoutFormat(tvNewLine, 20, 40, 20, 0, 0);
                 poemLayout.addView(tvNewLine);
             }
+            Button bPost = new Button(view.getContext());
+            bPost.setText("Post");
+            poemLayout.addView(bPost);
+            bPost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onPostClicked();
+                }
+            });
         } else {
             Log.i("bundle_null", "Bundle is null");
         }
+    }
+
+    private void onPostClicked() {
+        Post post = new Post();
+        post.setPoem(poem);
+        post.setAuthor(ParseUser.getCurrentUser());
+        post.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e("post_saved_failed", "Post has not been saved", e);
+                    Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.i("post_saved_succeed", "Post has been saved!");
+                }
+            }
+        });
+
+        Fragment feedFragment = new FeedFragment();
+        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, feedFragment).commit();
+    }
+
+    private TextView createDateTextView(View view, Poem poem) {
+        TextView tvDate = new TextView(view.getContext());
+        Date date = poem.getCreatedAt();
+        Log.i("poem_created_at", "Created at: " + date);
+        Log.i("poem_in_date", "Poem Created at: " + poem);
+        DateFormat df = DateFormat.getDateInstance();
+        String reportDate = df.format(date);
+        tvDate.setText(reportDate);
+        setLayoutFormat(tvDate, 30, 30, 20, 0, 0);
+        return tvDate;
     }
 
     private void setLayoutFormat(TextView textview, int textSize, int left, int top, int right, int bottom) {
