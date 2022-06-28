@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.capstone.fragments.ArchiveFragment;
 import com.example.capstone.fragments.FeedFragment;
 import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.fragments.PoemDetailsFragment;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         // two of three fragments currently commented out because they haven't been made yet
         final Fragment feedFragment = new FeedFragment();
         final Fragment generateFragment = new GenerateFragment();
-//        final Fragment fragment3 = new ThirdFragment();
+        final Fragment archiveFragment = new ArchiveFragment();
         final Fragment poemDetailsFragment = new PoemDetailsFragment();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                         fragment = generateFragment;
                         break;
                     case R.id.action_archive:
-                        fragment = generateFragment;
+                        fragment = archiveFragment;
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + item.getItemId());
@@ -65,16 +66,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
 
-//        Logout code; currently don't have a good place to put the button
-//        // Handle presses on the action bar items
-//        if (item.getItemId() == R.id.miLogout) {
-//            ParseUser.logOutInBackground();
-//            ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-//            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
-//        return super.onOptionsItemSelected(item);
+
 
 
 }

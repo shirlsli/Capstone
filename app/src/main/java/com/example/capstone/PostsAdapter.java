@@ -88,10 +88,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Uri uri = Uri.parse(profile.getUrl());
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
-
             Poem poem = (Poem) post.getPoem();
-            JSONArray jsonArray = poem.getJSONArray("poemLines");
-            Log.i("jsonArray", "JSONArray: " + jsonArray);
+            Log.i("poem", "Poem: " + poem);
+            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());
             tvTimeStamp.setText(post.getRelativeTimeAgo(post.getCreatedAt().toString()));
         }
 

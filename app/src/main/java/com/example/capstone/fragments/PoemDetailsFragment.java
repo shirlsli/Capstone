@@ -22,6 +22,8 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONException;
+
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -78,6 +80,7 @@ public class PoemDetailsFragment extends Fragment {
             poemLayout.addView(createDateTextView(view, poem));
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 TextView tvNewLine = new TextView(view.getContext());
+                // why does getPoemLines() work here but not in PostsAdapter?
                 tvNewLine.setText(poem.getPoemLines().get(i));
                 setLayoutFormat(tvNewLine, 20, 40, 20, 0, 0);
                 poemLayout.addView(tvNewLine);

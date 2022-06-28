@@ -2,7 +2,6 @@ package com.example.capstone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -16,14 +15,14 @@ import com.example.capstone.fragments.PoemDetailsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.elevation.SurfaceColors;
 
-public class FeedActivity extends AppCompatActivity {
+public class ArchiveActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
+        setContentView(R.layout.activity_archive);
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -56,8 +55,7 @@ public class FeedActivity extends AppCompatActivity {
             }
         });
 
-        bottomNavigationView.setSelectedItemId(R.id.action_feed);
+        bottomNavigationView.setSelectedItemId(R.id.action_archive);
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
-
     }
 }
