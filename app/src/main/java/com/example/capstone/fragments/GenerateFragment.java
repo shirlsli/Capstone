@@ -102,7 +102,6 @@ public class GenerateFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             createPoemLine(tvTestString);
-
                         }
                     });
                     linearLayout.addView(tvTestString);
@@ -119,6 +118,7 @@ public class GenerateFragment extends Fragment {
         try {
             poemLine = "";
             poemLine += tvTestString.getText().toString();
+            etUserInput.setText(tvTestString.getText().toString());
             bPublish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -147,7 +147,7 @@ public class GenerateFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putParcelable("Poem", poem);
                     poemDetailsFragment.setArguments(bundle);
-                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
+                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "generate_poem" ).commit();
                 } else {
                     Log.e("poem_creation_test", "Poem created failed :(", e);
                     Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",

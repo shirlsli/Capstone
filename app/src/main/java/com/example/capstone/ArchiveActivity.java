@@ -50,7 +50,7 @@ public class ArchiveActivity extends AppCompatActivity {
                     default:
                         throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).addToBackStack( "archive_fragment" ).commit();
                 return true;
             }
         });
@@ -58,4 +58,14 @@ public class ArchiveActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.action_archive);
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
+
+    @Override
+    public void onBackPressed() {
+        if (bottomNavigationView.getSelectedItemId () != R.id.action_archive) {
+            bottomNavigationView.setSelectedItemId(R.id.action_archive);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 }

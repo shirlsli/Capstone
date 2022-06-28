@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     default:
                         throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).addToBackStack( "main_fragment" ).commit();
                 return true;
             }
         });
@@ -67,7 +67,13 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        if (bottomNavigationView.getSelectedItemId () != R.id.action_generate) {
+            bottomNavigationView.setSelectedItemId(R.id.action_generate);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
 }

@@ -52,7 +52,7 @@ public class FeedActivity extends AppCompatActivity {
                     default:
                         throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).addToBackStack( "feed_fragment" ).commit();
                 return true;
             }
         });
@@ -60,5 +60,14 @@ public class FeedActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.action_feed);
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (bottomNavigationView.getSelectedItemId () != R.id.action_feed) {
+            bottomNavigationView.setSelectedItemId(R.id.action_feed);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

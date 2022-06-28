@@ -87,7 +87,7 @@ public class ArchiveAdapter extends RecyclerView.Adapter<ArchiveAdapter.ViewHold
                 bundle.putParcelable("Poem", poem);
                 Log.i("bundle_post_poem", "Parcelled item: " + poem);
                 poemDetailsFragment.setArguments(bundle);
-                fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "archive_poem" ).commit();
             }
         }
     }

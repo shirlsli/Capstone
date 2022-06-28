@@ -77,8 +77,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
             Poem poem = (Poem) post.getPoem();
-            Log.i("poem", "Poem: " + poem);
-            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());
+//            Log.i("poem", "Poem: " + poem);
+//            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());
             tvTimeStamp.setText(post.getRelativeTimeAgo(post.getCreatedAt().toString()));
         }
 
@@ -94,7 +94,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 bundle.putParcelable("Poem", post.getPoem());
                 Log.i("bundle_post_poem", "Parcelled item: " + post.getPoem());
                 poemDetailsFragment.setArguments(bundle);
-                fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "feed_poem" ).commit();
             }
         }
     }

@@ -67,6 +67,7 @@ public class PoemDetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_poem_details, container, false);
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         poemLayout = view.findViewById(R.id.poemLayout);
