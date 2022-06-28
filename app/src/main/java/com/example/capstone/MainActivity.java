@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.capstone.fragments.ArchiveFragment;
+//import com.example.capstone.fragments.ArchiveFragment;
 import com.example.capstone.fragments.FeedFragment;
 import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.fragments.PoemDetailsFragment;

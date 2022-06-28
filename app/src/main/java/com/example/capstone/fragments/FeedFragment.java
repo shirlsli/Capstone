@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 
 import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
-import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -68,7 +67,7 @@ public class FeedFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvPosts = view.findViewById(R.id.rvPosts);
+        rvPosts = view.findViewById(R.id.rvPoems);
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(view.getContext(), allPosts);
 
