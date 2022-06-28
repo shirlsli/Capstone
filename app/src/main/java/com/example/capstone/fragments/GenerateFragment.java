@@ -137,6 +137,7 @@ public class GenerateFragment extends Fragment {
         // otherwise just update poem
         poem.addAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(poemLine);
+        etUserInput.setText("");
         poem.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
