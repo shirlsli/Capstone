@@ -86,7 +86,7 @@ public class GenerateFragment extends Fragment {
         if (etUserInput.getText().toString().length() > 0) {
             // skeleton: generate hello world
             String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
-
+            bPublish.setVisibility(View.VISIBLE);
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
                 for( int i = 0; i < textArray.length; i++ )
@@ -110,6 +110,7 @@ public class GenerateFragment extends Fragment {
         } else {
             linearLayout.setVisibility(View.GONE);
             linearLayout.removeAllViews();
+            bPublish.setVisibility(View.GONE);
         }
         // Calls open ai on inputted word
     }
@@ -137,6 +138,7 @@ public class GenerateFragment extends Fragment {
         // otherwise just update poem
         poem.addAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(poemLine);
+//        ParseUser.getCurrentUser().add("archive", poem);
         etUserInput.setText("");
         poem.saveInBackground(new SaveCallback() {
             @Override

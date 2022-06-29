@@ -67,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
 
-    @Override
-    public void onBackPressed() {
-        if (bottomNavigationView.getSelectedItemId () != R.id.action_generate) {
-            bottomNavigationView.setSelectedItemId(R.id.action_generate);
-        } else {
-            super.onBackPressed();
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if (bottomNavigationView.getSelectedItemId () != R.id.action_generate) {
+//            bottomNavigationView.setSelectedItemId(R.id.action_generate);
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
 
 }

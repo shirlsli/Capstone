@@ -62,12 +62,12 @@ public class FeedActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        if (bottomNavigationView.getSelectedItemId () != R.id.action_feed) {
-            bottomNavigationView.setSelectedItemId(R.id.action_feed);
-        } else {
-            super.onBackPressed();
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if (bottomNavigationView.getSelectedItemId () != R.id.action_feed) {
+//            bottomNavigationView.setSelectedItemId(R.id.action_feed);
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
 }

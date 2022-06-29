@@ -45,7 +45,5 @@ public class Poem extends ParseObject implements Parcelable {
     // that means from 12:00 am to 11:59 pm
     // skeleton: time zone PDT
     // for now, just add it to the end of the poem
-    public void updatePoem(String poemLine) {
-        add(KEY_POEM_LINES, poemLine);
-    }
+    public void updatePoem(String poemLine) { add(KEY_POEM_LINES, poemLine); }
 }

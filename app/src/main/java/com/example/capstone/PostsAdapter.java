@@ -23,8 +23,6 @@ import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.ParseFile;
 
-import org.json.JSONArray;
-
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
@@ -77,7 +75,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
             Poem poem = (Poem) post.getPoem();
-//            Log.i("poem", "Poem: " + poem);
+            String poemString = "";
+            for (int i = 0; i < poem.getPoemLines().size(); i++) {
+                poemString = poem.getPoemLines().get(i) + "\n";
+            }
+            tvPoem.setText(poemString);
 //            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());
             tvTimeStamp.setText(post.getRelativeTimeAgo(post.getCreatedAt().toString()));
         }

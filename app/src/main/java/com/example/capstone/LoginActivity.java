@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.capstone.R;
 import android.content.Intent;
 import android.os.Bundle;
+import android.se.omapi.Session;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,10 +13,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.MainActivity;
+import com.example.capstone.models.Post;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseSession;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import java.util.Date;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -74,6 +82,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goMainActivity() {
+        // check if session's createdAt is within the day
+        // if difference between last updatedAt session and current createdAt session is greater than or equal to one day, create new poem
+        // query session with user parameter
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
