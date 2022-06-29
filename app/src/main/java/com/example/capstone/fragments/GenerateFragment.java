@@ -86,7 +86,6 @@ public class GenerateFragment extends Fragment {
         if (etUserInput.getText().toString().length() > 0) {
             // skeleton: generate hello world
             String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
-            bPublish.setVisibility(View.VISIBLE);
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
                 for( int i = 0; i < textArray.length; i++ )
@@ -120,6 +119,7 @@ public class GenerateFragment extends Fragment {
             poemLine = "";
             poemLine += tvTestString.getText().toString();
             etUserInput.setText(tvTestString.getText().toString());
+            bPublish.setVisibility(View.VISIBLE);
             bPublish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
