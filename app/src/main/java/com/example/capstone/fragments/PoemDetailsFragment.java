@@ -37,6 +37,7 @@ public class PoemDetailsFragment extends Fragment {
 
     private LinearLayout poemLayout;
     private Poem poem;
+    private String fromFeed;
 
     public PoemDetailsFragment() {
         // Required empty public constructor
@@ -76,6 +77,7 @@ public class PoemDetailsFragment extends Fragment {
         // maybe mark a poem with boolean signifying today?
         Bundle bundle = getArguments();
         if (bundle != null) {
+            fromFeed = getArguments().getString("fromFeed");
             poem = bundle.getParcelable("Poem");
             Log.i("bundle_received_poem", "Parcel received item: " + poem);
             poemLayout.addView(createDateTextView(view, poem));
@@ -85,15 +87,17 @@ public class PoemDetailsFragment extends Fragment {
                 setLayoutFormat(tvNewLine, 20, 40, 20, 0, 0);
                 poemLayout.addView(tvNewLine);
             }
-            Button bPost = new Button(view.getContext());
-            bPost.setText("Post");
-            poemLayout.addView(bPost);
-            bPost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onPostClicked();
-                }
-            });
+            if (fromFeed == null) {
+                Button bPost = new Button(view.getContext());
+                bPost.setText("Post");
+                poemLayout.addView(bPost);
+                bPost.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onPostClicked();
+                    }
+                });
+            }
         } else {
             Log.i("bundle_null", "Bundle is null");
         }

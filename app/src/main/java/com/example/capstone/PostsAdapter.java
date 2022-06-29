@@ -93,6 +93,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Post post = posts.get(position);
                 Fragment poemDetailsFragment = new PoemDetailsFragment();
                 Bundle bundle = new Bundle();
+                bundle.putString("fromFeed", "Feed");
                 bundle.putParcelable("Poem", post.getPoem());
                 Log.i("bundle_post_poem", "Parcelled item: " + post.getPoem());
                 poemDetailsFragment.setArguments(bundle);
