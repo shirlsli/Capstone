@@ -22,6 +22,8 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.parceler.Parcels;
+
 public class GenerateFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
@@ -134,10 +136,11 @@ public class GenerateFragment extends Fragment {
 
     public void createPoem() {
         // if user is the first friend to post poem line, create a new poem (for now, just creates a poem everytime)
-        Poem poem = new Poem();
         // otherwise just update poem
-        poem.addAuthor(ParseUser.getCurrentUser());
+        Poem poem = Parcels.unwrap(getActivity().getIntent().getParcelableExtra("poem"));
+        Log.i("before_line_update", "Before line update: " + poem.getPoemLines());
         poem.updatePoem(poemLine);
+        Log.i("after_line_update", "After line update: " + poem.getPoemLines());
 //        ParseUser.getCurrentUser().add("archive", poem);
         etUserInput.setText("");
         poem.saveInBackground(new SaveCallback() {

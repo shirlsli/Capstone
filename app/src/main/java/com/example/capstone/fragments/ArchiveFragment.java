@@ -19,7 +19,6 @@ import com.example.capstone.ArchiveAdapter;
 import com.example.capstone.LoginActivity;
 import com.example.capstone.R;
 import com.example.capstone.models.Poem;
-import com.example.capstone.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -35,7 +34,7 @@ public class ArchiveFragment extends Fragment {
 
     private Button bLogout;
     protected ArchiveAdapter adapter;
-    protected List<Poem> allPosts;
+    protected List<Poem> allPoems;
     private RecyclerView rvPoems;
 
     private String mParam1;
@@ -84,8 +83,8 @@ public class ArchiveFragment extends Fragment {
             }
         });
         rvPoems = view.findViewById(R.id.rvPoems);
-        allPosts = new ArrayList<Poem>();
-        adapter = new ArchiveAdapter(view.getContext(), allPosts);
+        allPoems = new ArrayList<Poem>();
+        adapter = new ArchiveAdapter(view.getContext(), allPoems);
 
         rvPoems.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
@@ -96,6 +95,7 @@ public class ArchiveFragment extends Fragment {
     private void queryPosts() {
         ParseQuery<Poem> query = ParseQuery.getQuery(Poem.class);
         query.include(Poem.KEY_AUTHORS);
+        query.whereEqualTo("authors", ParseUser.getCurrentUser());
         query.setLimit(20);
         query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<Poem>() {
@@ -105,7 +105,10 @@ public class ArchiveFragment extends Fragment {
                     Log.e("issue_getting_posts", "Issue with getting posts", e);
                     return;
                 }
-                allPosts.addAll(poems);
+                allPoems.addAll(poems);
+                for (Poem poem : allPoems) { // it works!
+                    Log.i("testing_author", "Author: " + poem.getAuthors());
+                }
 //                rvPosts.smoothScrollToPosition(0);
                 adapter.notifyDataSetChanged();
             }
