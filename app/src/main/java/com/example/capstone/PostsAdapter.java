@@ -77,7 +77,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Poem poem = (Poem) post.getPoem();
             String poemString = "";
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
-                poemString = poem.getPoemLines().get(i) + "\n";
+                poemString += poem.getPoemLines().get(i);
+                poemString += "\n";
             }
             tvPoem.setText(poemString);
 //            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());

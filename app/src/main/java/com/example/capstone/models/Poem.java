@@ -24,7 +24,7 @@ public class Poem extends ParseObject implements Parcelable {
 
     public static final String KEY_AUTHORS = "authors";
     public static final String KEY_POEM_LINES = "poemLines";
-    private String poemString;
+    public static final String KEY_LINE_IDX = "poemLines";
 
     public List<ParseUser> getAuthors() {
         return getList(KEY_AUTHORS);
@@ -41,7 +41,6 @@ public class Poem extends ParseObject implements Parcelable {
     // know for sure that poem line should be the object saving its index
     // having an index would be more runtime efficient than iterating through the poem and finding the line with matching user
     // constant vs linear time (depending on scope of user's friends)
-    // a poem line belongs to a poem when their createdAt and updatedAt dates/times match within 24 hours
     // that means from 12:00 am to 11:59 pm
     // skeleton: time zone PDT
     // for now, just add it to the end of the poem
