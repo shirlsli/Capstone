@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/tvAuthor"
-        android:layout_width="120dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -45,4 +45,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="an hour ago" />
+
+    <Button
+        android:id="@+id/bFriend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/friend"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAuthor"
+        app:layout_constraintEnd_toStartOf="@+id/tvTimeStamp"
+        app:layout_constraintStart_toEndOf="@+id/tvAuthor"
+        app:layout_constraintTop_toTopOf="@+id/tvAuthor"
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

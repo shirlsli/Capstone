@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import com.example.capstone.fragments.PoemDetailsFragment;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -58,6 +60,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView ivProfile;
         private TextView tvAuthor;
         private TextView tvPoem;
+        private Button bFriend;
         private TextView tvTimeStamp;
 
         public ViewHolder(@NonNull View itemView) throws NullPointerException {
@@ -66,6 +69,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivProfile = itemView.findViewById(R.id.ivProfile);
             tvAuthor = itemView.findViewById(R.id.tvAuthor);
             tvPoem = itemView.findViewById(R.id.tvPoem);
+            bFriend = itemView.findViewById(R.id.bFriend);
             tvTimeStamp = itemView.findViewById(R.id.tvTimeStamp);
         }
 
@@ -74,6 +78,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Uri uri = Uri.parse(profile.getUrl());
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
+            if (!post.getAuthor().getUsername().equals(ParseUser.getCurrentUser().getUsername())) {
+                bFriend.setVisibility(View.VISIBLE);
+                bFriend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onFriendClick();
+                    }
+                });
+            }
             Poem poem = (Poem) post.getPoem();
             String poemString = "";
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
@@ -99,6 +112,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Log.i("bundle_post_poem", "Parcelled item: " + post.getPoem());
                 poemDetailsFragment.setArguments(bundle);
                 fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "feed_poem" ).commit();
+            }
+        }
+
+        private void onFriendClick() {
+            int position = getAdapterPosition();
+            FragmentManager fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
+            if (position != RecyclerView.NO_POSITION) {
+                Post post = posts.get(position);
+                ParseUser.getCurrentUser().add("friends", post.getAuthor());
+                Log.i("added_friend_test", "Friend added!" + ParseUser.getCurrentUser().get("friends"));
             }
         }
     }
