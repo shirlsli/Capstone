@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.MainActivity;
+import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.FindCallback;
@@ -26,6 +27,7 @@ import com.parse.SignUpCallback;
 
 import org.parceler.Parcels;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -86,43 +88,27 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goMainActivity() {
-        ParseQuery<ParseSession> lastUserSessions = ParseQuery.getQuery(ParseSession.class);
-        lastUserSessions.whereEqualTo("user", ParseUser.getCurrentUser());
-        lastUserSessions.addDescendingOrder("createdAt");
-        lastUserSessions.setLimit(2);
-        lastUserSessions.findInBackground(new FindCallback<ParseSession>() {
+        ParseQuery<Poem> poemQuery = ParseQuery.getQuery(Poem.class);
+        poemQuery.include(Poem.KEY_AUTHORS);
+        poemQuery.include(Poem.KEY_POEM_LINES);
+        poemQuery.include("createdAt");
+        poemQuery.whereEqualTo("authors", ParseUser.getCurrentUser());
+        poemQuery.addDescendingOrder("createdAt");
+        poemQuery.setLimit(1);
+        poemQuery.findInBackground(new FindCallback<Poem>() {
             @Override
-            public void done(List<ParseSession> lastUserSessions, ParseException e) {
+            public void done(List<Poem> todayPoem, ParseException e) {
                 if (e != null) {
-                    Log.e("fetch_session_fail", "Issue with getting last user session", e);
+                    Log.e("poem_not_fetched", "Issue with getting today's poem", e);
                 } else {
-                    Log.i("fetch_session_succeed", "Succeeded getting last user session");
-                    ParseSession curUserSession = lastUserSessions.get(0);
-                    // error handling: this may be user's first session
-                    if (lastUserSessions.size() > 1) {
-                        ParseSession lastUserSession = lastUserSessions.get(1);
-                        if (sameDay(curUserSession.getCreatedAt(), lastUserSession.getUpdatedAt())) {
-                            ParseQuery<Poem> poemQuery = ParseQuery.getQuery(Poem.class);
-                            poemQuery.include(Poem.KEY_AUTHORS);
-                            poemQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                            poemQuery.addDescendingOrder("createdAt");
-                            poemQuery.setLimit(1);
-                            poemQuery.findInBackground(new FindCallback<Poem>() {
-                                @Override
-                                public void done(List<Poem> todayPoem, ParseException e) {
-                                    if (e != null) {
-                                        Log.e("poem_not_fetched", "Issue with getting today's poem", e);
-                                    } else {
-                                        poem = todayPoem.get(0);
-                                        Log.i("poem_when_login", "Poem when log in: " + poem);
-                                    }
-                                }
-                            });
-                        }
+                    Date currentTime = Calendar.getInstance().getTime();
+                    if (todayPoem.size() > 0 && sameDay(todayPoem.get(0).getCreatedAt(), currentTime)) {
+                        poem = todayPoem.get(0);
                     } else {
                         poem = new Poem();
                         poem.addAuthor(ParseUser.getCurrentUser());
                     }
+                    Log.i("poem_when_login", "Poem when log in: " + poem);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("poem", Parcels.wrap(poem));
                     startActivity(intent);

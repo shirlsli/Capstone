@@ -141,7 +141,6 @@ public class GenerateFragment extends Fragment {
         Log.i("before_line_update", "Before line update: " + poem.getPoemLines());
         poem.updatePoem(poemLine);
         Log.i("after_line_update", "After line update: " + poem.getPoemLines());
-//        ParseUser.getCurrentUser().add("archive", poem);
         etUserInput.setText("");
         poem.saveInBackground(new SaveCallback() {
             @Override
