@@ -162,9 +162,26 @@ public class GenerateFragment extends Fragment {
                 poemLineQuery.include(Line.KEY_POEM_LINE);
                 poemLineQuery.findInBackground(new FindCallback<Line>() {
                     @Override
-                    public void done(List<Line> objects, ParseException e) {
+                    public void done(List<Line> friendLines, ParseException e) {
                         if (e != null) {
-                            Log.i("tag", objects.toString());
+                            Log.e("tag", friendLines.toString(), e);
+                        } else {
+                            Poem poem = new Poem();
+                            poemLine.setAuthor(ParseUser.getCurrentUser());
+                            poem.addAuthor(ParseUser.getCurrentUser());
+                            poem.updatePoem(poemLine);
+                            tvPrompt.setVisibility(View.VISIBLE);
+                            bGenerate.setVisibility(View.GONE);
+                            bPublish.setVisibility(View.GONE);
+                            linearLayout.removeAllViews();
+                            if (friendLines.size() > 0) {
+                                addFriendLines(friendLines, poem);
+                            } else {
+                                TextView tvNoFriends = new TextView(getContext());
+                                tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
+                                tvNoFriends.setTextSize(20);
+                                linearLayout.addView(tvNoFriends);
+                            }
                         }
                     }
                 });
@@ -172,14 +189,7 @@ public class GenerateFragment extends Fragment {
             }
         });
 
-
         /*
-        Poem poem = new Poem();
-        poemLine.setAuthor(ParseUser.getCurrentUser());
-        poem.addAuthor(ParseUser.getCurrentUser());
-        poem.updatePoem(poemLine);
-        tvPrompt.setVisibility(View.VISIBLE);
-        bGenerate.setVisibility(View.GONE);
         // replace text strings with poem lines obtained from Parse
         // ParseQuery Poem Line class with whereEqualTo ParseUsers in currentUser’s friend array
 
@@ -187,8 +197,6 @@ public class GenerateFragment extends Fragment {
 
         if (p != null) {
 
-            List<Line> friendLines = poemLineQuery.find();
-            Log.i("lines_test", "Poem lines queried: " + friendLines);
             for (int i = 0; i < friendLines.size(); i++) {
                 Line friendLine = new Line();
                 friendLine.setAuthor(friendLines.get(i).getAuthor());
@@ -236,6 +244,28 @@ public class GenerateFragment extends Fragment {
 
 
          */
+    }
+
+    private void addFriendLines(List<Line> friendLines, Poem poem) {
+        for (int i = 0; i < friendLines.size(); i++) {
+            Line friendLine = new Line();
+            friendLine.setAuthor(friendLines.get(i).getAuthor());
+            friendLine.setPoemLine(friendLines.get(i).getPoemLine());
+            TextView tvTestString = new TextView(getContext());
+            tvTestString.setText(friendLine.getPoemLine());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0,0,0,20);
+            tvTestString.setLayoutParams(params);
+            tvTestString.setTextSize(20);
+            tvTestString.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tvTestString.setTextColor(getResources().getColor(R.color.gray));
+                    selectFriendLine(friendLine, poem);
+                }
+            });
+            linearLayout.addView(tvTestString);
+        }
     }
 
     private void selectFriendLine(Line friendLine, Poem poem) {
