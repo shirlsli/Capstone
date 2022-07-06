@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,11 +40,11 @@ public class GenerateFragment extends Fragment {
     private String mParam2;
 
     private EditText etUserInput;
-    private Button bGenerate;
     private LinearLayout linearLayout;
     private Line poemLine;
     private Button bPublish;
     private TextView tvPrompt;
+    private ImageView ivForwardArrow;
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -78,11 +79,12 @@ public class GenerateFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         etUserInput = view.findViewById(R.id.etUserInput);
-        bGenerate = view.findViewById(R.id.bGenerate);
+        etUserInput.setVisibility(View.VISIBLE);
         linearLayout = view.findViewById(R.id.linearLayout);
         bPublish = view.findViewById(R.id.bPublish);
         tvPrompt = view.findViewById(R.id.tvPrompt);
-        bGenerate.setOnClickListener(new View.OnClickListener() {
+        ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
+        ivForwardArrow.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
             @Override
             public void onClick(View v) {
@@ -129,11 +131,12 @@ public class GenerateFragment extends Fragment {
             poemLine = new Line();
             poemLine.setPoemLine(tvTestString.getText().toString());
             etUserInput.setText(tvTestString.getText().toString());
-            bPublish.setVisibility(View.VISIBLE);
-            bPublish.setOnClickListener(new View.OnClickListener() {
+            ivForwardArrow.setVisibility(View.VISIBLE);
+            ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
+                        // need to check if on add your friends' poem lines screen
                         createPoem();
                     } catch (ParseException e) {
                         Log.e("create_poem_error", "ParseException", e);
@@ -155,37 +158,41 @@ public class GenerateFragment extends Fragment {
             @Override
             public void done(List<User> objects, ParseException e) {
                 ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
-                poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
-                poemLineQuery.setLimit(5);
-                poemLineQuery.addDescendingOrder("createdAt");
-                poemLineQuery.include(Line.KEY_AUTHOR);
-                poemLineQuery.include(Line.KEY_POEM_LINE);
-                poemLineQuery.findInBackground(new FindCallback<Line>() {
-                    @Override
-                    public void done(List<Line> friendLines, ParseException e) {
-                        if (e != null) {
-                            Log.e("tag", friendLines.toString(), e);
-                        } else {
-                            Poem poem = new Poem();
-                            poemLine.setAuthor(ParseUser.getCurrentUser());
-                            poem.addAuthor(ParseUser.getCurrentUser());
-                            poem.updatePoem(poemLine);
-                            tvPrompt.setVisibility(View.VISIBLE);
-                            bGenerate.setVisibility(View.GONE);
-                            bPublish.setVisibility(View.GONE);
-                            linearLayout.removeAllViews();
-                            if (friendLines.size() > 0) {
-                                addFriendLines(friendLines, poem);
+                linearLayout.removeAllViews();
+                Poem poem = new Poem();
+                poemLine.setAuthor(ParseUser.getCurrentUser());
+                poem.addAuthor(ParseUser.getCurrentUser());
+                if (objects.get(0).getFriends() != null) {
+                    poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
+                    poemLineQuery.setLimit(5);
+                    poemLineQuery.addDescendingOrder("createdAt");
+                    poemLineQuery.include(Line.KEY_AUTHOR);
+                    poemLineQuery.include(Line.KEY_POEM_LINE);
+                    poemLineQuery.findInBackground(new FindCallback<Line>() {
+                        @Override
+                        public void done(List<Line> friendLines, ParseException e) {
+                            if (e != null) {
+                                Log.e("tag", friendLines.toString(), e);
                             } else {
-                                TextView tvNoFriends = new TextView(getContext());
-                                tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
-                                tvNoFriends.setTextSize(20);
-                                linearLayout.addView(tvNoFriends);
+                                poem.updatePoem(poemLine);
+                                tvPrompt.setVisibility(View.VISIBLE);
+                                bPublish.setVisibility(View.GONE);
+                                addFriendLines(friendLines, poem);
                             }
                         }
+                    });
+                } else {
+                    TextView tvNoFriends = new TextView(getContext());
+                    tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
+                    tvNoFriends.setTextSize(20);
+                    linearLayout.addView(tvNoFriends);
+                }
+                ivForwardArrow.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        poemConfirmScreen(poem);
                     }
                 });
-
             }
         });
 
@@ -246,6 +253,46 @@ public class GenerateFragment extends Fragment {
          */
     }
 
+    private void poemConfirmScreen(Poem poem) {
+        // change add friends' poem lines textview to contain text: Are you done creating your poem?
+        tvPrompt.setText("Are you done creating your poem?");
+        // remove linearlayout's textviews with one new textview (textview content: etUserInput text)
+        TextView tvPoem = new TextView(getContext());
+        tvPoem.setText(etUserInput.getText());
+        linearLayout.removeAllViews();
+        linearLayout.addView(tvPoem);
+        // set publish visibility to visible
+        bPublish.setVisibility(View.VISIBLE);
+        bPublish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                poem.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(getActivity(), "Your poem line was added to today's poem!",
+                                    Toast.LENGTH_LONG).show();
+                            Fragment poemDetailsFragment = new PoemDetailsFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable("Poem", poem);
+                            poemDetailsFragment.setArguments(bundle);
+                            getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "generate_poem" ).commit();
+                        } else {
+                            Log.e("poem_creation_test", "Poem created failed :(", e);
+                            Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
+        // set forward arrow visibility to gone
+        ivForwardArrow.setVisibility(View.GONE);
+        // set editext to gone? would need to set it to visible every time
+        etUserInput.setText("");
+        etUserInput.setVisibility(View.GONE);
+    }
+
     private void addFriendLines(List<Line> friendLines, Poem poem) {
         for (int i = 0; i < friendLines.size(); i++) {
             Line friendLine = new Line();
@@ -254,7 +301,7 @@ public class GenerateFragment extends Fragment {
             TextView tvTestString = new TextView(getContext());
             tvTestString.setText(friendLine.getPoemLine());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0,0,0,20);
+            params.setMargins(16,0,0,20);
             tvTestString.setLayoutParams(params);
             tvTestString.setTextSize(20);
             tvTestString.setOnClickListener(new View.OnClickListener() {
