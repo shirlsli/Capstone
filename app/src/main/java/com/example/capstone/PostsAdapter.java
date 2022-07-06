@@ -20,9 +20,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.fragments.PoemDetailsFragment;
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -90,7 +92,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Poem poem = (Poem) post.getPoem();
             String poemString = "";
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
-                poemString += poem.getPoemLines().get(i);
+                poemString += poem.getPoemLines().get(i).getPoemLine();
                 poemString += "\n";
             }
             tvPoem.setText(poemString);

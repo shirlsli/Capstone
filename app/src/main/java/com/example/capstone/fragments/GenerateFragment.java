@@ -17,12 +17,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.R;
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
+import com.example.capstone.models.User;
+import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
+
+import java.util.List;
 
 public class GenerateFragment extends Fragment {
 
@@ -35,8 +41,9 @@ public class GenerateFragment extends Fragment {
     private EditText etUserInput;
     private Button bGenerate;
     private LinearLayout linearLayout;
-    private String poemLine;
+    private Line poemLine;
     private Button bPublish;
+    private TextView tvPrompt;
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -74,7 +81,7 @@ public class GenerateFragment extends Fragment {
         bGenerate = view.findViewById(R.id.bGenerate);
         linearLayout = view.findViewById(R.id.linearLayout);
         bPublish = view.findViewById(R.id.bPublish);
-
+        tvPrompt = view.findViewById(R.id.tvPrompt);
         bGenerate.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
             @Override
@@ -102,6 +109,7 @@ public class GenerateFragment extends Fragment {
                     tvTestString.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            tvTestString.setTextColor(getResources().getColor(R.color.gray));
                             createPoemLine(tvTestString);
                         }
                     });
@@ -118,14 +126,18 @@ public class GenerateFragment extends Fragment {
 
     public void createPoemLine(TextView tvTestString) {
         try {
-            poemLine = "";
-            poemLine += tvTestString.getText().toString();
+            poemLine = new Line();
+            poemLine.setPoemLine(tvTestString.getText().toString());
             etUserInput.setText(tvTestString.getText().toString());
             bPublish.setVisibility(View.VISIBLE);
             bPublish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    createPoem();
+                    try {
+                        createPoem();
+                    } catch (ParseException e) {
+                        Log.e("create_poem_error", "ParseException", e);
+                    }
                 }
             });
             Log.i("poem_line_creation_test", "poem line creation success! " + poemLine);
@@ -134,14 +146,75 @@ public class GenerateFragment extends Fragment {
         }
     }
 
-    public void createPoem() {
-        // if user is the first friend to post poem line, create a new poem (for now, just creates a poem everytime)
-        // otherwise just update poem
-        Poem poem = Parcels.unwrap(getActivity().getIntent().getParcelableExtra("poem"));
-        Log.i("before_line_update", "Before line update: " + poem.getPoemLines());
+    public void createPoem() throws ParseException {
+        // brand new query for the current user
+        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+        currentUserQuery.include(User.KEY_FRIENDS); // TODO: see if we can remove this?
+        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        currentUserQuery.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> objects, ParseException e) {
+                ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
+                poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
+                poemLineQuery.setLimit(5);
+                poemLineQuery.addDescendingOrder("createdAt");
+                poemLineQuery.include(Line.KEY_AUTHOR);
+                poemLineQuery.include(Line.KEY_POEM_LINE);
+                poemLineQuery.findInBackground(new FindCallback<Line>() {
+                    @Override
+                    public void done(List<Line> objects, ParseException e) {
+                        if (e != null) {
+                            Log.i("tag", objects.toString());
+                        }
+                    }
+                });
+
+            }
+        });
+
+
+        /*
+        Poem poem = new Poem();
+        poemLine.setAuthor(ParseUser.getCurrentUser());
+        poem.addAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(poemLine);
-        Log.i("after_line_update", "After line update: " + poem.getPoemLines());
-        etUserInput.setText("");
+        tvPrompt.setVisibility(View.VISIBLE);
+        bGenerate.setVisibility(View.GONE);
+        // replace text strings with poem lines obtained from Parse
+        // ParseQuery Poem Line class with whereEqualTo ParseUsers in currentUser’s friend array
+
+
+
+        if (p != null) {
+
+            List<Line> friendLines = poemLineQuery.find();
+            Log.i("lines_test", "Poem lines queried: " + friendLines);
+            for (int i = 0; i < friendLines.size(); i++) {
+                Line friendLine = new Line();
+                friendLine.setAuthor(friendLines.get(i).getAuthor());
+                friendLine.setPoemLine(friendLines.get(i).getPoemLine());
+                TextView tvTestString = new TextView(getContext());
+                tvTestString.setText(friendLine.getPoemLine());
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0,0,0,20);
+                tvTestString.setLayoutParams(params);
+                tvTestString.setTextSize(20);
+                tvTestString.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
+                        selectFriendLine(friendLine, poem);
+                    }
+                });
+                linearLayout.addView(tvTestString);
+            }
+        } else {
+            TextView tvNoFriends = new TextView(getContext());
+            tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
+            tvNoFriends.setTextSize(20);
+            linearLayout.removeAllViews();
+            linearLayout.addView(tvNoFriends);
+        }
         poem.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -160,6 +233,15 @@ public class GenerateFragment extends Fragment {
                 }
             }
         });
+
+
+         */
+    }
+
+    private void selectFriendLine(Line friendLine, Poem poem) {
+        poem.updatePoem(friendLine);
+        String curPoem = etUserInput.getText().toString() + "\n" + friendLine.getPoemLine();
+        etUserInput.setText(curPoem);
     }
 
 }

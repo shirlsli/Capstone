@@ -19,9 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.fragments.PoemDetailsFragment;
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -72,7 +74,7 @@ public class ArchiveAdapter extends RecyclerView.Adapter<ArchiveAdapter.ViewHold
             DateFormat df = DateFormat.getDateInstance();
             String reportDate = df.format(date);
             tvDate.setText(reportDate);
-            tvPoemPreview.setText(poem.getPoemLines().get(0));
+            tvPoemPreview.setText(poem.getPoemLines().get(0).getPoemLine());
         }
 
         @Override

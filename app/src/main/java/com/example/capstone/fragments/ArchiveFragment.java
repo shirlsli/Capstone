@@ -18,6 +18,7 @@ import android.widget.Button;
 import com.example.capstone.ArchiveAdapter;
 import com.example.capstone.LoginActivity;
 import com.example.capstone.R;
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -95,6 +96,7 @@ public class ArchiveFragment extends Fragment {
     private void queryPosts() {
         ParseQuery<Poem> query = ParseQuery.getQuery(Poem.class);
         query.include(Poem.KEY_AUTHORS);
+        query.include(Poem.KEY_POEM_LINES);
         query.whereEqualTo("authors", ParseUser.getCurrentUser());
         query.setLimit(20);
         query.addDescendingOrder("createdAt");

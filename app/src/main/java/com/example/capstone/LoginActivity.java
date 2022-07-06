@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button bLogin;
     private Button bSignup;
     private TextView tvIncorrect;
-    private Poem poem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,40 +87,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goMainActivity() {
-        ParseQuery<Poem> poemQuery = ParseQuery.getQuery(Poem.class);
-        poemQuery.include(Poem.KEY_AUTHORS);
-        poemQuery.include(Poem.KEY_POEM_LINES);
-        poemQuery.include("createdAt");
-        poemQuery.whereEqualTo("authors", ParseUser.getCurrentUser());
-        poemQuery.addDescendingOrder("createdAt");
-        poemQuery.setLimit(1);
-        poemQuery.findInBackground(new FindCallback<Poem>() {
-            @Override
-            public void done(List<Poem> todayPoem, ParseException e) {
-                if (e != null) {
-                    Log.e("poem_not_fetched", "Issue with getting today's poem", e);
-                } else {
-                    Date currentTime = Calendar.getInstance().getTime();
-                    if (todayPoem.size() > 0 && sameDay(todayPoem.get(0).getCreatedAt(), currentTime)) {
-                        poem = todayPoem.get(0);
-                    } else {
-                        poem = new Poem();
-                        poem.addAuthor(ParseUser.getCurrentUser());
-                    }
-                    Log.i("poem_when_login", "Poem when log in: " + poem);
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("poem", Parcels.wrap(poem));
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
-    }
-
-    private boolean sameDay(Date d1, Date d2) {
-        return d1.getDate() == d2.getDate() &&
-                d1.getMonth() == d2.getMonth() &&
-                d1.getYear() == d2.getYear();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

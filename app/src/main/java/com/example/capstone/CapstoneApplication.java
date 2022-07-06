@@ -1,7 +1,9 @@
 package com.example.capstone;
 
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.example.capstone.models.User;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -15,6 +17,8 @@ public class CapstoneApplication extends Application {
         super.onCreate();
 
         // Register your parse models
+        ParseObject.registerSubclass(User.class);
+        ParseObject.registerSubclass(Line.class);
         ParseObject.registerSubclass(Poem.class);
         ParseObject.registerSubclass(Post.class);
 

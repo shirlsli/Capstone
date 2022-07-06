@@ -26,7 +26,7 @@ public class Post extends ParseObject {
 
     public void setAuthor(ParseUser user) { put(KEY_AUTHOR, user); }
 
-    public ParseObject getPoem() { return getParseObject(KEY_POEM); }
+    public Poem getPoem() { return (Poem) getParseObject(KEY_POEM); }
 
     public void setPoem(Poem poem) { put(KEY_POEM, poem); }
 
