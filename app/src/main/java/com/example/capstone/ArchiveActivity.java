@@ -2,10 +2,13 @@ package com.example.capstone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.capstone.fragments.ArchiveFragment;
@@ -14,6 +17,7 @@ import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.fragments.PoemDetailsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.elevation.SurfaceColors;
+import com.parse.ParseUser;
 
 public class ArchiveActivity extends AppCompatActivity {
 
@@ -41,9 +45,13 @@ public class ArchiveActivity extends AppCompatActivity {
                     case R.id.action_feed:
                         fragment = feedFragment;
                         break;
-                    case R.id.action_generate:
-                        fragment = generateFragment;
-                        break;
+//                    case R.id.action_generate:
+//                        fragment = archiveFragment;
+//                        ParseUser.logOutInBackground();
+//                        ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+//                        Intent intent = new Intent(ArchiveActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+//                        break;
                     case R.id.action_archive:
                         fragment = archiveFragment;
                         break;

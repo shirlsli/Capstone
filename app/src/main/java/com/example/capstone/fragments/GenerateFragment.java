@@ -27,8 +27,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 
 public class GenerateFragment extends Fragment {
@@ -94,6 +92,7 @@ public class GenerateFragment extends Fragment {
     }
 
     public void generatePrompts(View view) {
+//        openAI();
         if (etUserInput.getText().toString().length() > 0) {
             // skeleton: generate hello world
             String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
@@ -162,7 +161,7 @@ public class GenerateFragment extends Fragment {
                 Poem poem = new Poem();
                 poemLine.setAuthor(ParseUser.getCurrentUser());
                 poem.addAuthor(ParseUser.getCurrentUser());
-                if (objects.get(0).getFriends() != null) {
+                if (objects != null && objects.get(0).getFriends() != null) {
                     poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
                     poemLineQuery.setLimit(5);
                     poemLineQuery.addDescendingOrder("createdAt");
@@ -183,9 +182,10 @@ public class GenerateFragment extends Fragment {
                     });
                 } else {
                     TextView tvNoFriends = new TextView(getContext());
-                    tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
+                    tvNoFriends.setText("It seems like you have no friends to create poems with. Here's some poem lines from us to inspire you!");
                     tvNoFriends.setTextSize(20);
                     linearLayout.addView(tvNoFriends);
+                    // make a method that generates TextViews into a list to add to linearLayout
                 }
                 ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -195,63 +195,8 @@ public class GenerateFragment extends Fragment {
                 });
             }
         });
-
-        /*
-        // replace text strings with poem lines obtained from Parse
-        // ParseQuery Poem Line class with whereEqualTo ParseUsers in currentUser’s friend array
-
-
-
-        if (p != null) {
-
-            for (int i = 0; i < friendLines.size(); i++) {
-                Line friendLine = new Line();
-                friendLine.setAuthor(friendLines.get(i).getAuthor());
-                friendLine.setPoemLine(friendLines.get(i).getPoemLine());
-                TextView tvTestString = new TextView(getContext());
-                tvTestString.setText(friendLine.getPoemLine());
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(0,0,0,20);
-                tvTestString.setLayoutParams(params);
-                tvTestString.setTextSize(20);
-                tvTestString.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                        selectFriendLine(friendLine, poem);
-                    }
-                });
-                linearLayout.addView(tvTestString);
-            }
-        } else {
-            TextView tvNoFriends = new TextView(getContext());
-            tvNoFriends.setText("It seems like you have no friends to create poems with. :(");
-            tvNoFriends.setTextSize(20);
-            linearLayout.removeAllViews();
-            linearLayout.addView(tvNoFriends);
-        }
-        poem.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Toast.makeText(getActivity(), "Your poem line was added to today's poem!",
-                            Toast.LENGTH_LONG).show();
-                    Fragment poemDetailsFragment = new PoemDetailsFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("Poem", poem);
-                    poemDetailsFragment.setArguments(bundle);
-                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "generate_poem" ).commit();
-                } else {
-                    Log.e("poem_creation_test", "Poem created failed :(", e);
-                    Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
-         */
     }
+
 
     private void poemConfirmScreen(Poem poem) {
         // change add friends' poem lines textview to contain text: Are you done creating your poem?
@@ -319,6 +264,16 @@ public class GenerateFragment extends Fragment {
         poem.updatePoem(friendLine);
         String curPoem = etUserInput.getText().toString() + "\n" + friendLine.getPoemLine();
         etUserInput.setText(curPoem);
+    }
+
+    public void openAI() {
+        // "${OPENAI_API_KEY}"
+//        OpenAiService service = new OpenAiService("${OPENAI_API_KEY}");
+//        CompletionRequest completionRequest = CompletionRequest.builder()
+//                .prompt("Somebody once told me the world is gonna roll me")
+//                .echo(true)
+//                .build();
+//        service.createCompletion("ada", completionRequest).getChoices().forEach(System.out::println);
     }
 
 }

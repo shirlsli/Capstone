@@ -6,7 +6,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.example.capstone.fragments.ArchiveFragment;
@@ -16,6 +18,7 @@ import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.fragments.PoemDetailsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.elevation.SurfaceColors;
+import com.parse.ParseUser;
 
 public class FeedActivity extends AppCompatActivity {
 
@@ -43,9 +46,13 @@ public class FeedActivity extends AppCompatActivity {
                     case R.id.action_feed:
                         fragment = feedFragment;
                         break;
-                    case R.id.action_generate:
-                        fragment = generateFragment;
-                        break;
+//                    case R.id.action_generate:
+//                        fragment = feedFragment;
+//                        ParseUser.logOutInBackground();
+//                        ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+//                        Intent intent = new Intent(FeedActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+//                        break;
                     case R.id.action_archive:
                         fragment = archiveFragment;
                         break;

@@ -49,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_feed:
                         fragment = feedFragment;
                         break;
-                    case R.id.action_generate:
-                        fragment = generateFragment;
-                        break;
+//                    case R.id.action_generate:
+//                        fragment = generateFragment;
+//                        break;
                     case R.id.action_archive:
                         fragment = archiveFragment;
                         break;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        bottomNavigationView.setSelectedItemId(R.id.action_generate);
+//        bottomNavigationView.setSelectedItemId(R.id.action_generate);
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
 

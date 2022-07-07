@@ -14,4 +14,6 @@
     <string name="publish">Publish</string>
     <string name="friend">Friend</string>
     <string name="add_your_friends_poem_lines_to_your_poem">Add your friends\' poem lines to your poem</string>
+    <string name="logoutIcon">Logout</string>
+    <string name="my_poems">My Poems</string>
 </resources>

@@ -80,7 +80,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Uri uri = Uri.parse(profile.getUrl());
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
-            if (!post.getAuthor().getUsername().equals(ParseUser.getCurrentUser().getUsername())) {
+            if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                Log.i("parseuser_test", ParseUser.getCurrentUser().getObjectId());
                 bFriend.setVisibility(View.VISIBLE);
                 bFriend.setOnClickListener(new View.OnClickListener() {
                     @Override

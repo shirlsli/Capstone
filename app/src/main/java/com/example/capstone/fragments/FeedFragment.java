@@ -18,6 +18,7 @@ import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -38,6 +39,7 @@ public class FeedFragment extends Fragment {
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
     private RecyclerView rvPosts;
+    private FloatingActionButton fabGenerate;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -74,6 +76,16 @@ public class FeedFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPoems);
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(view.getContext(), allPosts);
+        fabGenerate = view.findViewById(R.id.fabGenerate);
+        fabGenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment generateFragment = new GenerateFragment();
+                Bundle bundle = new Bundle();
+                generateFragment.setArguments(bundle);
+                getParentFragmentManager().beginTransaction().replace(R.id.flContainer, generateFragment).addToBackStack( "generate_poem" ).commit();
+            }
+        });
 
         rvPosts.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());

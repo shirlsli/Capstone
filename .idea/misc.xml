@@ -4,19 +4,20 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_forward_arrow.xml" value="0.312" />
-        <entry key="app/src/main/res/layout/activity_archive.xml" value="0.335" />
-        <entry key="app/src/main/res/layout/activity_feed.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/activity_archive.xml" value="0.2520775623268698" />
+        <entry key="app/src/main/res/layout/activity_feed.xml" value="0.19374237060546878" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_login2.xml" value="0.34057971014492755" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.21175231933593752" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/fileprovider.xml" value="0.32971014492753625" />
         <entry key="app/src/main/res/layout/fragment_archive.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_feed.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/fragment_feed.xml" value="0.2548476454293629" />
         <entry key="app/src/main/res/layout/fragment_generate.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_poem_details.xml" value="0.22135416666666666" />
         <entry key="app/src/main/res/layout/item_poem.xml" value="0.29393115942028986" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.335" />
-        <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.16010589599609376" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.335" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.335" />
       </map>
