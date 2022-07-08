@@ -98,9 +98,9 @@ public class GenerateFragment extends Fragment {
     }
 
     public void generatePrompts(View view) {
-        OpenAIThread openAIThread = new OpenAIThread("sunshine");
-        openAIThread.start();
         if (etUserInput.getText().toString().length() > 0) {
+            OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
+            openAIThread.start();
             // skeleton: generate hello world
             String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
             if (linearLayout.getVisibility() != View.VISIBLE) {
