@@ -2,6 +2,7 @@ package com.example.capstone.models;
 
 import android.util.Log;
 
+import com.example.capstone.BuildConfig;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
@@ -13,22 +14,21 @@ import java.util.List;
 public class OpenAIThread extends Thread {
     // probably want to make a constructor holding the conditions needed for poem line generation
     private String prompt;
-    private ArrayList<String> generatedLines;
+    private String[] generatedLines;
+    private String[] splitLines;
 
     public OpenAIThread(String prompt) {
         this.prompt = prompt;
-        generatedLines = new ArrayList<>();
+        generatedLines = new String[1];
     }
 
-    public ArrayList<String> getGeneratedLines() {
-        return generatedLines;
+    public String[] getGeneratedLines() {
+        return splitLines;
     }
 
     @Override
     public void run() {
-        // "${OPENAI_API_KEY}"
-        // tested not using api key string as token and it got an error :(
-        OpenAiService service = new OpenAiService("");
+        OpenAiService service = new OpenAiService(BuildConfig.OPENAI_API_KEY);
 
         System.out.println("\nGetting da vinci engine...");
         Engine davinci = service.getEngine("text-davinci-002");
@@ -44,9 +44,11 @@ public class OpenAIThread extends Thread {
                 .presencePenalty(0.0)
                 .build();
         List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();
-        for (int i = 0; i < choices.size(); i++) {
-            generatedLines.add(choices.get(i).toString());
-            Log.i("openai_poem_lines_test", generatedLines.get(i));
+        generatedLines[0] = choices.get(0).toString();
+        splitLines = generatedLines[0].split("\n");
+        Log.i("openai_poem_lines_test", generatedLines[0]);
+        for (int i = 0; i < splitLines.length; i++) {
+            Log.i("splitLines_test", splitLines[i]);
         }
     }
 }

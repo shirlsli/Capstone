@@ -103,13 +103,13 @@ public class GenerateFragment extends Fragment {
             OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
             openAIThread.start();
             // skeleton: generate hello world
-            ArrayList<String> generatedLines = openAIThread.getGeneratedLines();
+            String[] generatedLines = openAIThread.getGeneratedLines();
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
-                for( int i = 0; i < generatedLines.size(); i++ )
+                for( int i = 2; i < generatedLines.length; i++ )
                 {
                     TextView tvTestString = new TextView(view.getContext());
-                    tvTestString.setText(generatedLines.get(i));
+                    tvTestString.setText(generatedLines[i]);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     params.setMargins(0,0,0,20);
                     tvTestString.setLayoutParams(params);
