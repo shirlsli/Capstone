@@ -16,4 +16,6 @@
     <string name="add_your_friends_poem_lines_to_your_poem">Add your friends\' poem lines to your poem</string>
     <string name="logoutIcon">Logout</string>
     <string name="my_poems">My Poems</string>
+    <string name="noFriendsPrompt">It seems like you have no friends to create poems with. Here\'s some poem lines from us to inspire you!</string>
+    <string name="poemConfirmation">Are you done creating your poem?</string>
 </resources>

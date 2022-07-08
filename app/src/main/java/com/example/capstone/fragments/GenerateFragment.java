@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
+import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.User;
 import com.parse.FindCallback;
@@ -26,7 +27,12 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.theokanning.openai.OpenAiService;
+import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.engine.Engine;
+import com.theokanning.openai.search.SearchRequest;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class GenerateFragment extends Fragment {
@@ -92,7 +98,8 @@ public class GenerateFragment extends Fragment {
     }
 
     public void generatePrompts(View view) {
-//        openAI();
+        OpenAIThread openAIThread = new OpenAIThread("sunshine");
+        openAIThread.start();
         if (etUserInput.getText().toString().length() > 0) {
             // skeleton: generate hello world
             String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
@@ -182,7 +189,7 @@ public class GenerateFragment extends Fragment {
                     });
                 } else {
                     TextView tvNoFriends = new TextView(getContext());
-                    tvNoFriends.setText("It seems like you have no friends to create poems with. Here's some poem lines from us to inspire you!");
+                    tvNoFriends.setText(R.string.noFriendsPrompt);
                     tvNoFriends.setTextSize(20);
                     linearLayout.addView(tvNoFriends);
                     // make a method that generates TextViews into a list to add to linearLayout
@@ -200,7 +207,7 @@ public class GenerateFragment extends Fragment {
 
     private void poemConfirmScreen(Poem poem) {
         // change add friends' poem lines textview to contain text: Are you done creating your poem?
-        tvPrompt.setText("Are you done creating your poem?");
+        tvPrompt.setText(R.string.poemConfirmation);
         // remove linearlayout's textviews with one new textview (textview content: etUserInput text)
         TextView tvPoem = new TextView(getContext());
         tvPoem.setText(etUserInput.getText());
@@ -264,16 +271,6 @@ public class GenerateFragment extends Fragment {
         poem.updatePoem(friendLine);
         String curPoem = etUserInput.getText().toString() + "\n" + friendLine.getPoemLine();
         etUserInput.setText(curPoem);
-    }
-
-    public void openAI() {
-        // "${OPENAI_API_KEY}"
-//        OpenAiService service = new OpenAiService("${OPENAI_API_KEY}");
-//        CompletionRequest completionRequest = CompletionRequest.builder()
-//                .prompt("Somebody once told me the world is gonna roll me")
-//                .echo(true)
-//                .build();
-//        service.createCompletion("ada", completionRequest).getChoices().forEach(System.out::println);
     }
 
 }
