@@ -31,19 +31,19 @@ public class OpenAIThread extends Thread {
         OpenAiService service = new OpenAiService("");
 
         System.out.println("\nGetting da vinci engine...");
-        Engine davinci = service.getEngine("davinci");
+        Engine davinci = service.getEngine("text-davinci-002");
         System.out.println(davinci);
 
         System.out.println("\nCreating completion...");
         CompletionRequest completionRequest = CompletionRequest.builder()
                 .prompt("write a poem with the word \"" + prompt + "\" in it")
                 .temperature(0.7)
-                .maxTokens(128)
+                .maxTokens(256)
                 .topP(1.0)
                 .frequencyPenalty(0.0)
                 .presencePenalty(0.0)
                 .build();
-        List<CompletionChoice> choices = service.createCompletion("davinci", completionRequest).getChoices();
+        List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();
         for (int i = 0; i < choices.size(); i++) {
             generatedLines.add(choices.get(i).toString());
             Log.i("openai_poem_lines_test", generatedLines.get(i));

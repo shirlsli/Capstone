@@ -32,6 +32,7 @@ import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.engine.Engine;
 import com.theokanning.openai.search.SearchRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,13 +103,13 @@ public class GenerateFragment extends Fragment {
             OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
             openAIThread.start();
             // skeleton: generate hello world
-            String[] textArray = {"hello world", "hello there", "hello everyone", "hello all"};
+            ArrayList<String> generatedLines = openAIThread.getGeneratedLines();
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
-                for( int i = 0; i < textArray.length; i++ )
+                for( int i = 0; i < generatedLines.size(); i++ )
                 {
                     TextView tvTestString = new TextView(view.getContext());
-                    tvTestString.setText(textArray[i]);
+                    tvTestString.setText(generatedLines.get(i));
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     params.setMargins(0,0,0,20);
                     tvTestString.setLayoutParams(params);
