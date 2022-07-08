@@ -46,6 +46,7 @@ public class OpenAIThread extends Thread {
         List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();
         generatedLines[0] = choices.get(0).toString();
         splitLines = generatedLines[0].split("\n");
+        splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
         Log.i("openai_poem_lines_test", generatedLines[0]);
         for (int i = 0; i < splitLines.length; i++) {
             Log.i("splitLines_test", splitLines[i]);

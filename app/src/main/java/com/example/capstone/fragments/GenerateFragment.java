@@ -93,16 +93,21 @@ public class GenerateFragment extends Fragment {
             // need to identify if the word is a real word
             @Override
             public void onClick(View v) {
-               generatePrompts(v);
+                try {
+                    generatePrompts(v);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    public void generatePrompts(View view) {
+    public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
             OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
             openAIThread.start();
             // skeleton: generate hello world
+            openAIThread.join();
             String[] generatedLines = openAIThread.getGeneratedLines();
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
