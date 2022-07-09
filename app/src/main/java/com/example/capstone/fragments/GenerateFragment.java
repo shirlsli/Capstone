@@ -22,18 +22,13 @@ import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.User;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import com.theokanning.openai.OpenAiService;
-import com.theokanning.openai.completion.CompletionRequest;
-import com.theokanning.openai.engine.Engine;
-import com.theokanning.openai.search.SearchRequest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GenerateFragment extends Fragment {
@@ -50,6 +45,7 @@ public class GenerateFragment extends Fragment {
     private Button bPublish;
     private TextView tvPrompt;
     private ImageView ivForwardArrow;
+
 
     public GenerateFragment() {
         // Required empty public constructor
@@ -111,24 +107,7 @@ public class GenerateFragment extends Fragment {
             String[] generatedLines = openAIThread.getGeneratedLines();
             if (linearLayout.getVisibility() != View.VISIBLE) {
                 linearLayout.setVisibility(View.VISIBLE);
-                for( int i = 2; i < generatedLines.length; i++ )
-                {
-                    TextView tvTestString = new TextView(view.getContext());
-                    tvTestString.setText(generatedLines[i]);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.setMargins(0,0,0,20);
-                    tvTestString.setLayoutParams(params);
-                    tvTestString.setTextSize(20);
-                    // if user taps on generated textview, go to next screen
-                    tvTestString.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                            createPoemLine(tvTestString);
-                        }
-                    });
-                    linearLayout.addView(tvTestString);
-                }
+                displayPoemLines(generatedLines, view);
             }
         } else {
             linearLayout.setVisibility(View.GONE);
@@ -138,7 +117,28 @@ public class GenerateFragment extends Fragment {
         // Calls open ai on inputted word
     }
 
-    public void createPoemLine(TextView tvTestString) {
+    private void displayPoemLines(String[] generatedLines, View view) {
+        for( int i = 2; i < generatedLines.length; i++ )
+        {
+            TextView tvTestString = new TextView(view.getContext());
+            tvTestString.setText(generatedLines[i]);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0,0,0,20);
+            tvTestString.setLayoutParams(params);
+            tvTestString.setTextSize(20);
+            // if user taps on generated textview, go to next screen
+            tvTestString.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tvTestString.setTextColor(getResources().getColor(R.color.gray));
+                    createPoemLine(tvTestString, view);
+                }
+            });
+            linearLayout.addView(tvTestString);
+        }
+    }
+
+    public void createPoemLine(TextView tvTestString, View view) {
         try {
             poemLine = new Line();
             poemLine.setPoemLine(tvTestString.getText().toString());
@@ -149,7 +149,7 @@ public class GenerateFragment extends Fragment {
                 public void onClick(View v) {
                     try {
                         // need to check if on add your friends' poem lines screen
-                        createPoem();
+                        createPoem(view);
                     } catch (ParseException e) {
                         Log.e("create_poem_error", "ParseException", e);
                     }
@@ -161,7 +161,7 @@ public class GenerateFragment extends Fragment {
         }
     }
 
-    public void createPoem() throws ParseException {
+    public void createPoem(View view) throws ParseException {
         // brand new query for the current user
         ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
         currentUserQuery.include(User.KEY_FRIENDS); // TODO: see if we can remove this?
@@ -194,11 +194,21 @@ public class GenerateFragment extends Fragment {
                         }
                     });
                 } else {
+                    OpenAIThread openAIThread = new OpenAIThread("day");
+                    openAIThread.start();
                     TextView tvNoFriends = new TextView(getContext());
                     tvNoFriends.setText(R.string.noFriendsPrompt);
                     tvNoFriends.setTextSize(20);
                     linearLayout.addView(tvNoFriends);
                     // make a method that generates TextViews into a list to add to linearLayout
+                    // skeleton: generate hello world
+                    try {
+                        openAIThread.join();
+                        String[] generatedLines = openAIThread.getGeneratedLines();
+                        displayPoemLines(generatedLines, view);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
                 ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                     @Override
