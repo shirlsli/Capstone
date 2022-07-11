@@ -1,5 +1,6 @@
 package com.example.capstone.fragments;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GenerateFragment extends Fragment {
@@ -102,7 +104,6 @@ public class GenerateFragment extends Fragment {
         if (etUserInput.getText().toString().length() > 0) {
             OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
             openAIThread.start();
-            // skeleton: generate hello world
             openAIThread.join();
             String[] generatedLines = openAIThread.getGeneratedLines();
             if (linearLayout.getVisibility() != View.VISIBLE) {
@@ -147,146 +148,20 @@ public class GenerateFragment extends Fragment {
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        // need to check if on add your friends' poem lines screen
-                        createPoem(view);
-                    } catch (ParseException e) {
-                        Log.e("create_poem_error", "ParseException", e);
-                    }
+                        // goes to Create Poem Fragment
+                        Poem poem = new Poem();
+                        Fragment createPoemFragment = new CreatePoemFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("Poem", poem);
+                        bundle.putParcelable("Line", poemLine);
+                        createPoemFragment.setArguments(bundle);
+                        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }
             });
             Log.i("poem_line_creation_test", "poem line creation success! " + poemLine);
         } catch (Exception exception) {
             Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
         }
-    }
-
-    public void createPoem(View view) throws ParseException {
-        // brand new query for the current user
-        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
-        currentUserQuery.include(User.KEY_FRIENDS); // TODO: see if we can remove this?
-        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        currentUserQuery.findInBackground(new FindCallback<User>() {
-            @Override
-            public void done(List<User> objects, ParseException e) {
-                ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
-                linearLayout.removeAllViews();
-                Poem poem = new Poem();
-                poemLine.setAuthor(ParseUser.getCurrentUser());
-                poem.addAuthor(ParseUser.getCurrentUser());
-                if (objects != null && objects.get(0).getFriends() != null) {
-                    poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
-                    poemLineQuery.setLimit(5);
-                    poemLineQuery.addDescendingOrder("createdAt");
-                    poemLineQuery.include(Line.KEY_AUTHOR);
-                    poemLineQuery.include(Line.KEY_POEM_LINE);
-                    poemLineQuery.findInBackground(new FindCallback<Line>() {
-                        @Override
-                        public void done(List<Line> friendLines, ParseException e) {
-                            if (e != null) {
-                                Log.e("tag", friendLines.toString(), e);
-                            } else {
-                                poem.updatePoem(poemLine);
-                                tvPrompt.setVisibility(View.VISIBLE);
-                                bPublish.setVisibility(View.GONE);
-                                addFriendLines(friendLines, poem);
-                            }
-                        }
-                    });
-                } else {
-                    OpenAIThread openAIThread = new OpenAIThread("day");
-                    openAIThread.start();
-                    TextView tvNoFriends = new TextView(getContext());
-                    tvNoFriends.setText(R.string.noFriendsPrompt);
-                    tvNoFriends.setTextSize(20);
-                    linearLayout.addView(tvNoFriends);
-                    // make a method that generates TextViews into a list to add to linearLayout
-                    // skeleton: generate hello world
-                    try {
-                        openAIThread.join();
-                        String[] generatedLines = openAIThread.getGeneratedLines();
-                        displayPoemLines(generatedLines, view);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                ivForwardArrow.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        poemConfirmScreen(poem);
-                    }
-                });
-            }
-        });
-    }
-
-
-    private void poemConfirmScreen(Poem poem) {
-        // change add friends' poem lines textview to contain text: Are you done creating your poem?
-        tvPrompt.setText(R.string.poemConfirmation);
-        // remove linearlayout's textviews with one new textview (textview content: etUserInput text)
-        TextView tvPoem = new TextView(getContext());
-        tvPoem.setText(etUserInput.getText());
-        linearLayout.removeAllViews();
-        linearLayout.addView(tvPoem);
-        // set publish visibility to visible
-        bPublish.setVisibility(View.VISIBLE);
-        bPublish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                poem.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(getActivity(), "Your poem line was added to today's poem!",
-                                    Toast.LENGTH_LONG).show();
-                            Fragment poemDetailsFragment = new PoemDetailsFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("Poem", poem);
-                            poemDetailsFragment.setArguments(bundle);
-                            getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "generate_poem" ).commit();
-                        } else {
-                            Log.e("poem_creation_test", "Poem created failed :(", e);
-                            Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-            }
-        });
-        // set forward arrow visibility to gone
-        ivForwardArrow.setVisibility(View.GONE);
-        // set editext to gone? would need to set it to visible every time
-        etUserInput.setText("");
-        etUserInput.setVisibility(View.GONE);
-    }
-
-    private void addFriendLines(List<Line> friendLines, Poem poem) {
-        for (int i = 0; i < friendLines.size(); i++) {
-            Line friendLine = new Line();
-            friendLine.setAuthor(friendLines.get(i).getAuthor());
-            friendLine.setPoemLine(friendLines.get(i).getPoemLine());
-            TextView tvTestString = new TextView(getContext());
-            tvTestString.setText(friendLine.getPoemLine());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(16,0,0,20);
-            tvTestString.setLayoutParams(params);
-            tvTestString.setTextSize(20);
-            tvTestString.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                    selectFriendLine(friendLine, poem);
-                }
-            });
-            linearLayout.addView(tvTestString);
-        }
-    }
-
-    private void selectFriendLine(Line friendLine, Poem poem) {
-        poem.updatePoem(friendLine);
-        String curPoem = etUserInput.getText().toString() + "\n" + friendLine.getPoemLine();
-        etUserInput.setText(curPoem);
     }
 
 }

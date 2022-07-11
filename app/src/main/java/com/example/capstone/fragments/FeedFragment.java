@@ -15,14 +15,11 @@ import android.view.ViewGroup;
 
 import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
-import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;

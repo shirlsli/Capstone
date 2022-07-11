@@ -40,7 +40,7 @@ public class OpenAIThread extends Thread {
                 .temperature(0.7)
                 .maxTokens(256)
                 .topP(1.0)
-                .frequencyPenalty(0.0)
+                .frequencyPenalty(1.0)
                 .presencePenalty(0.0)
                 .build();
         List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();

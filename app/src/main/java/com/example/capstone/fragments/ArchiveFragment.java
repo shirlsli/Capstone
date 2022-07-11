@@ -30,6 +30,7 @@ import com.example.capstone.BitmapScaler;
 import com.example.capstone.LoginActivity;
 import com.example.capstone.R;
 import com.example.capstone.models.Poem;
+import com.example.capstone.models.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -201,6 +202,7 @@ public class ArchiveFragment extends Fragment {
         ParseQuery<Poem> query = ParseQuery.getQuery(Poem.class);
         query.include(Poem.KEY_AUTHORS);
         query.include(Poem.KEY_POEM_LINES);
+        query.include(Post.KEY_POEM + "." + Poem.KEY_POEM_LINES);
         query.whereEqualTo("authors", ParseUser.getCurrentUser());
         query.setLimit(20);
         query.addDescendingOrder("createdAt");

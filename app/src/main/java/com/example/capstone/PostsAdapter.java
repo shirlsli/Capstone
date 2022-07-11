@@ -20,11 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.fragments.PoemDetailsFragment;
-import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.parse.ParseFile;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
