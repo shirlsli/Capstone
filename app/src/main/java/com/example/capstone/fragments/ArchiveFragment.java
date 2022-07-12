@@ -12,6 +12,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -57,6 +58,7 @@ public class ArchiveFragment extends Fragment {
     private FloatingActionButton fabGenerate;
     private ImageView ivProfilePic;
     private TextView tvUsernamePoem;
+    private SwipeRefreshLayout swipeContainer;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -133,11 +135,28 @@ public class ArchiveFragment extends Fragment {
         });
         String ownerPoems = ParseUser.getCurrentUser().getUsername() + "'s poems";
         tvUsernamePoem.setText(ownerPoems);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync(0);
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         rvPoems.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
         rvPoems.setLayoutManager(linearLayoutManager);
         queryPosts();
+    }
+
+    public void fetchTimelineAsync(int page) {
+        adapter.clear();
+        queryPosts();
+        swipeContainer.setRefreshing(false);
     }
 
     private void launchCamera() {

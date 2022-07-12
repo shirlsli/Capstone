@@ -101,6 +101,7 @@ public class CreatePoemFragment extends Fragment {
         tvPrompt.setVisibility(View.VISIBLE);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine.getPoemLine());
+        setLayout(tvTemp);
         poemLayout.addView(tvTemp);
         ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
         currentUserQuery.include(User.KEY_FRIENDS);
@@ -148,10 +149,7 @@ public class CreatePoemFragment extends Fragment {
         } else {
             TextView tvNoFriends = new TextView(getContext());
             tvNoFriends.setText(R.string.noFriendsPrompt);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0,0,0,20);
-            tvNoFriends.setLayoutParams(params);
-            tvNoFriends.setTextSize(20);
+            setLayout(tvNoFriends);
             tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
             friendsLinesLayout.addView(tvNoFriends);
             try {
@@ -179,10 +177,7 @@ public class CreatePoemFragment extends Fragment {
             friendLine.setPoemLine(friendLines.get(i).getPoemLine());
             TextView tvTestString = new TextView(getContext());
             tvTestString.setText(friendLine.getPoemLine());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(16,0,0,20);
-            tvTestString.setLayoutParams(params);
-            tvTestString.setTextSize(20);
+            setLayout(tvTestString);
             tvTestString.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -206,6 +201,7 @@ public class CreatePoemFragment extends Fragment {
                 deletePoemLine(tvTemp, tvTestString, friendLine);
             }
         });
+        setLayout(tvTemp);
         poemLayout.addView(tvTemp);
     }
 
@@ -214,5 +210,12 @@ public class CreatePoemFragment extends Fragment {
         poemLayout.removeView(tvTemp);
         poem.getPoemLines().remove(poemLine);
         tvTestString.setTextColor(getResources().getColor(R.color.black));
+    }
+
+    private void setLayout(TextView tvTemp) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0,0,0,10);
+        tvTemp.setLayoutParams(params);
+        tvTemp.setTextSize(20);
     }
 }

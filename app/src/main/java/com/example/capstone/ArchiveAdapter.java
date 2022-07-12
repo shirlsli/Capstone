@@ -39,6 +39,11 @@ public class ArchiveAdapter extends RecyclerView.Adapter<ArchiveAdapter.ViewHold
         this.poems = poems;
     }
 
+    public void clear() {
+        poems.clear();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ArchiveAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

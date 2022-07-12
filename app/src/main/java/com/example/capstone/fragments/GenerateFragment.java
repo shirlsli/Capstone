@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +16,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GenerateFragment extends Fragment {
 
@@ -32,9 +39,8 @@ public class GenerateFragment extends Fragment {
     private EditText etUserInput;
     private LinearLayout linearLayout;
     private Line poemLine;
-    private Button bPublish;
-    private TextView tvPrompt;
     private ImageView ivForwardArrow;
+    private ProgressBar pb;
 
 
     public GenerateFragment() {
@@ -72,8 +78,7 @@ public class GenerateFragment extends Fragment {
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
         linearLayout = view.findViewById(R.id.friendsLinesLayout);
-        bPublish = view.findViewById(R.id.bPublish);
-        tvPrompt = view.findViewById(R.id.tvPrompt);
+        pb = view.findViewById(R.id.pbLoading);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
         ivForwardArrow.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
@@ -90,40 +95,56 @@ public class GenerateFragment extends Fragment {
 
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
-            OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
-            openAIThread.start();
-            openAIThread.join();
-            String[] generatedLines = openAIThread.getGeneratedLines();
-            if (linearLayout.getVisibility() != View.VISIBLE) {
-                linearLayout.setVisibility(View.VISIBLE);
-                displayPoemLines(generatedLines, view);
-            }
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
+                    openAIThread.start();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+//                                pb.setVisibility(ProgressBar.VISIBLE);
+                                Thread.sleep(5000);
+//                                pb.setVisibility(ProgressBar.GONE);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            String[] generatedLines = openAIThread.getGeneratedLines();
+                            linearLayout.setVisibility(View.VISIBLE);
+                            displayPoemLines(generatedLines, view);
+                        }
+                    });
+                }
+            });
         } else {
             linearLayout.setVisibility(View.GONE);
             linearLayout.removeAllViews();
-            bPublish.setVisibility(View.GONE);
         }
-        // Calls open ai on inputted word
     }
 
     private void displayPoemLines(String[] generatedLines, View view) {
-        for( int i = 2; i < generatedLines.length; i++ )
-        {
-            TextView tvTestString = new TextView(view.getContext());
-            tvTestString.setText(generatedLines[i]);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0,0,0,20);
-            tvTestString.setLayoutParams(params);
-            tvTestString.setTextSize(20);
-            // if user taps on generated textview, go to next screen
-            tvTestString.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                    createPoemLine(tvTestString, view);
-                }
-            });
-            linearLayout.addView(tvTestString);
+        if (generatedLines != null) {
+            for( int i = 2; i < generatedLines.length; i++ )
+            {
+                TextView tvTestString = new TextView(view.getContext());
+                tvTestString.setText(generatedLines[i]);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0,0,0,20);
+                tvTestString.setLayoutParams(params);
+                tvTestString.setTextSize(20);
+                // if user taps on generated textview, go to next screen
+                tvTestString.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
+                        createPoemLine(tvTestString, view);
+                    }
+                });
+                linearLayout.addView(tvTestString);
+            }
         }
     }
 
@@ -133,7 +154,6 @@ public class GenerateFragment extends Fragment {
             poemLine.setPoemLine(tvTestString.getText().toString());
             String prompt = etUserInput.getText().toString();
             etUserInput.setText(tvTestString.getText().toString());
-            ivForwardArrow.setVisibility(View.VISIBLE);
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

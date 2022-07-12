@@ -38,6 +38,16 @@
         app:layout_constraintTop_toBottomOf="@+id/etUserInput"
         tools:visibility="visible"></LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/pbLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/friendsLinesLayout"
+        app:layout_constraintStart_toStartOf="@+id/friendsLinesLayout"
+        app:layout_constraintTop_toBottomOf="@+id/friendsLinesLayout"
+        tools:visibility="visible" />
+
 
     <ImageView
         android:id="@+id/ivForwardArrow"

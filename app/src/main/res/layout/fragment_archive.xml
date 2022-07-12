@@ -8,26 +8,37 @@
     android:fitsSystemWindows="true"
     tools:context=".FeedActivity">
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPoems"
-        android:layout_width="match_parent"
-        android:layout_height="640dp"
-        android:layout_marginTop="10dp"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/ivProfile">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPoems"
+            android:layout_width="match_parent"
+            android:layout_height="640dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabGenerate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="80dp"
         android:contentDescription="@string/generate"
         android:src="@android:drawable/ic_menu_edit"
         app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/rvPoems"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView

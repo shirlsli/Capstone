@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class FeedFragment extends Fragment {
     protected List<Post> allPosts;
     private RecyclerView rvPosts;
     private FloatingActionButton fabGenerate;
+    private SwipeRefreshLayout swipeContainer;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -74,6 +76,18 @@ public class FeedFragment extends Fragment {
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(view.getContext(), allPosts);
         fabGenerate = view.findViewById(R.id.fabGenerate);
+
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync(0);
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         fabGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,6 +102,12 @@ public class FeedFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
         rvPosts.setLayoutManager(linearLayoutManager);
         queryPosts();
+    }
+
+    public void fetchTimelineAsync(int page) {
+        adapter.clear();
+        queryPosts();
+        swipeContainer.setRefreshing(false);
     }
 
     private void queryPosts() {
