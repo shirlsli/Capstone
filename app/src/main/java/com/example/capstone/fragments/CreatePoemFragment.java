@@ -185,7 +185,7 @@ public class CreatePoemFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                    selectFriendLine(friendLine);
+                    selectFriendLine(friendLine, tvTestString);
                 }
             });
             friendsLinesLayout.addView(tvTestString);
@@ -193,11 +193,24 @@ public class CreatePoemFragment extends Fragment {
         friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
-    private void selectFriendLine(Line friendLine) {
+    private void selectFriendLine(Line friendLine, TextView tvTestString) {
         friendLine.setAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(friendLine);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(friendLine.getPoemLine());
+        tvTemp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deletePoemLine(tvTemp, tvTestString, friendLine);
+            }
+        });
         poemLayout.addView(tvTemp);
+    }
+
+    private void deletePoemLine(TextView tvTemp, TextView tvTestString, Line poemLine) {
+        // removes textview from poemLayout and un-grays the selected poem line
+        poemLayout.removeView(tvTemp);
+        poem.getPoemLines().remove(poemLine);
+        tvTestString.setTextColor(getResources().getColor(R.color.black));
     }
 }
