@@ -140,7 +140,7 @@ public class GenerateFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                        createPoemLine(tvTestString, view);
+                        createPoemLine(tvTestString, generatedLines);
                     }
                 });
                 linearLayout.addView(tvTestString);
@@ -148,7 +148,7 @@ public class GenerateFragment extends Fragment {
         }
     }
 
-    public void createPoemLine(TextView tvTestString, View view) {
+    public void createPoemLine(TextView tvTestString, String[] generatedLines) {
         try {
             poemLine = new Line();
             poemLine.setPoemLine(tvTestString.getText().toString());
@@ -164,6 +164,7 @@ public class GenerateFragment extends Fragment {
                         bundle.putParcelable("Poem", poem);
                         bundle.putParcelable("Line", poemLine);
                         bundle.putString("Prompt", prompt);
+                        bundle.putStringArray("GeneratedLines", generatedLines);
                         createPoemFragment.setArguments(bundle);
                         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }

@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".fragments.CreatePoemFragment">
 
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/toolbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="?attr/colorPrimary"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>-->
+
+
     <LinearLayout
         android:id="@+id/friendsLinesLayout"
         android:layout_width="0dp"
@@ -18,14 +30,14 @@
         app:layout_constraintBottom_toTopOf="@+id/ivForwardArrow2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/poemLayout"
+        app:layout_constraintTop_toBottomOf="@+id/tvPrompt"
         tools:visibility="visible"></LinearLayout>
 
     <ImageView
         android:id="@+id/ivForwardArrow2"
         android:layout_width="114dp"
         android:layout_height="58dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="60dp"
         android:src="@drawable/ic_forward_arrow"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -35,12 +47,13 @@
     <LinearLayout
         android:id="@+id/poemLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:orientation="vertical"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/friendsLinesLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,18 +62,44 @@
 
     <TextView
         android:id="@+id/tvPrompt"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
         android:text="@string/add_your_friends_poem_lines_to_your_poem"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/frameLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPrompt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPrompt">
+
+        <ImageView
+            android:id="@+id/ivMinus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_minus"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ivAdd"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_add"
+            tools:visibility="visible" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
