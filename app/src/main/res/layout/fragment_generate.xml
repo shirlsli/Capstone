@@ -24,7 +24,7 @@
         tools:visibility="visible" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/friendsLinesLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -47,7 +47,7 @@
         android:src="@drawable/ic_forward_arrow"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/friendsLinesLayout"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

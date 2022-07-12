@@ -1,6 +1,5 @@
 package com.example.capstone.fragments;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,22 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
-import com.example.capstone.models.User;
-import com.facebook.shimmer.ShimmerFrameLayout;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GenerateFragment extends Fragment {
 
@@ -83,7 +71,7 @@ public class GenerateFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
-        linearLayout = view.findViewById(R.id.linearLayout);
+        linearLayout = view.findViewById(R.id.friendsLinesLayout);
         bPublish = view.findViewById(R.id.bPublish);
         tvPrompt = view.findViewById(R.id.tvPrompt);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);

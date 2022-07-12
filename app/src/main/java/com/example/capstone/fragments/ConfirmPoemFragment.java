@@ -68,8 +68,9 @@ public class ConfirmPoemFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             poem = bundle.getParcelable("Poem");
-            linearLayout = view.findViewById(R.id.linearLayout);
-            tvPrompt = view.findViewById(R.id.tvPrompt);
+            linearLayout = view.findViewById(R.id.friendsLinesLayout);
+            tvPrompt = view.findViewById(R.id.tvPoemConfirmation);
+            bPublish = view.findViewById(R.id.bPublish);
             poemConfirmScreen();
         }
     }
@@ -78,6 +79,7 @@ public class ConfirmPoemFragment extends Fragment {
         // change add friends' poem lines textview to contain text: Are you done creating your poem?
         tvPrompt.setText(R.string.poemConfirmation);
         tvPrompt.setVisibility(View.VISIBLE);
+        linearLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poem.getPoemLines().size(); i++) {
             TextView tvPoem = new TextView(getContext());
             tvPoem.setText(poem.getPoemLines().get(i).getPoemLine());

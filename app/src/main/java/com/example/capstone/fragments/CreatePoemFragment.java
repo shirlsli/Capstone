@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,20 +14,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.capstone.GenerateAdapter;
 import com.example.capstone.R;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
-import com.example.capstone.models.Post;
 import com.example.capstone.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +36,10 @@ public class CreatePoemFragment extends Fragment {
 
     private Poem poem;
     private Line poemLine;
-    private LinearLayout linearLayout;
+    private LinearLayout friendsLinesLayout;
+    private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
     private TextView tvPrompt;
-
-    protected GenerateAdapter adapter;
-    protected List<Post> allPosts;
-    private RecyclerView rvPosts;
 
     private String mParam1;
     private String mParam2;
@@ -88,7 +80,8 @@ public class CreatePoemFragment extends Fragment {
         if (bundle != null) {
             poem = bundle.getParcelable("Poem");
             poemLine = bundle.getParcelable("Line");
-            linearLayout = view.findViewById(R.id.linearLayout);
+            poemLayout = view.findViewById(R.id.poemLayout);
+            friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
             tvPrompt = view.findViewById(R.id.tvPrompt);
             try {
@@ -101,14 +94,17 @@ public class CreatePoemFragment extends Fragment {
 
     public void createPoem(View view) throws ParseException {
         // brand new query for the current user
-        linearLayout.removeAllViews();
+        friendsLinesLayout.removeAllViews();
+        poemLayout.setVisibility(View.VISIBLE);
+        TextView tvTemp = new TextView(getContext());
+        tvTemp.setText(poemLine.getPoemLine());
+        poemLayout.addView(tvTemp);
         ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
-        currentUserQuery.include(User.KEY_FRIENDS); // TODO: see if we can remove this?
+        currentUserQuery.include(User.KEY_FRIENDS);
         currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
         currentUserQuery.findInBackground(new FindCallback<User>() {
             @Override
             public void done(List<User> objects, ParseException e) {
-                ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
                 poemLine.setAuthor(ParseUser.getCurrentUser());
                 poem.addAuthor(ParseUser.getCurrentUser());
                 ivForwardArrow.setOnClickListener(new View.OnClickListener() {
@@ -121,54 +117,58 @@ public class CreatePoemFragment extends Fragment {
                         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
                     }
                 });
-                if (objects != null && objects.get(0).getFriends() != null) {
-                    poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
-                    poemLineQuery.setLimit(5);
-                    poemLineQuery.addDescendingOrder("createdAt");
-                    poemLineQuery.include(Line.KEY_AUTHOR);
-                    poemLineQuery.include(Line.KEY_POEM_LINE);
-                    poemLineQuery.findInBackground(new FindCallback<Line>() {
-                        @Override
-                        public void done(List<Line> objects, ParseException e) {
-                            if (e != null) {
-                                Log.e("tag", objects.toString(), e);
-                            } else {
-                                poem.updatePoem(poemLine);
-                                tvPrompt.setVisibility(View.VISIBLE);
-                                ArrayList<Line> friendLines = new ArrayList<>(objects);
-                                addFriendLines(friendLines, poem);
-                            }
-                        }
-                    });
-                } else {
-                    TextView tvNoFriends = new TextView(getContext());
-                    tvNoFriends.setText(R.string.noFriendsPrompt);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.setMargins(0,0,0,20);
-                    tvNoFriends.setLayoutParams(params);
-                    tvNoFriends.setTextSize(20);
-                    tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
-                    linearLayout.addView(tvNoFriends);
-                    try {
-                        OpenAIThread openAIThread = new OpenAIThread("day");
-                        openAIThread.start();
-                        openAIThread.join();
-                        String[] generatedLines = openAIThread.getGeneratedLines();
-//                        displayPoemLines(generatedLines, view);
-                        ArrayList<Line> convertedLines = new ArrayList<>();
-                        for (int i = 2; i < generatedLines.length; i++) {
-                            Line line = new Line();
-                            line.setPoemLine(generatedLines[i]);
-                            convertedLines.add(line);
-                        }
-                        poem.updatePoem(poemLine);
-                        addFriendLines(convertedLines, poem);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                query(objects);
             }
         });
+    }
+
+    private void query(List<User> objects) {
+        if (objects != null && objects.get(0).getFriends() != null) {
+            ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
+            poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
+            poemLineQuery.setLimit(20);
+            poemLineQuery.addDescendingOrder("createdAt");
+            poemLineQuery.include(Line.KEY_AUTHOR);
+            poemLineQuery.include(Line.KEY_POEM_LINE);
+            poemLineQuery.findInBackground(new FindCallback<Line>() {
+                @Override
+                public void done(List<Line> objects, ParseException e) {
+                    if (e != null) {
+                        Log.e("tag", objects.toString(), e);
+                    } else {
+                        poem.updatePoem(poemLine);
+                        tvPrompt.setVisibility(View.VISIBLE);
+                        ArrayList<Line> friendLines = new ArrayList<>(objects);
+                        addFriendLines(friendLines, poem);
+                    }
+                }
+            });
+        } else {
+            TextView tvNoFriends = new TextView(getContext());
+            tvNoFriends.setText(R.string.noFriendsPrompt);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0,0,0,20);
+            tvNoFriends.setLayoutParams(params);
+            tvNoFriends.setTextSize(20);
+            tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
+            friendsLinesLayout.addView(tvNoFriends);
+            try {
+                OpenAIThread openAIThread = new OpenAIThread("day");
+                openAIThread.start();
+                openAIThread.join();
+                String[] generatedLines = openAIThread.getGeneratedLines();
+                ArrayList<Line> convertedLines = new ArrayList<>();
+                for (int i = 2; i < generatedLines.length; i++) {
+                    Line line = new Line();
+                    line.setPoemLine(generatedLines[i]);
+                    convertedLines.add(line);
+                }
+                poem.updatePoem(poemLine);
+                addFriendLines(convertedLines, poem);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void addFriendLines(ArrayList<Line> friendLines, Poem poem) {
@@ -188,8 +188,9 @@ public class CreatePoemFragment extends Fragment {
                     selectFriendLine(friendLine);
                 }
             });
-            linearLayout.addView(tvTestString);
+            friendsLinesLayout.addView(tvTestString);
         }
+        friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
     private void selectFriendLine(Line friendLine) {
@@ -197,6 +198,6 @@ public class CreatePoemFragment extends Fragment {
         poem.updatePoem(friendLine);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(friendLine.getPoemLine());
-        linearLayout.addView(tvTemp);
+        poemLayout.addView(tvTemp);
     }
 }
