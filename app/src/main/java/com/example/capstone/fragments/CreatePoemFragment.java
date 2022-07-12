@@ -40,6 +40,7 @@ public class CreatePoemFragment extends Fragment {
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
     private TextView tvPrompt;
+    private String prompt;
 
     private String mParam1;
     private String mParam2;
@@ -80,6 +81,7 @@ public class CreatePoemFragment extends Fragment {
         if (bundle != null) {
             poem = bundle.getParcelable("Poem");
             poemLine = bundle.getParcelable("Line");
+            prompt = bundle.getString("Prompt");
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
@@ -96,6 +98,7 @@ public class CreatePoemFragment extends Fragment {
         // brand new query for the current user
         friendsLinesLayout.removeAllViews();
         poemLayout.setVisibility(View.VISIBLE);
+        tvPrompt.setVisibility(View.VISIBLE);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine.getPoemLine());
         poemLayout.addView(tvTemp);
@@ -137,7 +140,6 @@ public class CreatePoemFragment extends Fragment {
                         Log.e("tag", objects.toString(), e);
                     } else {
                         poem.updatePoem(poemLine);
-                        tvPrompt.setVisibility(View.VISIBLE);
                         ArrayList<Line> friendLines = new ArrayList<>(objects);
                         addFriendLines(friendLines, poem);
                     }
@@ -153,7 +155,7 @@ public class CreatePoemFragment extends Fragment {
             tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
             friendsLinesLayout.addView(tvNoFriends);
             try {
-                OpenAIThread openAIThread = new OpenAIThread("day");
+                OpenAIThread openAIThread = new OpenAIThread(prompt + "\" and \"day");
                 openAIThread.start();
                 openAIThread.join();
                 String[] generatedLines = openAIThread.getGeneratedLines();

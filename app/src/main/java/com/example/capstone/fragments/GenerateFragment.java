@@ -131,6 +131,7 @@ public class GenerateFragment extends Fragment {
         try {
             poemLine = new Line();
             poemLine.setPoemLine(tvTestString.getText().toString());
+            String prompt = etUserInput.getText().toString();
             etUserInput.setText(tvTestString.getText().toString());
             ivForwardArrow.setVisibility(View.VISIBLE);
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +143,7 @@ public class GenerateFragment extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("Poem", poem);
                         bundle.putParcelable("Line", poemLine);
+                        bundle.putString("Prompt", prompt);
                         createPoemFragment.setArguments(bundle);
                         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }
