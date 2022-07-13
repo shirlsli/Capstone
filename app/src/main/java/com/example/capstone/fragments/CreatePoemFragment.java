@@ -215,7 +215,7 @@ public class CreatePoemFragment extends Fragment {
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
                         }
-                        addFriendLines(friendLines, poem);
+                        addFriendLines(friendLines);
                     }
                 }
             });
@@ -230,11 +230,11 @@ public class CreatePoemFragment extends Fragment {
                 convertedLines.add(generatedLines[i]);
             }
             poem.updatePoem(poemLine);
-            addFriendLines(convertedLines, poem);
+            addFriendLines(convertedLines);
         }
     }
 
-    private void addFriendLines(ArrayList<String> friendLines, Poem poem) {
+    private void addFriendLines(ArrayList<String> friendLines) {
         for (int i = 0; i < friendLines.size(); i++) {
             TextView tvTestString = new TextView(getContext());
             tvTestString.setText(friendLines.get(i));

@@ -1,7 +1,5 @@
 package com.example.capstone.models;
 
-import android.util.Log;
-
 import com.example.capstone.BuildConfig;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -12,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAIThread {
-    // probably want to make a constructor holding the conditions needed for poem line generation
     private String prompt;
     private String[] generatedLines;
     private String[] splitLines;
