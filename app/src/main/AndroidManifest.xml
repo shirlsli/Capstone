@@ -38,7 +38,7 @@
         <activity
             android:name=".ArchiveActivity"
             android:exported="false"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".FeedActivity"
             android:exported="false" />

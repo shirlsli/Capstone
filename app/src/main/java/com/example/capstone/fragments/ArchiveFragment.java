@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +52,6 @@ public class ArchiveFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private ImageView ivLogout;
     protected ArchiveAdapter adapter;
     protected List<Poem> allPoems;
     private RecyclerView rvPoems;
@@ -99,6 +99,7 @@ public class ArchiveFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         fabGenerate = view.findViewById(R.id.fabGenerate);
         fabGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,16 +108,6 @@ public class ArchiveFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 generateFragment.setArguments(bundle);
                 getParentFragmentManager().beginTransaction().replace(R.id.flContainer, generateFragment).addToBackStack( "generate_poem" ).commit();
-            }
-        });
-        ivLogout = view.findViewById(R.id.ivLogout);
-        ivLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ParseUser.logOutInBackground();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
             }
         });
         rvPoems = view.findViewById(R.id.rvPoems);

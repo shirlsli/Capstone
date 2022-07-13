@@ -134,7 +134,6 @@ public class GenerateFragment extends Fragment {
                 params.setMargins(0,0,0,20);
                 tvTestString.setLayoutParams(params);
                 tvTestString.setTextSize(20);
-                // if user taps on generated textview, go to next screen
                 tvTestString.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
