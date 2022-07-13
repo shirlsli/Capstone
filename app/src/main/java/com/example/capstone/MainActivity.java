@@ -37,11 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        // two of three fragments currently commented out because they haven't been made yet
         final Fragment feedFragment = new FeedFragment();
-        final Fragment generateFragment = new GenerateFragment();
         final Fragment archiveFragment = new ArchiveFragment();
-        final Fragment poemDetailsFragment = new PoemDetailsFragment();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
@@ -52,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_feed:
                         fragment = feedFragment;
                         break;
-//                    case R.id.action_generate:
-//                        fragment = generateFragment;
-//                        break;
                     case R.id.action_archive:
                         fragment = archiveFragment;
                         break;
@@ -66,17 +60,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        bottomNavigationView.setSelectedItemId(R.id.action_generate);
         bottomNavigationView.setBackgroundColor(SurfaceColors.SURFACE_2.getColor(this));
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        if (bottomNavigationView.getSelectedItemId () != R.id.action_generate) {
-//            bottomNavigationView.setSelectedItemId(R.id.action_generate);
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
 }
