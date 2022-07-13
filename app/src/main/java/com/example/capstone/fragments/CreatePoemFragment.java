@@ -95,7 +95,7 @@ public class CreatePoemFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            poem = bundle.getParcelable("Poem");
+            poem = new Poem();
             poemLine = bundle.getParcelable("Line");
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArray("GeneratedLines");

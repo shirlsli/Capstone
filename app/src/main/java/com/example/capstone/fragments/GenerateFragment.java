@@ -1,5 +1,6 @@
 package com.example.capstone.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -96,8 +97,8 @@ public class GenerateFragment extends Fragment {
 
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
-            ExecutorService service = Executors.newSingleThreadExecutor();
             pb.setVisibility(ProgressBar.VISIBLE);
+            ExecutorService service = Executors.newSingleThreadExecutor();
             service.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -157,10 +158,8 @@ public class GenerateFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                         // goes to Create Poem Fragment
-                        Poem poem = new Poem();
                         Fragment createPoemFragment = new CreatePoemFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("Poem", poem);
                         bundle.putParcelable("Line", poemLine);
                         bundle.putString("Prompt", prompt);
                         bundle.putStringArray("GeneratedLines", generatedLines);

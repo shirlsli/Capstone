@@ -18,8 +18,11 @@ public class ExampleUnitTest {
      */
     public void openAI() throws InterruptedException {
         OpenAIThread openAIThread = new OpenAIThread("test");
-        openAIThread.start();
-        openAIThread.join();
-        assertNotNull(openAIThread.getGeneratedLines());
+        openAIThread.runCallback(new Runnable() {
+            @Override
+            public void run() {
+                assertNotNull(openAIThread.getGeneratedLines());
+            }
+        });
     }
 }
