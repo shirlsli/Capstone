@@ -29,6 +29,10 @@ public class FeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
 
+        Toolbar toolbar = findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
+        setTitle("Feed");
+
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         // two of three fragments currently commented out because they haven't been made yet

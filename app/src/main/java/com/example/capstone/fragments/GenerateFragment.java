@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -96,24 +97,22 @@ public class GenerateFragment extends Fragment {
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
             ExecutorService service = Executors.newSingleThreadExecutor();
-            Handler handler = new Handler(Looper.getMainLooper());
+            pb.setVisibility(ProgressBar.VISIBLE);
             service.execute(new Runnable() {
                 @Override
                 public void run() {
                     OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
-                    openAIThread.start();
-                    handler.post(new Runnable() {
+                    openAIThread.runCallback(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-//                                pb.setVisibility(ProgressBar.VISIBLE);
-                                Thread.sleep(5000);
-//                                pb.setVisibility(ProgressBar.GONE);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
                             String[] generatedLines = openAIThread.getGeneratedLines();
-                            displayPoemLines(generatedLines, view);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pb.setVisibility(ProgressBar.GONE);
+                                    displayPoemLines(generatedLines, view);
+                                }
+                            });
                         }
                     });
                 }

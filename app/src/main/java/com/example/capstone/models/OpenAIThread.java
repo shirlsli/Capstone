@@ -11,7 +11,7 @@ import com.theokanning.openai.engine.Engine;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OpenAIThread extends Thread {
+public class OpenAIThread {
     // probably want to make a constructor holding the conditions needed for poem line generation
     private String prompt;
     private String[] generatedLines;
@@ -26,8 +26,8 @@ public class OpenAIThread extends Thread {
         return splitLines;
     }
 
-    @Override
-    public void run() {
+    public void runCallback(Runnable callback)
+    {
         OpenAiService service = new OpenAiService(BuildConfig.OPENAI_API_KEY);
 
         System.out.println("\nGetting da vinci engine...");
@@ -43,9 +43,13 @@ public class OpenAIThread extends Thread {
                 .frequencyPenalty(1.0)
                 .presencePenalty(0.0)
                 .build();
+        // asynch call that gets treated as synchronous
         List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();
         generatedLines[0] = choices.get(0).toString();
         splitLines = generatedLines[0].split("\n");
         splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
+        // Run callback
+        callback.run();
     }
+
 }
