@@ -106,7 +106,7 @@ public class CreatePoemFragment extends Fragment {
             ivAdd = view.findViewById(R.id.ivAdd);
             ivMinus = view.findViewById(R.id.ivMinus);
             try {
-                createPoem(view);
+                createPoem();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -145,7 +145,7 @@ public class CreatePoemFragment extends Fragment {
 //        });
 //    }
 
-    public void createPoem(View view) throws ParseException {
+    public void createPoem() throws ParseException {
         // brand new query for the current user
         friendsLinesLayout.removeAllViews();
         friendsLinesLayout.setVisibility(View.GONE);
@@ -167,7 +167,6 @@ public class CreatePoemFragment extends Fragment {
                         switchToAdd();
                     }
                 });
-                // if friendsLinesLayout does not have any views
                 if (friendsLinesLayout.getChildCount() > 0) {
                     friendsLinesLayout.setVisibility(View.VISIBLE);
                 } else {
@@ -212,7 +211,10 @@ public class CreatePoemFragment extends Fragment {
                         Log.e("tag", objects.toString(), e);
                     } else {
                         poem.updatePoem(poemLine);
-                        ArrayList<Line> friendLines = new ArrayList<>(objects);
+                        ArrayList<String> friendLines = new ArrayList<>();
+                        for (int i = 0; i < objects.size(); i++) {
+                            friendLines.add(objects.get(i).getPoemLine());
+                        }
                         addFriendLines(friendLines, poem);
                     }
                 }
@@ -223,29 +225,25 @@ public class CreatePoemFragment extends Fragment {
             setLayout(tvNoFriends);
             tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
             friendsLinesLayout.addView(tvNoFriends);
-            ArrayList<Line> convertedLines = new ArrayList<>();
+            ArrayList<String> convertedLines = new ArrayList<>();
             for (int i = 2; i < generatedLines.length; i++) {
-                Line line = new Line();
-                line.setPoemLine(generatedLines[i]);
-                convertedLines.add(line);
+                convertedLines.add(generatedLines[i]);
             }
             poem.updatePoem(poemLine);
             addFriendLines(convertedLines, poem);
         }
     }
 
-    private void addFriendLines(ArrayList<Line> friendLines, Poem poem) {
+    private void addFriendLines(ArrayList<String> friendLines, Poem poem) {
         for (int i = 0; i < friendLines.size(); i++) {
-            Line friendLine = new Line();
-            friendLine.setPoemLine(friendLines.get(i).getPoemLine());
             TextView tvTestString = new TextView(getContext());
-            tvTestString.setText(friendLine.getPoemLine());
+            tvTestString.setText(friendLines.get(i));
             setLayout(tvTestString);
             tvTestString.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                    selectFriendLine(friendLine, tvTestString);
+                    selectFriendLine(tvTestString);
                 }
             });
             friendsLinesLayout.addView(tvTestString);
@@ -253,7 +251,9 @@ public class CreatePoemFragment extends Fragment {
         friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
-    private void selectFriendLine(Line friendLine, TextView tvTestString) {
+    private void selectFriendLine(TextView tvTestString) {
+        Line friendLine = new Line();
+        friendLine.setPoemLine(tvTestString.getText().toString());
         friendLine.setAuthor(ParseUser.getCurrentUser());
         poem.updatePoem(friendLine);
         TextView tvTemp = new TextView(getContext());

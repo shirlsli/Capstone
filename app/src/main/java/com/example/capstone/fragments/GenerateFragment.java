@@ -113,7 +113,6 @@ public class GenerateFragment extends Fragment {
                                 e.printStackTrace();
                             }
                             String[] generatedLines = openAIThread.getGeneratedLines();
-                            linearLayout.setVisibility(View.VISIBLE);
                             displayPoemLines(generatedLines, view);
                         }
                     });
@@ -145,6 +144,7 @@ public class GenerateFragment extends Fragment {
                 });
                 linearLayout.addView(tvTestString);
             }
+            linearLayout.setVisibility(View.VISIBLE);
         }
     }
 
