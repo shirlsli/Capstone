@@ -261,7 +261,11 @@ public class CreatePoemFragment extends Fragment {
         tvTemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deletePoemLine(tvTemp, tvTestString, friendLine);
+                try {
+                    deletePoemLine(tvTemp, tvTestString, friendLine);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         });
         setLayout(tvTemp);
@@ -269,10 +273,11 @@ public class CreatePoemFragment extends Fragment {
         switchToAdd();
     }
 
-    private void deletePoemLine(TextView tvTemp, TextView tvTestString, Line poemLine) {
+    private void deletePoemLine(TextView tvTemp, TextView tvTestString, Line poemLine) throws ParseException {
         // removes textview from poemLayout and un-grays the selected poem line
         poemLayout.removeView(tvTemp);
         poem.getPoemLines().remove(poemLine);
+        poemLine.delete();
         tvTestString.setTextColor(getResources().getColor(R.color.black));
     }
 
