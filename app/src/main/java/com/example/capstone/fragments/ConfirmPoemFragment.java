@@ -16,16 +16,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.R;
+import com.example.capstone.models.Line;
 import com.example.capstone.models.Poem;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import java.util.ArrayList;
 
 public class ConfirmPoemFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private Poem poem;
+    private ArrayList<Line> poemLines;
     private LinearLayout linearLayout;
     private TextView tvPrompt;
     private Button bPublish;
@@ -67,7 +71,7 @@ public class ConfirmPoemFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            poem = bundle.getParcelable("Poem");
+            poemLines = bundle.getParcelableArrayList("Poem");
             linearLayout = view.findViewById(R.id.friendsLinesLayout);
             tvPrompt = view.findViewById(R.id.tvPoemConfirmation);
             bPublish = view.findViewById(R.id.bPublish);
@@ -80,9 +84,9 @@ public class ConfirmPoemFragment extends Fragment {
         tvPrompt.setText(R.string.poemConfirmation);
         tvPrompt.setVisibility(View.VISIBLE);
         linearLayout.setVisibility(View.VISIBLE);
-        for (int i = 0; i < poem.getPoemLines().size(); i++) {
+        for (int i = 0; i < poemLines.size(); i++) {
             TextView tvPoem = new TextView(getContext());
-            tvPoem.setText(poem.getPoemLines().get(i).getPoemLine());
+            tvPoem.setText(poemLines.get(i).getPoemLine());
             linearLayout.addView(tvPoem);
         }
         // set publish visibility to visible
@@ -90,6 +94,11 @@ public class ConfirmPoemFragment extends Fragment {
         bPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Poem poem = new Poem();
+                for (int i = 0; i < poemLines.size(); i++) {
+                    poem.updatePoem(poemLines.get(i));
+                }
+                poem.addAuthor(ParseUser.getCurrentUser());
                 poem.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
