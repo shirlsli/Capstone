@@ -40,7 +40,7 @@ public class GenerateFragment extends Fragment {
 
     private EditText etUserInput;
     private LinearLayout linearLayout;
-    private Line poemLine;
+    private String poemLine;
     private ImageView ivForwardArrow;
     private ProgressBar pb;
 
@@ -98,6 +98,7 @@ public class GenerateFragment extends Fragment {
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
             pb.setVisibility(ProgressBar.VISIBLE);
+            ivForwardArrow.setVisibility(View.GONE);
             ExecutorService service = Executors.newSingleThreadExecutor();
             service.execute(new Runnable() {
                 @Override
@@ -111,6 +112,7 @@ public class GenerateFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     pb.setVisibility(ProgressBar.GONE);
+                                    ivForwardArrow.setVisibility(View.VISIBLE);
                                     displayPoemLines(generatedLines, view);
                                 }
                             });
@@ -149,8 +151,7 @@ public class GenerateFragment extends Fragment {
 
     public void createPoemLine(TextView tvTestString, String[] generatedLines) {
         try {
-            poemLine = new Line();
-            poemLine.setPoemLine(tvTestString.getText().toString());
+            poemLine = tvTestString.getText().toString();
             String prompt = etUserInput.getText().toString();
             etUserInput.setText(tvTestString.getText().toString());
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +160,7 @@ public class GenerateFragment extends Fragment {
                         // goes to Create Poem Fragment
                         Fragment createPoemFragment = new CreatePoemFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("Line", poemLine);
+                        bundle.putString("Line", poemLine);
                         bundle.putString("Prompt", prompt);
                         bundle.putStringArray("GeneratedLines", generatedLines);
                         createPoemFragment.setArguments(bundle);

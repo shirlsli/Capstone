@@ -45,7 +45,7 @@ public class CreatePoemFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private ArrayList<String> poemLines;
-    private Line poemLine;
+    private String poemLine;
     private LinearLayout friendsLinesLayout;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
@@ -96,7 +96,7 @@ public class CreatePoemFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             poemLines = new ArrayList<>();
-            poemLine = bundle.getParcelable("Line");
+            poemLine = bundle.getString("Line");
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArray("GeneratedLines");
             poemLayout = view.findViewById(R.id.poemLayout);
@@ -152,7 +152,7 @@ public class CreatePoemFragment extends Fragment {
         poemLayout.setVisibility(View.VISIBLE);
         tvPrompt.setVisibility(View.VISIBLE);
         TextView tvTemp = new TextView(getContext());
-        tvTemp.setText(poemLine.getPoemLine());
+        tvTemp.setText(poemLine);
         setLayout(tvTemp);
         poemLayout.addView(tvTemp);
         ivAdd.setOnClickListener(new View.OnClickListener() {
@@ -176,7 +176,6 @@ public class CreatePoemFragment extends Fragment {
                     currentUserQuery.findInBackground(new FindCallback<User>() {
                         @Override
                         public void done(List<User> objects, ParseException e) {
-                            poemLine.setAuthor(ParseUser.getCurrentUser());
                             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -209,7 +208,7 @@ public class CreatePoemFragment extends Fragment {
                     if (e != null) {
                         Log.e("tag", objects.toString(), e);
                     } else {
-                        poemLines.add(poemLine.getPoemLine());
+                        poemLines.add(poemLine);
                         ArrayList<String> friendLines = new ArrayList<>();
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
@@ -228,7 +227,7 @@ public class CreatePoemFragment extends Fragment {
             for (int i = 2; i < generatedLines.length; i++) {
                 convertedLines.add(generatedLines[i]);
             }
-            poemLines.add(poemLine.getPoemLine());
+            poemLines.add(poemLine);
             addFriendLines(convertedLines);
         }
     }
