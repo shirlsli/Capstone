@@ -188,7 +188,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     if (e != null) {
                         Log.e("tag", objects.toString(), e);
                     } else {
-                        poemLines.add(poemLine);
                         ArrayList<String> friendLines = new ArrayList<>();
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
