@@ -32,11 +32,11 @@ import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.example.capstone.models.User;
+import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.woxthebox.draglistview.DragListView;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,12 +61,12 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
     private ImageView ivMinus;
-    private DragListView mDragListView;
     protected SearchAdapter adapter;
     protected List<String> allFriendsLines;
     private RecyclerView rvFriendsLines;
     private TextView tvLinesCount;
     private String linesCount;
+    private DragLinearLayout dragLinearLayout;
 
     private String mParam1;
     private String mParam2;
@@ -111,7 +111,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLine = bundle.getString("Line");
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
-//            mDragListView = (DragListView) view.findViewById(R.id.drag_list_view);
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
@@ -119,6 +118,20 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             ivAdd = view.findViewById(R.id.ivAdd);
             ivMinus = view.findViewById(R.id.ivMinus);
             tvLinesCount = view.findViewById(R.id.tvLinesCount);
+            dragLinearLayout = (DragLinearLayout) view.findViewById(R.id.dragDropContainer);
+            dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
+                @Override
+                public void onSwap(View firstView, int firstPosition,
+                                   View secondView, int secondPosition) {
+                    int firstIndex = poemLines.indexOf(((TextView) firstView).getText().toString());
+                    int secondIndex = poemLines.indexOf(((TextView) secondView).getText().toString());
+                    if (firstIndex >= 0 && secondIndex >= 0) {
+                        String temp = poemLines.get(secondIndex);
+                        poemLines.set(secondIndex, poemLines.get(firstIndex));
+                        poemLines.set(firstIndex, temp);
+                    }
+                }
+            });
             linesCount = "/12 lines";
             try {
                 createPoem();
@@ -137,7 +150,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine);
         setLayout(tvTemp);
-        poemLayout.addView(tvTemp);
+        dragLinearLayout.addView(tvTemp);
+        dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
         poemLines.add(poemLine);
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
@@ -248,7 +262,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 }
             });
             setLayout(tvTemp);
-            poemLayout.addView(tvTemp);
+            dragLinearLayout.addView(tvTemp);
+            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
             String temp = poemLines.size() + linesCount;
             tvLinesCount.setText(temp);
         } else {
@@ -258,7 +273,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void deletePoemLine(TextView tvTemp, String poemLine) throws ParseException {
-        poemLayout.removeView(tvTemp);
+        dragLinearLayout.removeDragView(tvTemp);
         poemLines.remove(poemLine);
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);

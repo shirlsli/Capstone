@@ -42,7 +42,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPrompt"
         tools:visibility="visible">
-
     </LinearLayout>
 
     <ImageView
@@ -55,6 +54,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
 
+
     <LinearLayout
         android:id="@+id/poemLayout"
         android:layout_width="0dp"
@@ -64,13 +64,18 @@
         android:layout_marginEnd="16dp"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/ivForwardArrow2"
+        app:layout_constraintBottom_toTopOf="@+id/ivForwardArrow2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPrompt"
         tools:visibility="visible">
 
+        <com.jmedeisis.draglinearlayout.DragLinearLayout
+            android:id="@+id/dragDropContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="@+id/rvFriendsLines"></com.jmedeisis.draglinearlayout.DragLinearLayout>
     </LinearLayout>
 
     <TextView

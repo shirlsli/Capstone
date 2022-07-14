@@ -136,26 +136,6 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         rvGeneratedLines.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvGeneratedLines.setLayoutManager(linearLayoutManager);
-//        if (generatedLines != null) {
-//            for( int i = 2; i < generatedLines.length; i++ )
-//            {
-//                TextView tvTestString = new TextView(view.getContext());
-//                tvTestString.setText(generatedLines[i]);
-//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//                params.setMargins(0,0,0,20);
-//                tvTestString.setLayoutParams(params);
-//                tvTestString.setTextSize(20);
-//                tvTestString.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
-//                        createPoemLine(tvTestString, generatedLines);
-//                    }
-//                });
-//                linearLayout.addView(tvTestString);
-//            }
-//            linearLayout.setVisibility(View.VISIBLE);
-//        }
     }
 
     public void createPoemLine(String line, ArrayList<String> generatedLines) {
