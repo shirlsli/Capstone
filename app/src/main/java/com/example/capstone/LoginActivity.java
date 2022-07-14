@@ -1,6 +1,8 @@
 package com.example.capstone;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import com.example.capstone.R;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,9 +15,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.MainActivity;
+import com.example.capstone.fragments.ConfirmPoemFragment;
 import com.example.capstone.fragments.GenerateFragment;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.example.capstone.models.User;
 import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;

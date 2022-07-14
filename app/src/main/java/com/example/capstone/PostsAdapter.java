@@ -22,7 +22,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.fragments.PoemDetailsFragment;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.example.capstone.models.User;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -67,6 +71,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView tvPoem;
         private Button bFriend;
         private TextView tvTimeStamp;
+        private List<User> curUserFriends;
 
         public ViewHolder(@NonNull View itemView) throws NullPointerException {
             super(itemView);

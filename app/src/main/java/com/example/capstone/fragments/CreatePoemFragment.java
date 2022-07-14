@@ -198,6 +198,9 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
                         }
+                        for (int i = 3; i < generatedLines.length - 1; i++) {
+                            friendLines.add(generatedLines[i]);
+                        }
                         addFriendLines(friendLines);
                     }
                 }
