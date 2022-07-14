@@ -112,11 +112,9 @@ public class FeedFragment extends Fragment {
 
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-//        query.include("Poem.poemLines");
         query.include(Post.KEY_AUTHOR);
         query.include(Post.KEY_POEM);
         query.include(Post.KEY_POEM + "." + Poem.KEY_POEM_LINES);
-        // include (Post.KEY_POEM) --> (Poem.KEY_POEM_LINES)
         query.setLimit(20);
         query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<Post>() {
@@ -127,13 +125,6 @@ public class FeedFragment extends Fragment {
                     return;
                 }
                 for (Post post : posts) {
-//                    ((Poem) post.getPoem()).getPoemLines();
-//                    post.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-//                        @Override
-//                        public void done(ParseObject object, ParseException e) {
-//                            Log.i("debug_query", "Post: ");
-//                        }
-//                    });
                     Log.i("no_issue_getting_posts", "Post: " + post.getPoem() + ", username: " + post.getAuthor().getUsername());
                 }
                 allPosts.addAll(posts);

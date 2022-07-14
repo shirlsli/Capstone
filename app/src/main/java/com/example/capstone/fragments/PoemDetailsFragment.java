@@ -84,7 +84,11 @@ public class PoemDetailsFragment extends Fragment {
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 TextView tvNewLine = new TextView(view.getContext());
                 tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
-                setLayoutFormat(tvNewLine, 20, 40, 20, 0, 0);
+                if (i == 4 || i == 8) {
+                    TextView tvBlank = new TextView(getContext());
+                    poemLayout.addView(tvBlank);
+                }
+                setLayoutFormat(tvNewLine, 16, 40, 20, 0, 0);
                 poemLayout.addView(tvNewLine);
             }
             if (fromFeed == null) {

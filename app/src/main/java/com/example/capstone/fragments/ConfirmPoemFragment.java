@@ -87,6 +87,10 @@ public class ConfirmPoemFragment extends Fragment {
         for (int i = 0; i < poemLines.size(); i++) {
             TextView tvPoem = new TextView(getContext());
             tvPoem.setText(poemLines.get(i));
+            if (i == 4 || i == 8) {
+                TextView tvBlank = new TextView(getContext());
+                linearLayout.addView(tvBlank);
+            }
             linearLayout.addView(tvPoem);
         }
         // set publish visibility to visible
