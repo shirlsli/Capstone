@@ -97,6 +97,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             String poemString = "";
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 poemString += poem.getPoemLines().get(i).getPoemLine();
+                if (i == 3 || i == 7) {
+                    poemString += "\n";
+                }
                 poemString += "\n";
             }
             tvPoem.setText(poemString);
