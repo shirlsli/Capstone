@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Line;
@@ -46,10 +47,10 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private EditText etUserInput;
     private String poemLine;
     private ImageView ivForwardArrow;
-    private ProgressBar pb;
     protected SearchAdapter adapter;
     protected List<String> allGeneratedLines;
     private RecyclerView rvGeneratedLines;
+    private LottieAnimationView lottieAnimationView;
 
 
     public GenerateFragment() {
@@ -86,7 +87,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         super.onViewCreated(view, savedInstanceState);
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
-        pb = view.findViewById(R.id.pbLoading);
+        lottieAnimationView = view.findViewById(R.id.lottieLoad);
         rvGeneratedLines = view.findViewById(R.id.rvGeneratedLines);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
         ivForwardArrow.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +105,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
 
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
-            pb.setVisibility(ProgressBar.VISIBLE);
+            lottieAnimationView.setVisibility(View.VISIBLE);
             ivForwardArrow.setVisibility(View.GONE);
             ExecutorService service = Executors.newSingleThreadExecutor();
             service.execute(new Runnable() {
@@ -118,7 +119,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    pb.setVisibility(ProgressBar.GONE);
+                                    lottieAnimationView.setVisibility(View.GONE);
                                     ivForwardArrow.setVisibility(View.VISIBLE);
                                     displayPoemLines(generatedLines, view);
                                 }

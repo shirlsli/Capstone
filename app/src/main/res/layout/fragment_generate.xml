@@ -37,19 +37,21 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <ProgressBar
-        android:id="@+id/pbLoading"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:elevation="99dp"
-        android:indeterminate="true"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieLoad"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/etUserInput"
-        app:layout_constraintStart_toStartOf="@id/etUserInput"
-        app:layout_constraintTop_toBottomOf="@+id/etUserInput"
-        tools:visibility="visible" />
+        app:layout_constraintBottom_toBottomOf="@+id/rvGeneratedLines"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="layer.json"
+        app:lottie_loop="true"
+        app:lottie_speed="1"
+        tools:visibility="gone" />
 
 
     <ImageView
