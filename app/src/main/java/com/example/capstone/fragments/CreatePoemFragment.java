@@ -24,22 +24,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
+import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
+import com.example.capstone.models.Post;
 import com.example.capstone.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.woxthebox.draglistview.DragListView;
+
 import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class CreatePoemFragment extends Fragment {
+public class CreatePoemFragment extends Fragment implements SearchAdapter.EventListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -54,8 +61,10 @@ public class CreatePoemFragment extends Fragment {
     private ImageView ivAdd;
     private String[] generatedLines;
     private ImageView ivMinus;
-//    private MenuItem searchItem;
-//    private SearchView searchView;
+    private DragListView mDragListView;
+    protected SearchAdapter adapter;
+    protected List<String> allFriendsLines;
+    private RecyclerView rvFriendsLines;
 
     private String mParam1;
     private String mParam2;
@@ -93,12 +102,14 @@ public class CreatePoemFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        rvFriendsLines = view.findViewById(R.id.rvFriendsLines);
         Bundle bundle = getArguments();
         if (bundle != null) {
             poemLines = new ArrayList<>();
             poemLine = bundle.getString("Line");
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArray("GeneratedLines");
+//            mDragListView = (DragListView) view.findViewById(R.id.drag_list_view);
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
@@ -111,39 +122,7 @@ public class CreatePoemFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-//        Toolbar toolbar = view.findViewById(R.id.toolbar);
-//        AppCompatActivity activity = (AppCompatActivity) getActivity();
-//        activity.setSupportActionBar(toolbar);
-//        activity.getSupportActionBar().setTitle("Search for poem lines");
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater.inflate(R.menu.menu, menu);
-//        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-//        searchView.setIconified(true);
-//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-//        searchItem = menu.findItem(R.id.action_search);
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                // perform query here
-//
-//                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
-//                // see https://code.google.com/p/android/issues/detail?id=24599
-//                searchView.clearFocus();
-//
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return false;
-//            }
-//        });
-//    }
 
     public void createPoem() throws ParseException {
         // brand new query for the current user
@@ -155,6 +134,7 @@ public class CreatePoemFragment extends Fragment {
         tvTemp.setText(poemLine);
         setLayout(tvTemp);
         poemLayout.addView(tvTemp);
+        poemLines.add(poemLine);
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,46 +198,37 @@ public class CreatePoemFragment extends Fragment {
                 }
             });
         } else {
-            TextView tvNoFriends = new TextView(getContext());
-            tvNoFriends.setText(R.string.noFriendsPrompt);
-            setLayout(tvNoFriends);
-            tvNoFriends.setTypeface(Typeface.DEFAULT_BOLD);
-            friendsLinesLayout.addView(tvNoFriends);
+            tvPrompt.setText(R.string.noFriendsPrompt);
             ArrayList<String> convertedLines = new ArrayList<>();
             for (int i = 2; i < generatedLines.length; i++) {
                 convertedLines.add(generatedLines[i]);
             }
-            poemLines.add(poemLine);
             addFriendLines(convertedLines);
         }
     }
 
+    public void onEvent(String data) {
+        selectFriendLine(data);
+    }
+
     private void addFriendLines(ArrayList<String> friendLines) {
-        for (int i = 0; i < friendLines.size(); i++) {
-            TextView tvTestString = new TextView(getContext());
-            tvTestString.setText(friendLines.get(i));
-            setLayout(tvTestString);
-            tvTestString.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                    selectFriendLine(tvTestString);
-                }
-            });
-            friendsLinesLayout.addView(tvTestString);
-        }
+        allFriendsLines = friendLines;
+        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
+        rvFriendsLines.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
+        rvFriendsLines.setLayoutManager(linearLayoutManager);
         friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
-    private void selectFriendLine(TextView tvTestString) {
-        poemLines.add(tvTestString.getText().toString());
+    private void selectFriendLine(String line) {
+        poemLines.add(line);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLines.get(poemLines.size() - 1));
         tvTemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    deletePoemLine(tvTemp, tvTestString, poemLines.get(poemLines.size() - 1));
+                    deletePoemLine(tvTemp, poemLines.get(poemLines.size() - 1));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -268,10 +239,9 @@ public class CreatePoemFragment extends Fragment {
         switchToAdd();
     }
 
-    private void deletePoemLine(TextView tvTemp, TextView tvTestString, String poemLine) throws ParseException {
+    private void deletePoemLine(TextView tvTemp, String poemLine) throws ParseException {
         poemLayout.removeView(tvTemp);
         poemLines.remove(poemLine);
-        tvTestString.setTextColor(getResources().getColor(R.color.black));
     }
 
     private void setLayout(TextView tvTemp) {

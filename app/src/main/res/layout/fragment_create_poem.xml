@@ -18,6 +18,16 @@
 <!--        app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>-->
 
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriendsLines"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/friendsLinesLayout"
+        app:layout_constraintEnd_toEndOf="@+id/friendsLinesLayout"
+        app:layout_constraintStart_toStartOf="@+id/friendsLinesLayout"
+        app:layout_constraintTop_toTopOf="@+id/friendsLinesLayout" />
+
     <LinearLayout
         android:id="@+id/friendsLinesLayout"
         android:layout_width="0dp"
@@ -31,7 +41,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPrompt"
-        tools:visibility="visible"></LinearLayout>
+        tools:visibility="visible">
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/ivForwardArrow2"
@@ -58,7 +70,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPrompt"
-        tools:visibility="visible"></LinearLayout>
+        tools:visibility="visible">
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvPrompt"
