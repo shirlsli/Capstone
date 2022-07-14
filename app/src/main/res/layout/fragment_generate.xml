@@ -7,6 +7,20 @@
     tools:context=".fragments.GenerateFragment">
 
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvGeneratedLines"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etUserInput" />
+
     <EditText
         android:id="@+id/etUserInput"
         android:layout_width="0dp"
@@ -17,9 +31,8 @@
         android:ems="10"
         android:hint="@string/enter_a_word_describing_your_day"
         android:inputType="textMultiLine|textPersonName"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/ivForwardArrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
@@ -29,9 +42,7 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="3dp"
         android:elevation="99dp"
         android:indeterminate="true"
         android:visibility="gone"
@@ -40,32 +51,17 @@
         app:layout_constraintTop_toBottomOf="@+id/etUserInput"
         tools:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/friendsLinesLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etUserInput"
-        tools:visibility="visible"></LinearLayout>
-
 
     <ImageView
         android:id="@+id/ivForwardArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="16dp"
         android:src="@drawable/ic_forward_arrow"
         android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/etUserInput"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/friendsLinesLayout"
+        app:layout_constraintTop_toTopOf="@+id/etUserInput"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

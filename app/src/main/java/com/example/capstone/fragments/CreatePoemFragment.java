@@ -59,7 +59,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private TextView tvPrompt;
     private String prompt;
     private ImageView ivAdd;
-    private String[] generatedLines;
+    private ArrayList<String> generatedLines;
     private ImageView ivMinus;
     private DragListView mDragListView;
     protected SearchAdapter adapter;
@@ -110,7 +110,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLines = new ArrayList<>();
             poemLine = bundle.getString("Line");
             prompt = bundle.getString("Prompt");
-            generatedLines = bundle.getStringArray("GeneratedLines");
+            generatedLines = bundle.getStringArrayList("GeneratedLines");
 //            mDragListView = (DragListView) view.findViewById(R.id.drag_list_view);
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
@@ -181,6 +181,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void query(List<User> objects) {
+        ArrayList<String> friendLines = new ArrayList<>();
         if (objects != null && objects.get(0).getFriends() != null) {
             ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
             poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
@@ -194,25 +195,27 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     if (e != null) {
                         Log.e("tag", objects.toString(), e);
                     } else {
-                        ArrayList<String> friendLines = new ArrayList<>();
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
                         }
-                        for (int i = 3; i < generatedLines.length - 1; i++) {
-                            friendLines.add(generatedLines[i]);
-                        }
-                        addFriendLines(friendLines);
+                        includeGeneratedLines(friendLines);
                     }
                 }
             });
         } else {
             tvPrompt.setText(R.string.noFriendsPrompt);
-            ArrayList<String> convertedLines = new ArrayList<>();
-            for (int i = 2; i < generatedLines.length; i++) {
-                convertedLines.add(generatedLines[i]);
-            }
-            addFriendLines(convertedLines);
+            includeGeneratedLines(friendLines); // have two includedGeneratedLines calls instead one outside of the if-statement
+            // because the one on line 201 needs to be nested in the query done function
         }
+    }
+
+    private void includeGeneratedLines(ArrayList<String> friendLines) {
+        for (int i = 0; i < generatedLines.size(); i++) {
+            if (!generatedLines.get(i).equals("")) {
+                friendLines.add(generatedLines.get(i));
+            }
+        }
+        addFriendLines(friendLines);
     }
 
     public void onEvent(String data) {

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -22,15 +24,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.capstone.R;
+import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class GenerateFragment extends Fragment {
+public class GenerateFragment extends Fragment implements SearchAdapter.EventListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -39,10 +44,12 @@ public class GenerateFragment extends Fragment {
     private String mParam2;
 
     private EditText etUserInput;
-    private LinearLayout linearLayout;
     private String poemLine;
     private ImageView ivForwardArrow;
     private ProgressBar pb;
+    protected SearchAdapter adapter;
+    protected List<String> allGeneratedLines;
+    private RecyclerView rvGeneratedLines;
 
 
     public GenerateFragment() {
@@ -79,8 +86,8 @@ public class GenerateFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
-        linearLayout = view.findViewById(R.id.friendsLinesLayout);
         pb = view.findViewById(R.id.pbLoading);
+        rvGeneratedLines = view.findViewById(R.id.rvGeneratedLines);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
         ivForwardArrow.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
@@ -120,49 +127,50 @@ public class GenerateFragment extends Fragment {
                     });
                 }
             });
-        } else {
-            linearLayout.setVisibility(View.GONE);
-            linearLayout.removeAllViews();
         }
     }
 
     private void displayPoemLines(String[] generatedLines, View view) {
-        if (generatedLines != null) {
-            for( int i = 2; i < generatedLines.length; i++ )
-            {
-                TextView tvTestString = new TextView(view.getContext());
-                tvTestString.setText(generatedLines[i]);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(0,0,0,20);
-                tvTestString.setLayoutParams(params);
-                tvTestString.setTextSize(20);
-                tvTestString.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
-                        createPoemLine(tvTestString, generatedLines);
-                    }
-                });
-                linearLayout.addView(tvTestString);
-            }
-            linearLayout.setVisibility(View.VISIBLE);
-        }
+        allGeneratedLines = Arrays.asList(generatedLines).subList(2, generatedLines.length);
+        adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this);
+        rvGeneratedLines.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
+        rvGeneratedLines.setLayoutManager(linearLayoutManager);
+//        if (generatedLines != null) {
+//            for( int i = 2; i < generatedLines.length; i++ )
+//            {
+//                TextView tvTestString = new TextView(view.getContext());
+//                tvTestString.setText(generatedLines[i]);
+//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//                params.setMargins(0,0,0,20);
+//                tvTestString.setLayoutParams(params);
+//                tvTestString.setTextSize(20);
+//                tvTestString.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        tvTestString.setTextColor(getResources().getColor(R.color.gray));
+//                        createPoemLine(tvTestString, generatedLines);
+//                    }
+//                });
+//                linearLayout.addView(tvTestString);
+//            }
+//            linearLayout.setVisibility(View.VISIBLE);
+//        }
     }
 
-    public void createPoemLine(TextView tvTestString, String[] generatedLines) {
+    public void createPoemLine(String line, ArrayList<String> generatedLines) {
         try {
-            poemLine = tvTestString.getText().toString();
             String prompt = etUserInput.getText().toString();
-            etUserInput.setText(tvTestString.getText().toString());
+            etUserInput.setText(line);
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                         // goes to Create Poem Fragment
                         Fragment createPoemFragment = new CreatePoemFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putString("Line", poemLine);
+                        bundle.putString("Line", line);
                         bundle.putString("Prompt", prompt);
-                        bundle.putStringArray("GeneratedLines", generatedLines);
+                        bundle.putStringArrayList("GeneratedLines", generatedLines);
                         createPoemFragment.setArguments(bundle);
                         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }
@@ -173,4 +181,8 @@ public class GenerateFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onEvent(String data) {
+        createPoemLine(data, new ArrayList<String>(allGeneratedLines));
+    }
 }
