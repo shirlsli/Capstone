@@ -29,7 +29,7 @@ public class ConfirmPoemFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private ArrayList<Line> poemLines;
+    private ArrayList<String> poemLines;
     private LinearLayout linearLayout;
     private TextView tvPrompt;
     private Button bPublish;
@@ -71,7 +71,7 @@ public class ConfirmPoemFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            poemLines = bundle.getParcelableArrayList("Poem");
+            poemLines = bundle.getStringArrayList("Poem");
             linearLayout = view.findViewById(R.id.friendsLinesLayout);
             tvPrompt = view.findViewById(R.id.tvPoemConfirmation);
             bPublish = view.findViewById(R.id.bPublish);
@@ -86,7 +86,7 @@ public class ConfirmPoemFragment extends Fragment {
         linearLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poemLines.size(); i++) {
             TextView tvPoem = new TextView(getContext());
-            tvPoem.setText(poemLines.get(i).getPoemLine());
+            tvPoem.setText(poemLines.get(i));
             linearLayout.addView(tvPoem);
         }
         // set publish visibility to visible
@@ -96,7 +96,9 @@ public class ConfirmPoemFragment extends Fragment {
             public void onClick(View v) {
                 Poem poem = new Poem();
                 for (int i = 0; i < poemLines.size(); i++) {
-                    poem.updatePoem(poemLines.get(i));
+                    Line line = new Line();
+                    line.setPoemLine(poemLines.get(i));
+                    poem.updatePoem(line);
                 }
                 poem.addAuthor(ParseUser.getCurrentUser());
                 poem.saveInBackground(new SaveCallback() {

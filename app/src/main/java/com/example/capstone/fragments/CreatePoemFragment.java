@@ -44,7 +44,7 @@ public class CreatePoemFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private ArrayList<Line> poemLines;
+    private ArrayList<String> poemLines;
     private Line poemLine;
     private LinearLayout friendsLinesLayout;
     private LinearLayout poemLayout;
@@ -182,7 +182,7 @@ public class CreatePoemFragment extends Fragment {
                                 public void onClick(View v) {
                                     Fragment confirmPoemFragment = new ConfirmPoemFragment();
                                     Bundle bundle = new Bundle();
-                                    bundle.putParcelableArrayList("Poem", poemLines);
+                                    bundle.putStringArrayList("Poem", poemLines);
                                     confirmPoemFragment.setArguments(bundle);
                                     getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
                                 }
@@ -209,7 +209,7 @@ public class CreatePoemFragment extends Fragment {
                     if (e != null) {
                         Log.e("tag", objects.toString(), e);
                     } else {
-                        poemLines.add(poemLine);
+                        poemLines.add(poemLine.getPoemLine());
                         ArrayList<String> friendLines = new ArrayList<>();
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
@@ -228,7 +228,7 @@ public class CreatePoemFragment extends Fragment {
             for (int i = 2; i < generatedLines.length; i++) {
                 convertedLines.add(generatedLines[i]);
             }
-            poemLines.add(poemLine);
+            poemLines.add(poemLine.getPoemLine());
             addFriendLines(convertedLines);
         }
     }
@@ -251,17 +251,14 @@ public class CreatePoemFragment extends Fragment {
     }
 
     private void selectFriendLine(TextView tvTestString) {
-        Line friendLine = new Line();
-        friendLine.setPoemLine(tvTestString.getText().toString());
-        friendLine.setAuthor(ParseUser.getCurrentUser());
-        poemLines.add(poemLine);
+        poemLines.add(tvTestString.getText().toString());
         TextView tvTemp = new TextView(getContext());
-        tvTemp.setText(friendLine.getPoemLine());
+        tvTemp.setText(poemLines.get(poemLines.size() - 1));
         tvTemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    deletePoemLine(tvTemp, tvTestString, friendLine);
+                    deletePoemLine(tvTemp, tvTestString, poemLines.get(poemLines.size() - 1));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -272,10 +269,9 @@ public class CreatePoemFragment extends Fragment {
         switchToAdd();
     }
 
-    private void deletePoemLine(TextView tvTemp, TextView tvTestString, Line poemLine) throws ParseException {
+    private void deletePoemLine(TextView tvTemp, TextView tvTestString, String poemLine) throws ParseException {
         poemLayout.removeView(tvTemp);
         poemLines.remove(poemLine);
-        poemLine.delete();
         tvTestString.setTextColor(getResources().getColor(R.color.black));
     }
 
