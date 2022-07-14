@@ -1,5 +1,6 @@
 package com.example.capstone.fragments;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -105,6 +107,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
 
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
+            hideSoftKeyboard(getActivity());
             lottieAnimationView.setVisibility(View.VISIBLE);
             ivForwardArrow.setVisibility(View.GONE);
             ExecutorService service = Executors.newSingleThreadExecutor();
@@ -128,6 +131,18 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     });
                 }
             });
+        }
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
         }
     }
 
