@@ -49,7 +49,6 @@
         android:id="@+id/ivForwardArrow2"
         android:layout_width="114dp"
         android:layout_height="58dp"
-        android:layout_marginBottom="60dp"
         android:src="@drawable/ic_forward_arrow"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -65,7 +64,7 @@
         android:layout_marginEnd="16dp"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/friendsLinesLayout"
+        app:layout_constraintBottom_toTopOf="@id/ivForwardArrow2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,5 +114,14 @@
             android:src="@drawable/ic_add"
             tools:visibility="gone" />
     </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvLinesCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tvPrompt"
+        tools:text="12/12 lines" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

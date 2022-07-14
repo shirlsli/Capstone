@@ -65,6 +65,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     protected SearchAdapter adapter;
     protected List<String> allFriendsLines;
     private RecyclerView rvFriendsLines;
+    private TextView tvLinesCount;
+    private String linesCount;
 
     private String mParam1;
     private String mParam2;
@@ -116,6 +118,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             tvPrompt = view.findViewById(R.id.tvPrompt);
             ivAdd = view.findViewById(R.id.ivAdd);
             ivMinus = view.findViewById(R.id.ivMinus);
+            tvLinesCount = view.findViewById(R.id.tvLinesCount);
+            linesCount = "/12 lines";
             try {
                 createPoem();
             } catch (ParseException e) {
@@ -135,6 +139,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         setLayout(tvTemp);
         poemLayout.addView(tvTemp);
         poemLines.add(poemLine);
+        String temp = poemLines.size() + linesCount;
+        tvLinesCount.setText(temp);
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -211,36 +217,45 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void addFriendLines(ArrayList<String> friendLines) {
-        allFriendsLines = friendLines;
-        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
-        rvFriendsLines.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
-        rvFriendsLines.setLayoutManager(linearLayoutManager);
-        friendsLinesLayout.setVisibility(View.VISIBLE);
+            allFriendsLines = friendLines;
+            adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
+            rvFriendsLines.setAdapter(adapter);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
+            rvFriendsLines.setLayoutManager(linearLayoutManager);
+            friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
     private void selectFriendLine(String line) {
-        poemLines.add(line);
-        TextView tvTemp = new TextView(getContext());
-        tvTemp.setText(poemLines.get(poemLines.size() - 1));
-        tvTemp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    deletePoemLine(tvTemp, poemLines.get(poemLines.size() - 1));
-                } catch (ParseException e) {
-                    e.printStackTrace();
+        if (poemLines.size() < 12) {
+            tvLinesCount.setTextColor(getResources().getColor(R.color.gray));
+            poemLines.add(line);
+            TextView tvTemp = new TextView(getContext());
+            tvTemp.setText(poemLines.get(poemLines.size() - 1));
+            tvTemp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        deletePoemLine(tvTemp, poemLines.get(poemLines.size() - 1));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
-        setLayout(tvTemp);
-        poemLayout.addView(tvTemp);
+            });
+            setLayout(tvTemp);
+            poemLayout.addView(tvTemp);
+            String temp = poemLines.size() + linesCount;
+            tvLinesCount.setText(temp);
+        } else {
+            tvLinesCount.setTextColor(getResources().getColor(R.color.purple_500));
+        }
         switchToAdd();
     }
 
     private void deletePoemLine(TextView tvTemp, String poemLine) throws ParseException {
         poemLayout.removeView(tvTemp);
         poemLines.remove(poemLine);
+        String temp = poemLines.size() + linesCount;
+        tvLinesCount.setText(temp);
     }
 
     private void setLayout(TextView tvTemp) {
