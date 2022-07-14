@@ -132,7 +132,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     }
                 }
             });
-            linesCount = "/12 lines";
+            linesCount = "/16 lines";
             try {
                 createPoem();
             } catch (ParseException e) {
@@ -246,7 +246,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void selectFriendLine(String line) {
-        if (poemLines.size() < 12) {
+        if (poemLines.size() < 16) {
             tvLinesCount.setTextColor(getResources().getColor(R.color.gray));
             poemLines.add(line);
             TextView tvTemp = new TextView(getContext());
@@ -283,7 +283,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(0,0,0,20);
         tvTemp.setLayoutParams(params);
-        tvTemp.setTextSize(20);
+        tvTemp.setTextSize(16);
     }
 
     private void switchToAdd() {

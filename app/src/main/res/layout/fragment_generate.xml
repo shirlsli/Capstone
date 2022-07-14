@@ -31,7 +31,7 @@
         android:ems="10"
         android:hint="@string/enter_a_word_describing_your_day"
         android:inputType="textMultiLine|textPersonName"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/ivForwardArrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
