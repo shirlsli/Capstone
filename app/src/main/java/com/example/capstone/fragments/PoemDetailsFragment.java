@@ -72,9 +72,6 @@ public class PoemDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         poemLayout = view.findViewById(R.id.poemLayout);
-        // Skeleton: everyone's poem lines get broken into stanzas (one giant poem a day)
-        // Stretch: want to query poem containing all of user's friends
-        // maybe mark a poem with boolean signifying today?
         Bundle bundle = getArguments();
         if (bundle != null) {
             fromFeed = getArguments().getString("fromFeed");

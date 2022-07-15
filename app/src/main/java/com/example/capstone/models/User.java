@@ -18,4 +18,6 @@ public class User extends ParseUser {
     public ParseFile getProfilePic() {
         return getParseFile(KEY_PROFILE_PIC);
     }
+
+    public void setProfilePic(ParseFile profilePic) { put(KEY_PROFILE_PIC, profilePic); }
 }

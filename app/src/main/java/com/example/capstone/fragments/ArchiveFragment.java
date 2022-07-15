@@ -3,11 +3,14 @@ package com.example.capstone.fragments;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -33,12 +36,14 @@ import com.example.capstone.LoginActivity;
 import com.example.capstone.R;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.example.capstone.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,6 +51,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ArchiveFragment extends Fragment {
 
@@ -56,9 +63,10 @@ public class ArchiveFragment extends Fragment {
     protected List<Poem> allPoems;
     private RecyclerView rvPoems;
     private FloatingActionButton fabGenerate;
-    private ImageView ivProfilePic;
+    private CircleImageView ivProfilePic;
     private TextView tvUsernamePoem;
     private SwipeRefreshLayout swipeContainer;
+    private User user;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -115,13 +123,22 @@ public class ArchiveFragment extends Fragment {
         adapter = new ArchiveAdapter(view.getContext(), allPoems);
         ivProfilePic = view.findViewById(R.id.ivProfile);
         tvUsernamePoem = view.findViewById(R.id.tvUsernamePoem);
-        ParseFile profile = (ParseFile) ParseUser.getCurrentUser().get("profilePic");
-        Uri uri = Uri.parse(profile.getUrl());
-        Glide.with(getContext()).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfilePic);
-        ivProfilePic.setOnClickListener(new View.OnClickListener() {
+        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+        currentUserQuery.include(User.KEY_FRIENDS);
+        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        currentUserQuery.findInBackground(new FindCallback<User>() {
             @Override
-            public void onClick(View v) {
-//                launchCamera();
+            public void done(List<User> objects, ParseException e) {
+                user = objects.get(0);
+                ParseFile profile = user.getProfilePic();
+                Uri uri = Uri.parse(profile.getUrl());
+                Glide.with(getContext()).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfilePic);
+                ivProfilePic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        launchCamera();
+                    }
+                });
             }
         });
         String ownerPoems = ParseUser.getCurrentUser().getUsername() + "'s poems";
@@ -196,16 +213,58 @@ public class ArchiveFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                ExifInterface exif = null;
+                try {
+                    exif = new ExifInterface(resizedFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 // RESIZE BITMAP, see section below
+                switch(orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        takenImage = rotateImage(takenImage, 90);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        takenImage = rotateImage(takenImage, 180);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        takenImage = rotateImage(takenImage, 270);
+                        break;
+                }
                 // Load the taken image into a preview
-                ivProfilePic.setImageBitmap(takenImage);
+//                ivProfilePic.setImageBitmap(takenImage);
+                Glide.with(getContext()).load(takenImage).centerCrop().transform(new RoundedCorners(360)).into(ivProfilePic);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                byte[] bitmapBytes = stream.toByteArray();
+                ParseFile image = new ParseFile("profilePic", bitmapBytes);
+                user.setProfilePic(image);
+                user.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e("profile_pic_test", "Issue with saving profile pic", e);
+                        } else {
+                            Log.i("profile_pic_test", "Profile pic saved!");
+                        }
+                    }
+                });
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
     private void queryPosts() {
@@ -246,8 +305,18 @@ public class ArchiveFragment extends Fragment {
 
         // Return the file target for the photo based on filename
         File file = new File(mediaStorageDir.getPath() + File.separator + photoFileName);
-
         return file;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 
 }

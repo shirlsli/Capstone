@@ -31,6 +31,8 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private Context context;
@@ -66,7 +68,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private ImageView ivProfile;
+        private CircleImageView ivProfile;
         private TextView tvAuthor;
         private TextView tvPoem;
         private Button bFriend;
