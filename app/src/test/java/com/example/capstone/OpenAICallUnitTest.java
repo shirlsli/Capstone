@@ -11,11 +11,8 @@ import com.example.capstone.models.OpenAIThread;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class ExampleUnitTest {
+public class OpenAICallUnitTest {
     @Test
-    /**
-     * Tests OpenAI API call and on "test" prompt and checks if fetched value is null
-     */
     public void openAI() throws InterruptedException {
         OpenAIThread openAIThread = new OpenAIThread("test");
         openAIThread.runCallback(new Runnable() {

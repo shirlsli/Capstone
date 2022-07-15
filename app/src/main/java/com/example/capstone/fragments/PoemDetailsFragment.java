@@ -90,7 +90,7 @@ public class PoemDetailsFragment extends Fragment {
             }
             if (fromFeed == null) {
                 Button bPost = new Button(view.getContext());
-                bPost.setText("Post");
+                bPost.setText(R.string.post);
                 poemLayout.addView(bPost);
                 bPost.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -25,10 +25,8 @@ import java.util.List;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ParseUnitTest {
+
     @Test
-    /**
-     * Tests query lines from Parse
-     */
     public void parseQueryLines() throws InterruptedException {
         ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
         poemLineQuery.setLimit(5);
@@ -45,9 +43,6 @@ public class ParseUnitTest {
     }
 
     @Test
-    /**
-     * Tests query poems from Parse
-     */
     public void parseQueryPoems() throws InterruptedException {
         ParseQuery<Poem> poemQuery = ParseQuery.getQuery(Poem.class);
         poemQuery.setLimit(5);
@@ -64,9 +59,6 @@ public class ParseUnitTest {
     }
 
     @Test
-    /**
-     * Tests query posts from Parse
-     */
     public void parseQueryPosts() throws InterruptedException {
         ParseQuery<Post> postQuery = ParseQuery.getQuery(Post.class);
         postQuery.setLimit(5);

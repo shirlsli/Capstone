@@ -192,17 +192,16 @@ public class ArchiveFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == getActivity().RESULT_OK) {
-//                hasPhoto = true;
                 Uri takenPhotoUri = Uri.fromFile(getPhotoFileUri(photoFileName));
-// by this point we have the camera photo on disk
+                // by this point we have the camera photo on disk
                 Bitmap rawTakenImage = BitmapFactory.decodeFile(takenPhotoUri.getPath());
-// See BitmapScaler.java: https://gist.github.com/nesquena/3885707fd3773c09f1bb
+                // See BitmapScaler.java: https://gist.github.com/nesquena/3885707fd3773c09f1bb
                 Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, 500);
                 // Configure byte output stream
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-// Compress the image further
+                // Compress the image further
                 resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
-// Create a new file for the resized bitmap (`getPhotoFileUri` defined above)
+                // Create a new file for the resized bitmap (`getPhotoFileUri` defined above)
                 File resizedFile = getPhotoFileUri(photoFileName + "_resized");
                 try {
                     resizedFile.createNewFile();
@@ -213,31 +212,10 @@ public class ArchiveFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                ExifInterface exif = null;
-                try {
-                    exif = new ExifInterface(resizedFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                switch(orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        takenImage = rotateImage(takenImage, 90);
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        takenImage = rotateImage(takenImage, 180);
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        takenImage = rotateImage(takenImage, 270);
-                        break;
-                }
+                Bitmap rotatedImage = changeOrientation(resizedFile, takenImage);
                 // Load the taken image into a preview
-                ivProfilePic.setImageBitmap(takenImage);
+                ivProfilePic.setImageBitmap(rotatedImage);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 byte[] bitmapBytes = stream.toByteArray();
@@ -259,11 +237,41 @@ public class ArchiveFragment extends Fragment {
         }
     }
 
-    public static Bitmap rotateImage(Bitmap source, float angle) {
+    private Bitmap changeOrientation(File resizedFile, Bitmap takenImage) {
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(resizedFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED);
+        Bitmap rotatedImage = null;
+        switch(orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                rotatedImage = rotateImage(takenImage, 90);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                rotatedImage = rotateImage(takenImage, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                rotatedImage = rotateImage(takenImage, 270);
+                break;
+            case ExifInterface.ORIENTATION_NORMAL:
+            default:
+                rotatedImage = takenImage;
+        }
+        return rotatedImage;
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
         Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
     private void queryPosts() {

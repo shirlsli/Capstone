@@ -18,4 +18,5 @@
     <string name="my_poems">My Poems</string>
     <string name="noFriendsPrompt">It seems like you have no friends to create poems with. Here\'s some poem lines from us to inspire you!</string>
     <string name="poemConfirmation">Are you done creating your poem?</string>
+    <string name="post">Post</string>
 </resources>
