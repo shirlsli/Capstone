@@ -132,7 +132,7 @@ public class ArchiveFragment extends Fragment {
                 user = objects.get(0);
                 ParseFile profile = user.getProfilePic();
                 Uri uri = Uri.parse(profile.getUrl());
-                Glide.with(getContext()).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfilePic);
+                Glide.with(getContext()).load(uri).centerCrop().into(ivProfilePic);
                 ivProfilePic.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -237,8 +237,7 @@ public class ArchiveFragment extends Fragment {
                         break;
                 }
                 // Load the taken image into a preview
-//                ivProfilePic.setImageBitmap(takenImage);
-                Glide.with(getContext()).load(takenImage).centerCrop().transform(new RoundedCorners(360)).into(ivProfilePic);
+                ivProfilePic.setImageBitmap(takenImage);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 byte[] bitmapBytes = stream.toByteArray();
