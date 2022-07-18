@@ -23,6 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private Button bSignup;
+    private static final String TAG = "SignupActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,12 @@ public class SignupActivity extends AppCompatActivity {
                 user.signUpInBackground(new SignUpCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
-                            Log.i("sign_up_success", "Sign up success!");
+                            Log.i(TAG, "Sign up success!");
                             Intent intent = new Intent(SignupActivity.this, FeedActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
-                            Log.i("sign_up_fail", "Sign up went wrong :(");
+                            Log.i(TAG, "Sign up went wrong :(");
                         }
                     }
                 });

@@ -31,7 +31,7 @@ public class FeedActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
-        setTitle("Feed"); // use resource string
+        setTitle(getString(R.string.feed));
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 

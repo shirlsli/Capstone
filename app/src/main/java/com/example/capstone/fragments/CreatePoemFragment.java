@@ -20,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -56,7 +58,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private LinearLayout friendsLinesLayout;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
-    private TextView tvPrompt;
     private String prompt;
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
@@ -67,9 +68,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private TextView tvLinesCount;
     private String linesCount;
     private DragLinearLayout dragLinearLayout;
+    private EditText etSearch;
 
     private String mParam1;
     private String mParam2;
+    private static final String TAG = "CreatePoemFragment";
 
     public CreatePoemFragment() {
         // Required empty public constructor
@@ -114,10 +117,10 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
-            tvPrompt = view.findViewById(R.id.tvPrompt);
             ivAdd = view.findViewById(R.id.ivAdd);
             ivMinus = view.findViewById(R.id.ivMinus);
             tvLinesCount = view.findViewById(R.id.tvLinesCount);
+            etSearch = view.findViewById(R.id.etSearch);
             dragLinearLayout = (DragLinearLayout) view.findViewById(R.id.dragDropContainer);
             dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
                 @Override
@@ -146,7 +149,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         friendsLinesLayout.removeAllViews();
         friendsLinesLayout.setVisibility(View.GONE);
         poemLayout.setVisibility(View.VISIBLE);
-        tvPrompt.setVisibility(View.VISIBLE);
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine);
         setLayout(tvTemp);
@@ -182,6 +184,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                     Fragment confirmPoemFragment = new ConfirmPoemFragment();
                                     Bundle bundle = new Bundle();
                                     bundle.putStringArrayList("Poem", poemLines);
+                                    bundle.putString("PoemLine", poemLine);
                                     confirmPoemFragment.setArguments(bundle);
                                     getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
                                 }
@@ -196,8 +199,24 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
 
     private void query(List<User> objects) {
         ArrayList<String> friendLines = new ArrayList<>();
+        // query for the user that is typed in -> query for current user's friends' list
         if (objects != null && objects.get(0).getFriends() != null) {
             ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
+            if (!etSearch.getText().toString().isEmpty()) {
+                // query User with username: etSearch's input
+                ParseQuery<User> userQuery = ParseQuery.getQuery(User.class);
+                userQuery.whereEqualTo("username", etSearch.getText().toString());
+                userQuery.findInBackground(new FindCallback<User>() {
+                    @Override
+                    public void done(List<User> objects, ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, objects.toString(), e);
+                        } else {
+                            poemLineQuery.whereEqualTo(Line.KEY_AUTHOR, objects.get(0));
+                        }
+                    }
+                });
+            }
             poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
             poemLineQuery.setLimit(20);
             poemLineQuery.addDescendingOrder("createdAt");
@@ -207,7 +226,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 @Override
                 public void done(List<Line> objects, ParseException e) {
                     if (e != null) {
-                        Log.e("tag", objects.toString(), e);
+                        Log.e(TAG, objects.toString(), e);
                     } else {
                         for (int i = 0; i < objects.size(); i++) {
                             friendLines.add(objects.get(i).getPoemLine());
@@ -217,7 +236,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 }
             });
         } else {
-            tvPrompt.setText(R.string.noFriendsPrompt);
             includeGeneratedLines(friendLines); // have two includedGeneratedLines calls instead one outside of the if-statement
             // because the one on line 201 needs to be nested in the query done function
         }

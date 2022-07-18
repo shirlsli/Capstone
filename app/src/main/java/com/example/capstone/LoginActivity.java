@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button bLogin;
     private Button bSignup;
     private TextView tvIncorrect;
+    private static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("login_button_click", "Login button was clicked");
+                Log.i(TAG, "Login button was clicked");
                 String email = etEmail.getText().toString();
                 String password = etPassword.getText().toString();
                 loginUser(email, password);
@@ -76,12 +77,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String password) {
-        Log.i("log_in", "Logging user in");
+        Log.i(TAG, "Logging user in");
         ParseUser.logInInBackground(email, password, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
                 if (e != null) {
-                    Log.e("login_error", "Login failed");
+                    Log.e(TAG, "Login failed");
                     tvIncorrect.setVisibility(View.VISIBLE);
                 } else {
                     goMainActivity();

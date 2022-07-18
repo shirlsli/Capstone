@@ -33,6 +33,8 @@ public class ConfirmPoemFragment extends Fragment {
     private LinearLayout linearLayout;
     private TextView tvPrompt;
     private Button bPublish;
+    private String poemLine;
+    private static final String TAG = "ConfirmPoemFragments";
 
     private String mParam1;
     private String mParam2;
@@ -72,6 +74,7 @@ public class ConfirmPoemFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             poemLines = bundle.getStringArrayList("Poem");
+            poemLine = bundle.getString("PoemLine");
             linearLayout = view.findViewById(R.id.friendsLinesLayout);
             tvPrompt = view.findViewById(R.id.tvPoemConfirmation);
             bPublish = view.findViewById(R.id.bPublish);
@@ -79,8 +82,7 @@ public class ConfirmPoemFragment extends Fragment {
         }
     }
 
-    private void poemConfirmScreen() {
-        // change add friends' poem lines textview to contain text: Are you done creating your poem?
+    private void setPoemConfirmUI() {
         tvPrompt.setText(R.string.poemConfirmation);
         tvPrompt.setVisibility(View.VISIBLE);
         linearLayout.setVisibility(View.VISIBLE);
@@ -95,13 +97,22 @@ public class ConfirmPoemFragment extends Fragment {
         }
         // set publish visibility to visible
         bPublish.setVisibility(View.VISIBLE);
+    }
+
+    private void poemConfirmScreen() {
+        // change add friends' poem lines textview to contain text: Are you done creating your poem?
+        setPoemConfirmUI();
         bPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Poem poem = new Poem();
+                int userLineIdx = poemLines.indexOf(poemLine);
                 for (int i = 0; i < poemLines.size(); i++) {
                     Line line = new Line();
                     line.setPoemLine(poemLines.get(i));
+                    if (i == userLineIdx) {
+                        line.setAuthor(ParseUser.getCurrentUser());
+                    }
                     poem.updatePoem(line);
                 }
                 poem.addAuthor(ParseUser.getCurrentUser());
@@ -117,7 +128,7 @@ public class ConfirmPoemFragment extends Fragment {
                             poemDetailsFragment.setArguments(bundle);
                             getParentFragmentManager().beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "generate_poem" ).commit();
                         } else {
-                            Log.e("poem_creation_test", "Poem created failed :(", e);
+                            Log.e(TAG, "Poem created failed :(", e);
                             Toast.makeText(getActivity(), "Your poem line was not saved to today's poem :(",
                                     Toast.LENGTH_LONG).show();
                         }

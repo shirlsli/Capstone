@@ -38,6 +38,7 @@ public class PoemDetailsFragment extends Fragment {
     private LinearLayout poemLayout;
     private Poem poem;
     private String fromFeed;
+    private static final String TAG = "PoemDetailsFragment";
 
     public PoemDetailsFragment() {
         // Required empty public constructor
@@ -76,7 +77,7 @@ public class PoemDetailsFragment extends Fragment {
         if (bundle != null) {
             fromFeed = getArguments().getString("fromFeed");
             poem = bundle.getParcelable("Poem");
-            Log.i("bundle_received_poem", "Parcel received item: " + poem);
+            Log.i(TAG, "Parcel received item: " + poem);
             poemLayout.addView(createDateTextView(view, poem));
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 TextView tvNewLine = new TextView(view.getContext());
@@ -100,7 +101,7 @@ public class PoemDetailsFragment extends Fragment {
                 });
             }
         } else {
-            Log.i("bundle_null", "Bundle is null");
+            Log.i(TAG, "Bundle is null");
         }
     }
 
@@ -112,10 +113,10 @@ public class PoemDetailsFragment extends Fragment {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e("post_saved_failed", "Post has not been saved", e);
+                    Log.e(TAG, "Post has not been saved", e);
                     Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.i("post_saved_succeed", "Post has been saved!");
+                    Log.i(TAG, "Post has been saved!");
                 }
             }
         });
@@ -127,8 +128,8 @@ public class PoemDetailsFragment extends Fragment {
     private TextView createDateTextView(View view, Poem poem) {
         TextView tvDate = new TextView(view.getContext());
         Date date = poem.getCreatedAt();
-        Log.i("poem_created_at", "Created at: " + date);
-        Log.i("poem_in_date", "Poem Created at: " + poem);
+        Log.i(TAG, "Created at: " + date);
+        Log.i(TAG, "Poem Created at: " + poem);
         DateFormat df = DateFormat.getDateInstance();
         String reportDate = df.format(date);
         tvDate.setText(reportDate);

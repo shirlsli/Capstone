@@ -39,6 +39,7 @@ public class FeedFragment extends Fragment {
     private RecyclerView rvPosts;
     private FloatingActionButton fabGenerate;
     private SwipeRefreshLayout swipeContainer;
+    private static final String TAG = "FeedFragment";
 
     public FeedFragment() {
         // Required empty public constructor
@@ -121,11 +122,11 @@ public class FeedFragment extends Fragment {
             @Override
             public void done(List<Post> posts, ParseException e) {
                 if (e != null) {
-                    Log.e("issue_getting_posts", "Issue with getting posts", e);
+                    Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
                 for (Post post : posts) {
-                    Log.i("no_issue_getting_posts", "Post: " + post.getPoem() + ", username: " + post.getAuthor().getUsername());
+                    Log.i(TAG, "Post: " + post.getPoem() + ", username: " + post.getAuthor().getUsername());
                 }
                 allPosts.addAll(posts);
 //                rvPosts.smoothScrollToPosition(0);

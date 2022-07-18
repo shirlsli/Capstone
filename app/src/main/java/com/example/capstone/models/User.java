@@ -15,6 +15,8 @@ public class User extends ParseUser {
         return getList(KEY_FRIENDS);
     }
 
+    public void addFriends(ParseUser user) { add(KEY_FRIENDS, user); }
+
     public ParseFile getProfilePic() {
         return getParseFile(KEY_PROFILE_PIC);
     }

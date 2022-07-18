@@ -34,6 +34,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     private Context context;
     private List<String> friendsLines;
     EventListener eventListener;
+    private static final String TAG = "SearchAdapter";
 
     public interface EventListener {
         void onEvent(String data);

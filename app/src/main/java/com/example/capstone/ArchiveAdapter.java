@@ -33,6 +33,7 @@ public class ArchiveAdapter extends RecyclerView.Adapter<ArchiveAdapter.ViewHold
 
     private Context context;
     private List<Poem> poems;
+    private static final String TAG = "ArchiveAdapter";
 
     public ArchiveAdapter(Context context, List<Poem> poems) {
         this.context = context;
@@ -92,7 +93,7 @@ public class ArchiveAdapter extends RecyclerView.Adapter<ArchiveAdapter.ViewHold
                 Fragment poemDetailsFragment = new PoemDetailsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("Poem", poem);
-                Log.i("bundle_post_poem", "Parcelled item: " + poem);
+                Log.i(TAG, "Parcelled item: " + poem);
                 poemDetailsFragment.setArguments(bundle);
                 fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "archive_poem" ).commit();
             }

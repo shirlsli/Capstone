@@ -55,6 +55,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private RecyclerView rvGeneratedLines;
     private LottieAnimationView lottieAnimationView;
     private String[] generatedLines;
+    private static final String TAG = "GenerateFragment";
 
 
     public GenerateFragment() {
@@ -176,9 +177,9 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }
             });
-            Log.i("poem_line_creation_test", "poem line creation success! " + poemLine);
+            Log.i(TAG, "poem line creation success! " + poemLine);
         } catch (Exception exception) {
-            Log.e("poem_line_creation_test", "poem line creation failed :(", exception);
+            Log.e(TAG, "poem line creation failed :(", exception);
         }
     }
 

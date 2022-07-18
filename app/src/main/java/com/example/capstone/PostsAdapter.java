@@ -35,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
+    private static final String TAG = "PostsAdapter";
     private Context context;
     private List<Post> posts;
 
@@ -91,7 +92,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                Log.i("parseuser_test", ParseUser.getCurrentUser().getObjectId());
+                Log.i(TAG, ParseUser.getCurrentUser().getObjectId());
                 bFriend.setVisibility(View.VISIBLE);
                 bFriend.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -110,7 +111,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 poemString += "\n";
             }
             tvPoem.setText(poemString);
-//            Log.i("poem_size", "Poem size: " + poem.getPoemLines().size());
             tvTimeStamp.setText(post.getRelativeTimeAgo(post.getCreatedAt().toString()));
         }
 
@@ -125,7 +125,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Bundle bundle = new Bundle();
                 bundle.putString("fromFeed", "Feed");
                 bundle.putParcelable("Poem", post.getPoem());
-                Log.i("bundle_post_poem", "Parcelled item: " + post.getPoem());
+                Log.i(TAG, "Parcelled item: " + post.getPoem());
                 poemDetailsFragment.setArguments(bundle);
                 fragmentManager.beginTransaction().replace(R.id.flContainer, poemDetailsFragment).addToBackStack( "feed_poem" ).commit();
             }
@@ -136,8 +136,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             FragmentManager fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
             if (position != RecyclerView.NO_POSITION) {
                 Post post = posts.get(position);
-                ParseUser.getCurrentUser().add("friends", post.getAuthor());
-                Log.i("added_friend_test", "Friend added!" + ParseUser.getCurrentUser().get("friends"));
+                ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+                currentUserQuery.include(User.KEY_FRIENDS);
+                currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+                currentUserQuery.findInBackground(new FindCallback<User>() {
+                    @Override
+                    public void done(List<User> objects, ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "Friend not added", e);
+                        } else {
+                            objects.get(0).addFriends(post.getAuthor());
+                            Log.i(TAG, "Friend added!" + objects.get(0).getFriends());
+                        }
+                    }
+                });
             }
         }
     }

@@ -11,7 +11,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,15 +23,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.capstone.ArchiveAdapter;
 import com.example.capstone.BitmapScaler;
-import com.example.capstone.LoginActivity;
 import com.example.capstone.R;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
@@ -67,6 +63,7 @@ public class ArchiveFragment extends Fragment {
     private TextView tvUsernamePoem;
     private SwipeRefreshLayout swipeContainer;
     private User user;
+    private static final String TAG = "ArchiveFragment";
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -225,9 +222,9 @@ public class ArchiveFragment extends Fragment {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
-                            Log.e("profile_pic_test", "Issue with saving profile pic", e);
+                            Log.e(TAG, "Issue with saving profile pic", e);
                         } else {
-                            Log.i("profile_pic_test", "Profile pic saved!");
+                            Log.i(TAG, "Profile pic saved!");
                         }
                     }
                 });
@@ -286,13 +283,10 @@ public class ArchiveFragment extends Fragment {
             @Override
             public void done(List<Poem> poems, ParseException e) {
                 if (e != null) {
-                    Log.e("issue_getting_posts", "Issue with getting posts", e);
+                    Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
                 allPoems.addAll(poems);
-                for (Poem poem : allPoems) { // it works!
-                    Log.i("testing_author", "Author: " + poem.getAuthors());
-                }
 //                rvPosts.smoothScrollToPosition(0);
                 adapter.notifyDataSetChanged();
             }
@@ -307,7 +301,7 @@ public class ArchiveFragment extends Fragment {
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d("directory_creation_test", "failed to create directory");
+            Log.d(TAG, "Failed to create directory");
         }
 
         // Return the file target for the photo based on filename
