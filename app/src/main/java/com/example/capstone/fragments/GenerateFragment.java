@@ -135,6 +135,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                             });
                         }
                     });
+                    service.shutdown();
                 }
             });
         }
@@ -167,14 +168,16 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                        // goes to Create Poem Fragment
-                        Fragment createPoemFragment = new CreatePoemFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("Line", line);
-                        bundle.putString("Prompt", prompt);
-                        bundle.putStringArrayList("GeneratedLines", generatedLines);
-                        createPoemFragment.setArguments(bundle);
-                        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
+                    // goes to Create Poem Fragment
+                    ArrayList<String> poemLines = new ArrayList<>();
+                    Fragment createPoemFragment = new CreatePoemFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putStringArrayList("Poem", poemLines);
+                    bundle.putString("Line", line);
+                    bundle.putString("Prompt", prompt);
+                    bundle.putStringArrayList("GeneratedLines", generatedLines);
+                    createPoemFragment.setArguments(bundle);
+                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }
             });
             Log.i(TAG, "poem line creation success! " + poemLine);

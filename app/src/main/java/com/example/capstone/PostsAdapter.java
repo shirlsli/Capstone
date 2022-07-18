@@ -28,6 +28,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -147,6 +148,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         } else {
                             objects.get(0).addFriends(post.getAuthor());
                             Log.i(TAG, "Friend added!" + objects.get(0).getFriends());
+                            objects.get(0).saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.e(TAG, "New friend not saved :(", e);
+                                    } else {
+                                        Log.i(TAG, "New friend saved!");
+                                    }
+                                }
+                            });
                         }
                     }
                 });

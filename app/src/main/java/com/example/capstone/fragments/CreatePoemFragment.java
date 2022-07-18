@@ -32,6 +32,7 @@ import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
+import com.example.capstone.models.Query;
 import com.example.capstone.models.User;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.parse.FindCallback;
@@ -46,6 +47,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 
 public class CreatePoemFragment extends Fragment implements SearchAdapter.EventListener {
@@ -110,13 +117,24 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         rvFriendsLines = view.findViewById(R.id.rvFriendsLines);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            poemLines = new ArrayList<>();
+            poemLines = bundle.getStringArrayList("Poem");
             poemLine = bundle.getString("Line");
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
             poemLayout = view.findViewById(R.id.poemLayout);
             friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
+            ivForwardArrow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Fragment confirmPoemFragment = new ConfirmPoemFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putStringArrayList("Poem", poemLines);
+                    bundle.putString("PoemLine", poemLine);
+                    confirmPoemFragment.setArguments(bundle);
+                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
+                }
+            });
             ivAdd = view.findViewById(R.id.ivAdd);
             ivMinus = view.findViewById(R.id.ivMinus);
             tvLinesCount = view.findViewById(R.id.tvLinesCount);
@@ -149,118 +167,99 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         friendsLinesLayout.removeAllViews();
         friendsLinesLayout.setVisibility(View.GONE);
         poemLayout.setVisibility(View.VISIBLE);
-        TextView tvTemp = new TextView(getContext());
-        tvTemp.setText(poemLine);
-        setLayout(tvTemp);
-        dragLinearLayout.addView(tvTemp);
-        dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
-        poemLines.add(poemLine);
+        for (int i = 0; i < poemLines.size(); i++) {
+            TextView tvTemp = new TextView(getContext());
+            tvTemp.setText(poemLines.get(i));
+            setLayout(tvTemp);
+            if (!poemLines.get(i).equals(poemLine)) {
+                tvTemp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            deletePoemLine(tvTemp, tvTemp.getText().toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+            dragLinearLayout.addView(tvTemp);
+            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+        }
+        if (poemLines.size() == 0) {
+            TextView tvTemp = new TextView(getContext());
+            tvTemp.setText(poemLine);
+            setLayout(tvTemp);
+            dragLinearLayout.addView(tvTemp);
+            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+            poemLines.add(poemLine);
+        }
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                poemLayout.setVisibility(View.GONE);
-                ivAdd.setVisibility(View.GONE);
-                ivMinus.setVisibility(View.VISIBLE);
-                ivMinus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        switchToAdd();
-                    }
-                });
-                if (friendsLinesLayout.getChildCount() > 0) {
-                    friendsLinesLayout.setVisibility(View.VISIBLE);
-                } else {
-                    ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
-                    currentUserQuery.include(User.KEY_FRIENDS);
-                    currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-                    currentUserQuery.findInBackground(new FindCallback<User>() {
-                        @Override
-                        public void done(List<User> objects, ParseException e) {
-                            ivForwardArrow.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Fragment confirmPoemFragment = new ConfirmPoemFragment();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putStringArrayList("Poem", poemLines);
-                                    bundle.putString("PoemLine", poemLine);
-                                    confirmPoemFragment.setArguments(bundle);
-                                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
-                                }
-                            });
-                            query(objects);
-                        }
-                    });
-                }
+                onAddClicked();
             }
         });
     }
 
-    private void query(List<User> objects) {
-        ArrayList<String> friendLines = new ArrayList<>();
-        // query for the user that is typed in -> query for current user's friends' list
-        if (objects != null && objects.get(0).getFriends() != null) {
-            ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
-            if (!etSearch.getText().toString().isEmpty()) {
-                // query User with username: etSearch's input
-                ParseQuery<User> userQuery = ParseQuery.getQuery(User.class);
-                userQuery.whereEqualTo("username", etSearch.getText().toString());
-                userQuery.findInBackground(new FindCallback<User>() {
-                    @Override
-                    public void done(List<User> objects, ParseException e) {
-                        if (e != null) {
-                            Log.e(TAG, objects.toString(), e);
-                        } else {
-                            poemLineQuery.whereEqualTo(Line.KEY_AUTHOR, objects.get(0));
-                        }
-                    }
-                });
+    private void onAddClicked() {
+        poemLayout.setVisibility(View.GONE);
+        ivAdd.setVisibility(View.GONE);
+        ivMinus.setVisibility(View.VISIBLE);
+        ivMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchToAdd();
             }
-            poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, objects.get(0).getFriends());
-            poemLineQuery.setLimit(20);
-            poemLineQuery.addDescendingOrder("createdAt");
-            poemLineQuery.include(Line.KEY_AUTHOR);
-            poemLineQuery.include(Line.KEY_POEM_LINE);
-            poemLineQuery.findInBackground(new FindCallback<Line>() {
+        });
+        if (friendsLinesLayout.getChildCount() > 0) {
+            friendsLinesLayout.setVisibility(View.VISIBLE);
+        } else {
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            service.execute(new Runnable() {
                 @Override
-                public void done(List<Line> objects, ParseException e) {
-                    if (e != null) {
-                        Log.e(TAG, objects.toString(), e);
-                    } else {
-                        for (int i = 0; i < objects.size(); i++) {
-                            friendLines.add(objects.get(i).getPoemLine());
-                        }
-                        includeGeneratedLines(friendLines);
+                public void run() {
+                    Query query = new Query(etSearch.getText().toString());
+                    try {
+                        query.call(new Runnable() {
+                            @Override
+                            public void run() {
+                                generatedLines = query.getFriendsLines();
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        includeGeneratedLines(generatedLines);
+                                    }
+                                });
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    service.shutdown();
                 }
             });
-        } else {
-            includeGeneratedLines(friendLines); // have two includedGeneratedLines calls instead one outside of the if-statement
-            // because the one on line 201 needs to be nested in the query done function
         }
     }
 
     private void includeGeneratedLines(ArrayList<String> friendLines) {
+        allFriendsLines = friendLines;
+        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
+        rvFriendsLines.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
+        rvFriendsLines.setLayoutManager(linearLayoutManager);
+        friendsLinesLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < generatedLines.size(); i++) {
             if (!generatedLines.get(i).equals("")) {
                 friendLines.add(generatedLines.get(i));
             }
         }
-        addFriendLines(friendLines);
     }
 
     public void onEvent(String data) {
         selectFriendLine(data);
-    }
-
-    private void addFriendLines(ArrayList<String> friendLines) {
-            allFriendsLines = friendLines;
-            adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
-            rvFriendsLines.setAdapter(adapter);
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
-            rvFriendsLines.setLayoutManager(linearLayoutManager);
-            friendsLinesLayout.setVisibility(View.VISIBLE);
     }
 
     private void selectFriendLine(String line) {
@@ -273,7 +272,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 @Override
                 public void onClick(View v) {
                     try {
-                        deletePoemLine(tvTemp, poemLines.get(poemLines.size() - 1));
+                        deletePoemLine(tvTemp, tvTemp.getText().toString());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
