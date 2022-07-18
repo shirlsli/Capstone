@@ -54,6 +54,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     protected List<String> allGeneratedLines;
     private RecyclerView rvGeneratedLines;
     private LottieAnimationView lottieAnimationView;
+    private String[] generatedLines;
 
 
     public GenerateFragment() {
@@ -109,6 +110,9 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     public void generatePrompts(View view) throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
             hideSoftKeyboard(getActivity());
+            if (generatedLines != null) {
+                generatedLines = null;
+            }
             lottieAnimationView.setVisibility(View.VISIBLE);
             ivForwardArrow.setVisibility(View.GONE);
             ExecutorService service = Executors.newSingleThreadExecutor();
@@ -119,7 +123,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     openAIThread.runCallback(new Runnable() {
                         @Override
                         public void run() {
-                            String[] generatedLines = openAIThread.getGeneratedLines();
+                            generatedLines = openAIThread.getGeneratedLines();
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
