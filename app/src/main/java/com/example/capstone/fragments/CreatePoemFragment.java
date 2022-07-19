@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,8 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Query;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
 import com.parse.ParseException;
 
@@ -58,6 +62,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private LottieAnimationView lottieAnimationView;
     private TextView tvInstructions;
     private ImageView ivSearch;
+    private ChipGroup chipGroup;
 
     private String mParam1;
     private String mParam2;
@@ -123,6 +128,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             etSearch = view.findViewById(R.id.etSearch);
             tvInstructions = view.findViewById(R.id.tvInstructions);
             ivSearch = view.findViewById(R.id.ivSearch);
+            chipGroup = view.findViewById(R.id.chipGroup);
             ivSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -201,6 +207,21 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void onSearchClicked() {
+        if (chipGroup.getHeight() < rvFriendsLines.getHeight() + (chipGroup.getHeight() - 200)) {
+            Chip chip = new Chip(getContext());
+            chip.setText(etSearch.getText());
+            // can set icon to show profile pic as well
+            chip.setCloseIconVisible(true);
+            chip.setCheckable(false);
+            chip.setOnCloseIconClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    chipGroup.removeView(chip);
+                }
+            });
+            chipGroup.addView(chip);
+            chipGroup.setVisibility(View.VISIBLE);
+        }
         hideSoftKeyboard(requireActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
         if (allFriendsLines.size() > 0 && etSearch.getText().toString().equals(previousChipText)) {
@@ -305,6 +326,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         ivBack.setVisibility(View.VISIBLE);
         rvFriendsLines.setVisibility(View.VISIBLE);
         ivSearch.setVisibility(View.VISIBLE);
+        chipGroup.setVisibility(View.VISIBLE);
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -321,6 +343,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         ivAdd.setVisibility(View.VISIBLE);
         ivBack.setVisibility(View.GONE);
         ivSearch.setVisibility(View.GONE);
+        chipGroup.setVisibility(View.GONE);
     }
 
     public static void hideSoftKeyboard(Activity activity) {
