@@ -51,6 +51,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
+    public void addAll(List<String> list) {
+        friendsLines.addAll(list);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public SearchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

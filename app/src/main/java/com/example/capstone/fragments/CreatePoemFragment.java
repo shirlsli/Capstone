@@ -67,7 +67,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private String poemLine;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
-    private String prompt;
+    private String previousChipText = "";
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
     private ImageView ivMinus;
@@ -122,11 +122,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         if (bundle != null) {
             poemLines = bundle.getStringArrayList("Poem");
             poemLine = bundle.getString("Line");
-            prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
             poemLayout = view.findViewById(R.id.poemLayout);
             lottieAnimationView = view.findViewById(R.id.lottieLoad);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
+            allFriendsLines = new ArrayList<>();
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -221,30 +221,44 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         });
         hideSoftKeyboard(getActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                Query query = new Query(etSearch.getText().toString());
-                try {
-                    query.call(new Runnable() {
-                        @Override
-                        public void run() {
-                            allFriendsLines = new ArrayList<>();
-                            allFriendsLines.addAll(query.getFriendsLines());
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    includeGeneratedLines();
+        // only query when first time opening, otherwise just display the recyclerview
+        if (allFriendsLines != null && etSearch.getText().toString().equals(previousChipText)) {
+            lottieAnimationView.setVisibility(View.GONE);
+            rvFriendsLines.setVisibility(View.VISIBLE);
+        } else {
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Query query = new Query(etSearch.getText().toString());
+                    try {
+                        query.call(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (adapter != null && !etSearch.getText().toString().equals(previousChipText)) {
+                                    previousChipText = etSearch.getText().toString();
+                                    adapter.clear();
+                                    adapter.addAll(query.getFriendsLines());
+                                    rvFriendsLines.setVisibility(View.VISIBLE);
+                                    lottieAnimationView.setVisibility(View.GONE);
+                                } else {
+                                    previousChipText = etSearch.getText().toString();
+                                    allFriendsLines.addAll(query.getFriendsLines());
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            includeGeneratedLines();
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void includeGeneratedLines() {
