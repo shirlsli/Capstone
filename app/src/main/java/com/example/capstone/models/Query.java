@@ -15,14 +15,14 @@ import java.util.concurrent.Callable;
 public class Query {
 
     private static final String TAG = "Query";
-    private ArrayList<String> friendsLines;
-    private String userInput;
+    private final String userInput;
+    private List<String> friendsLines;
 
     public Query(String userInput) {
         this.userInput = userInput;
     }
 
-    public ArrayList<String> getFriendsLines() {
+    public List<String> getFriendsLines() {
         return friendsLines;
     }
 
@@ -68,6 +68,7 @@ public class Query {
                                                         for (int i = 0; i < friendLines.size(); i++) {
                                                             friendsLines.add(friendLines.get(i).getPoemLine());
                                                         }
+                                                        callback.run();
                                                     }
                                                 });
                                             }
@@ -80,6 +81,5 @@ public class Query {
                 }
             }
         });
-        callback.run();
     }
 }

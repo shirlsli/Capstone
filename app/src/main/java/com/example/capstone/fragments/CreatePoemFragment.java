@@ -1,5 +1,6 @@
 package com.example.capstone.fragments;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -20,11 +21,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
@@ -62,7 +65,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
 
     private ArrayList<String> poemLines;
     private String poemLine;
-    private LinearLayout friendsLinesLayout;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
     private String prompt;
@@ -76,6 +78,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private String linesCount;
     private DragLinearLayout dragLinearLayout;
     private EditText etSearch;
+    private LottieAnimationView lottieAnimationView;
 
     private String mParam1;
     private String mParam2;
@@ -122,7 +125,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             prompt = bundle.getString("Prompt");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
             poemLayout = view.findViewById(R.id.poemLayout);
-            friendsLinesLayout = view.findViewById(R.id.friendsLinesLayout);
+            lottieAnimationView = view.findViewById(R.id.lottieLoad);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -164,8 +167,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
 
     public void createPoem() throws ParseException {
         // brand new query for the current user
-        friendsLinesLayout.removeAllViews();
-        friendsLinesLayout.setVisibility(View.GONE);
         poemLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poemLines.size(); i++) {
             TextView tvTemp = new TextView(getContext());
@@ -199,12 +200,16 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAddClicked();
+                try {
+                    onAddClicked();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void onAddClicked() {
+    private void onAddClicked() throws ExecutionException, InterruptedException {
         poemLayout.setVisibility(View.GONE);
         ivAdd.setVisibility(View.GONE);
         ivMinus.setVisibility(View.VISIBLE);
@@ -214,48 +219,41 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 switchToAdd();
             }
         });
-        if (friendsLinesLayout.getChildCount() > 0) {
-            friendsLinesLayout.setVisibility(View.VISIBLE);
-        } else {
-            ExecutorService service = Executors.newSingleThreadExecutor();
-            service.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Query query = new Query(etSearch.getText().toString());
-                    try {
-                        query.call(new Runnable() {
-                            @Override
-                            public void run() {
-                                generatedLines = query.getFriendsLines();
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        includeGeneratedLines(generatedLines);
-                                    }
-                                });
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    service.shutdown();
+        hideSoftKeyboard(getActivity());
+        lottieAnimationView.setVisibility(View.VISIBLE);
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                Query query = new Query(etSearch.getText().toString());
+                try {
+                    query.call(new Runnable() {
+                        @Override
+                        public void run() {
+                            allFriendsLines = new ArrayList<>();
+                            allFriendsLines.addAll(query.getFriendsLines());
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    includeGeneratedLines();
+                                }
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            });
-        }
+            }
+        });
     }
 
-    private void includeGeneratedLines(ArrayList<String> friendLines) {
-        allFriendsLines = friendLines;
-        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
-        rvFriendsLines.setAdapter(adapter);
+    private void includeGeneratedLines() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvFriendsLines.setLayoutManager(linearLayoutManager);
-        friendsLinesLayout.setVisibility(View.VISIBLE);
-        for (int i = 0; i < generatedLines.size(); i++) {
-            if (!generatedLines.get(i).equals("")) {
-                friendLines.add(generatedLines.get(i));
-            }
-        }
+        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
+        rvFriendsLines.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+        lottieAnimationView.setVisibility(View.GONE);
     }
 
     public void onEvent(String data) {
@@ -305,8 +303,31 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
 
     private void switchToAdd() {
         poemLayout.setVisibility(View.VISIBLE);
-        friendsLinesLayout.setVisibility(View.GONE);
+        rvFriendsLines.setVisibility(View.GONE);
         ivAdd.setVisibility(View.VISIBLE);
         ivMinus.setVisibility(View.GONE);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 }

@@ -23,24 +23,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/friendsLinesLayout"
-        app:layout_constraintEnd_toEndOf="@+id/friendsLinesLayout"
-        app:layout_constraintStart_toStartOf="@+id/friendsLinesLayout"
+        app:layout_constraintBottom_toTopOf="@id/ivForwardArrow2"
+        app:layout_constraintEnd_toEndOf="@+id/frameLayout"
+        app:layout_constraintStart_toStartOf="@+id/etSearch"
         app:layout_constraintTop_toBottomOf="@+id/etSearch" />
-
-    <LinearLayout
-        android:id="@+id/friendsLinesLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/ivForwardArrow2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etSearch"
-        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/ivForwardArrow2"
@@ -101,6 +87,22 @@
             android:src="@drawable/ic_add"
             tools:visibility="gone" />
     </FrameLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieLoad"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/ivForwardArrow2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipGroup"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="lf20_5hpcwrqe.json"
+        app:lottie_loop="true"
+        app:lottie_speed="1"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tvLinesCount"

@@ -130,12 +130,11 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                                 public void run() {
                                     lottieAnimationView.setVisibility(View.GONE);
                                     ivForwardArrow.setVisibility(View.VISIBLE);
-                                    displayPoemLines(generatedLines, view);
+                                    displayPoemLines(generatedLines);
                                 }
                             });
                         }
                     });
-                    service.shutdown();
                 }
             });
         }
@@ -153,7 +152,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         }
     }
 
-    private void displayPoemLines(String[] generatedLines, View view) {
+    private void displayPoemLines(String[] generatedLines) {
         allGeneratedLines = Arrays.asList(generatedLines).subList(2, generatedLines.length);
         adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this);
         rvGeneratedLines.setAdapter(adapter);
