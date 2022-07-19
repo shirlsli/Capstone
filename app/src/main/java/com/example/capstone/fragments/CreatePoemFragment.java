@@ -48,7 +48,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private String poemLine;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
-    private String previousChipText = "";
+    private String previousChipText;
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
     private ImageView ivBack;
@@ -207,7 +207,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void onSearchClicked() {
-        if (chipGroup.getHeight() < rvFriendsLines.getHeight() + (chipGroup.getHeight() - 200)) {
+        if (chipGroup.getChildCount() < 44) {
             Chip chip = new Chip(getContext());
             chip.setText(etSearch.getText());
             // can set icon to show profile pic as well
@@ -216,6 +216,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             chip.setOnCloseIconClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (chipGroup.getChildCount() == 1) {
+                        adapter.clear();
+                        etSearch.setText("");
+                        showSoftKeyboard(getActivity());
+                    }
                     chipGroup.removeView(chip);
                 }
             });
@@ -346,15 +351,21 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         chipGroup.setVisibility(View.GONE);
     }
 
-    public static void hideSoftKeyboard(Activity activity) {
+    private static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()) {
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),
+                    0);
+        }
+    }
+
+    private void showSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(
                         Activity.INPUT_METHOD_SERVICE);
-        if(inputMethodManager.isAcceptingText()){
-            inputMethodManager.hideSoftInputFromWindow(
-                    activity.getCurrentFocus().getWindowToken(),
-                    0
-            );
+        if(inputMethodManager.isAcceptingText()) {
+            inputMethodManager.showSoftInput(etSearch, 0);
         }
     }
 
