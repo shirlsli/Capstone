@@ -252,7 +252,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         rvFriendsLines.setLayoutManager(linearLayoutManager);
         adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
         rvFriendsLines.setAdapter(adapter);
-        getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
         lottieAnimationView.setVisibility(View.GONE);
     }
 
