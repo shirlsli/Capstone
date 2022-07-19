@@ -77,6 +77,22 @@ public class Query {
                                 }
                             }
                         });
+                    } else {
+                        ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
+                        poemLineQuery.include(Line.KEY_AUTHOR);
+                        poemLineQuery.include(Line.KEY_POEM_LINE);
+                        poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, currentUser.getFriends());
+                        poemLineQuery.setLimit(20);
+                        poemLineQuery.addDescendingOrder("createdAt");
+                        poemLineQuery.findInBackground(new FindCallback<Line>() {
+                            @Override
+                            public void done(List<Line> friendLines, ParseException e) {
+                                for (int i = 0; i < friendLines.size(); i++) {
+                                    friendsLines.add(friendLines.get(i).getPoemLine());
+                                }
+                                callback.run();
+                            }
+                        });
                     }
                 }
             }

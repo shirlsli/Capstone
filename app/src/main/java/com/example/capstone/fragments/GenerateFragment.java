@@ -86,7 +86,13 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_generate, container, false);
     }
-
+// add instructions for generate
+    // move hint in etSearch to a TextView label for instruction - done
+    // tell user that they can drag and drop, tap to delete, and tap to add
+    // move etSearch to visible when add is clicked; replace current etSearch with instructions/guidance text - done
+    // allow user to choose to make their poem line public
+    // add friend's username to their poem line in edit poem screen
+    // rephrase line count: Max 16 lines?
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

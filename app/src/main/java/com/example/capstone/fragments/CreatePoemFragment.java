@@ -1,24 +1,14 @@
 package com.example.capstone.fragments;
 
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Context;
-import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -28,34 +18,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
-import com.example.capstone.models.Line;
-import com.example.capstone.models.OpenAIThread;
-import com.example.capstone.models.Poem;
-import com.example.capstone.models.Post;
 import com.example.capstone.models.Query;
-import com.example.capstone.models.User;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
-import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 
 public class CreatePoemFragment extends Fragment implements SearchAdapter.EventListener {
@@ -70,7 +47,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private String previousChipText = "";
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
-    private ImageView ivMinus;
+    private ImageView ivBack;
     protected SearchAdapter adapter;
     protected List<String> allFriendsLines;
     private RecyclerView rvFriendsLines;
@@ -79,6 +56,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private DragLinearLayout dragLinearLayout;
     private EditText etSearch;
     private LottieAnimationView lottieAnimationView;
+    private TextView tvInstructions;
+    private ImageView ivSearch;
 
     private String mParam1;
     private String mParam2;
@@ -139,9 +118,17 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 }
             });
             ivAdd = view.findViewById(R.id.ivAdd);
-            ivMinus = view.findViewById(R.id.ivMinus);
+            ivBack = view.findViewById(R.id.ivMinus);
             tvLinesCount = view.findViewById(R.id.tvLinesCount);
             etSearch = view.findViewById(R.id.etSearch);
+            tvInstructions = view.findViewById(R.id.tvInstructions);
+            ivSearch = view.findViewById(R.id.ivSearch);
+            ivSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onSearchClicked();
+                }
+            });
             dragLinearLayout = (DragLinearLayout) view.findViewById(R.id.dragDropContainer);
             dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
                 @Override
@@ -210,22 +197,20 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void onAddClicked() throws ExecutionException, InterruptedException {
-        poemLayout.setVisibility(View.GONE);
-        ivAdd.setVisibility(View.GONE);
-        ivMinus.setVisibility(View.VISIBLE);
-        ivMinus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchToAdd();
-            }
-        });
-        hideSoftKeyboard(getActivity());
+        showBackArrow();
+    }
+
+    private void onSearchClicked() {
+        hideSoftKeyboard(requireActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
-        // only query when first time opening, otherwise just display the recyclerview
-        if (allFriendsLines != null && etSearch.getText().toString().equals(previousChipText)) {
+        if (allFriendsLines.size() > 0 && etSearch.getText().toString().equals(previousChipText)) {
             lottieAnimationView.setVisibility(View.GONE);
-            rvFriendsLines.setVisibility(View.VISIBLE);
         } else {
+            runQuery();
+        }
+    }
+
+    private void runQuery() {
             ExecutorService service = Executors.newSingleThreadExecutor();
             service.execute(new Runnable() {
                 @Override
@@ -239,7 +224,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                     previousChipText = etSearch.getText().toString();
                                     adapter.clear();
                                     adapter.addAll(query.getFriendsLines());
-                                    rvFriendsLines.setVisibility(View.VISIBLE);
                                     lottieAnimationView.setVisibility(View.GONE);
                                 } else {
                                     previousChipText = etSearch.getText().toString();
@@ -247,7 +231,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            includeGeneratedLines();
+                                            setUpAdapter();
                                         }
                                     });
                                 }
@@ -258,10 +242,9 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     }
                 }
             });
-        }
     }
 
-    private void includeGeneratedLines() {
+    private void setUpAdapter() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvFriendsLines.setLayoutManager(linearLayoutManager);
         adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
@@ -314,11 +297,30 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         tvTemp.setTextSize(16);
     }
 
+    private void showBackArrow() {
+        poemLayout.setVisibility(View.GONE);
+        ivAdd.setVisibility(View.GONE);
+        tvInstructions.setVisibility(View.GONE);
+        etSearch.setVisibility(View.VISIBLE);
+        ivBack.setVisibility(View.VISIBLE);
+        rvFriendsLines.setVisibility(View.VISIBLE);
+        ivSearch.setVisibility(View.VISIBLE);
+        ivBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchToAdd();
+            }
+        });
+    }
+
     private void switchToAdd() {
         poemLayout.setVisibility(View.VISIBLE);
         rvFriendsLines.setVisibility(View.GONE);
+        tvInstructions.setVisibility(View.VISIBLE);
+        etSearch.setVisibility(View.GONE);
         ivAdd.setVisibility(View.VISIBLE);
-        ivMinus.setVisibility(View.GONE);
+        ivBack.setVisibility(View.GONE);
+        ivSearch.setVisibility(View.GONE);
     }
 
     public static void hideSoftKeyboard(Activity activity) {
