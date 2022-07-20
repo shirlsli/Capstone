@@ -48,7 +48,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private String poemLine;
     private LinearLayout poemLayout;
     private ImageView ivForwardArrow;
-    private String previousChipText;
+    private ArrayList<String> previousChipText;
     private ImageView ivAdd;
     private ArrayList<String> generatedLines;
     private ImageView ivBack;
@@ -63,6 +63,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private TextView tvInstructions;
     private ImageView ivSearch;
     private ChipGroup chipGroup;
+    ArrayList<String> chips;
 
     private String mParam1;
     private String mParam2;
@@ -111,6 +112,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             lottieAnimationView = view.findViewById(R.id.lottieLoad);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
             allFriendsLines = new ArrayList<>();
+            chips = new ArrayList<>();
+            previousChipText = new ArrayList<>();
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -210,6 +213,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         if (chipGroup.getChildCount() < 44) {
             Chip chip = new Chip(getContext());
             chip.setText(etSearch.getText());
+            chips.add(etSearch.getText().toString());
+            etSearch.setText("");
             // can set icon to show profile pic as well
             chip.setCloseIconVisible(true);
             chip.setCheckable(false);
@@ -222,14 +227,14 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                         showSoftKeyboard(getActivity());
                     }
                     chipGroup.removeView(chip);
+                    chips.remove(chip.getText().toString());
                 }
             });
             chipGroup.addView(chip);
-            chipGroup.setVisibility(View.VISIBLE);
         }
         hideSoftKeyboard(requireActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
-        if (allFriendsLines.size() > 0 && etSearch.getText().toString().equals(previousChipText)) {
+        if (allFriendsLines.size() > 0 && chips.containsAll(previousChipText)) {
             lottieAnimationView.setVisibility(View.GONE);
         } else {
             runQuery();
@@ -241,18 +246,19 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             service.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Query query = new Query(etSearch.getText().toString());
+                    Query query = new Query(chips);
                     try {
                         query.call(new Runnable() {
                             @Override
                             public void run() {
-                                if (adapter != null && !etSearch.getText().toString().equals(previousChipText)) {
-                                    previousChipText = etSearch.getText().toString();
+                                if (adapter != null && !chips.containsAll(previousChipText)) {
+                                    previousChipText.removeAll(previousChipText);
+                                    previousChipText.addAll(chips);
                                     adapter.clear();
                                     adapter.addAll(query.getFriendsLines());
                                     lottieAnimationView.setVisibility(View.GONE);
                                 } else {
-                                    previousChipText = etSearch.getText().toString();
+                                    previousChipText.addAll(chips);
                                     allFriendsLines.addAll(query.getFriendsLines());
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override

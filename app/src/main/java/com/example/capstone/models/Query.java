@@ -15,10 +15,10 @@ import java.util.concurrent.Callable;
 public class Query {
 
     private static final String TAG = "Query";
-    private final String userInput;
+    private ArrayList<String> userInput;
     private List<String> friendsLines;
 
-    public Query(String userInput) {
+    public Query(ArrayList<String> userInput) {
         this.userInput = userInput;
     }
 
@@ -35,15 +35,15 @@ public class Query {
             @Override
             public void done(User currentUser, ParseException e) {
                 if (currentUser != null && currentUser.getFriends() != null) {
-                    if (!userInput.isEmpty()) {
+                    if (userInput.size() > 0) {
                         // query User with username: etSearch's input
                         ParseQuery<ParseUser> userQuery = ParseQuery.getQuery(ParseUser.class);
-                        userQuery.whereEqualTo("username", userInput);
-                        userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                        userQuery.whereContainedIn("username", userInput);
+                        userQuery.findInBackground(new FindCallback<ParseUser>() {
                             @Override
-                            public void done(ParseUser friend, ParseException e) {
+                            public void done(List<ParseUser> friends, ParseException e) {
                                 if (e != null) {
-                                    Log.e(TAG, friend.toString(), e);
+                                    Log.e(TAG, friends.toString(), e);
                                 } else {
                                     ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
                                     poemLineQuery.include(Line.KEY_AUTHOR);
@@ -58,7 +58,7 @@ public class Query {
                                                 Log.e(TAG, objects.toString(), e);
                                             } else {
                                                 ParseQuery<Line> friendLineQuery = ParseQuery.getQuery(Line.class);
-                                                friendLineQuery.whereEqualTo(Line.KEY_AUTHOR, friend);
+                                                friendLineQuery.whereContainedIn(Line.KEY_AUTHOR, friends);
                                                 friendLineQuery.include(Line.KEY_POEM_LINE);
                                                 friendLineQuery.setLimit(20);
                                                 friendLineQuery.addDescendingOrder("createdAt");
