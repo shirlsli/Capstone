@@ -7,20 +7,24 @@ import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.engine.Engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class OpenAIThread {
     private String prompt;
     private String[] generatedLines;
     private String[] splitLines;
+    private ArrayList<String> editedLines;
 
     public OpenAIThread(String prompt) {
         this.prompt = prompt;
         generatedLines = new String[1];
+        editedLines = new ArrayList<>();
     }
 
-    public String[] getGeneratedLines() {
-        return splitLines;
+    public ArrayList<String> getGeneratedLines() {
+        return editedLines;
     }
 
     public void runCallback(Runnable callback)
@@ -45,6 +49,8 @@ public class OpenAIThread {
         generatedLines[0] = choices.get(0).toString();
         splitLines = generatedLines[0].split("\n");
         splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
+        editedLines.addAll(Arrays.asList(splitLines));
+        editedLines.removeAll(Collections.singleton(""));
         // Run callback
         callback.run();
     }

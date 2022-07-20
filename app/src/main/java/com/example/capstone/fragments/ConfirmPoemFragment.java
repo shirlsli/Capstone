@@ -77,7 +77,7 @@ public class ConfirmPoemFragment extends Fragment {
             poemLine = bundle.getString("PoemLine");
             linearLayout = view.findViewById(R.id.friendsLinesLayout);
             tvPrompt = view.findViewById(R.id.tvPoemConfirmation);
-            bPublish = view.findViewById(R.id.bPublish);
+            bPublish = view.findViewById(R.id.bPost);
             poemConfirmScreen();
         }
     }

@@ -54,7 +54,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     protected List<String> allGeneratedLines;
     private RecyclerView rvGeneratedLines;
     private LottieAnimationView lottieAnimationView;
-    private String[] generatedLines;
+    private ArrayList<String> generatedLines;
     private static final String TAG = "GenerateFragment";
 
 
@@ -158,8 +158,8 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         }
     }
 
-    private void displayPoemLines(String[] generatedLines) {
-        allGeneratedLines = Arrays.asList(generatedLines).subList(2, generatedLines.length);
+    private void displayPoemLines(ArrayList<String> generatedLines) {
+        allGeneratedLines = generatedLines.subList(2, generatedLines.size());
         adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this);
         rvGeneratedLines.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());

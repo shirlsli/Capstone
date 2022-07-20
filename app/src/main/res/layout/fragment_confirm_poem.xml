@@ -19,7 +19,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPoemConfirmation"
-        tools:visibility="visible"></LinearLayout>
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tvPoemConfirmation"
@@ -38,7 +38,7 @@
         tools:visibility="visible" />
 
     <Button
-        android:id="@+id/bPublish"
+        android:id="@+id/bPost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"

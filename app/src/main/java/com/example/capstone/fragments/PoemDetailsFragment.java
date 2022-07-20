@@ -38,6 +38,8 @@ public class PoemDetailsFragment extends Fragment {
     private LinearLayout poemLayout;
     private Poem poem;
     private String fromFeed;
+    private TextView tvDateDetails;
+    private Button bPost;
     private static final String TAG = "PoemDetailsFragment";
 
     public PoemDetailsFragment() {
@@ -77,8 +79,9 @@ public class PoemDetailsFragment extends Fragment {
         if (bundle != null) {
             fromFeed = getArguments().getString("fromFeed");
             poem = bundle.getParcelable("Poem");
-            Log.i(TAG, "Parcel received item: " + poem);
-            poemLayout.addView(createDateTextView(view, poem));
+            tvDateDetails = view.findViewById(R.id.tvDateDetails);
+            bPost = view.findViewById(R.id.bPost);
+            createDateTextView(view, poem);
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 TextView tvNewLine = new TextView(view.getContext());
                 tvNewLine.setText(poem.getPoemLines().get(i).getPoemLine());
@@ -86,22 +89,20 @@ public class PoemDetailsFragment extends Fragment {
                     TextView tvBlank = new TextView(getContext());
                     poemLayout.addView(tvBlank);
                 }
-                setLayoutFormat(tvNewLine, 16, 40, 20, 0, 0);
+                setLayoutFormat(tvNewLine, 16, 0, 20, 0, 0);
                 poemLayout.addView(tvNewLine);
             }
             if (fromFeed == null) {
-                Button bPost = new Button(view.getContext());
-                bPost.setText(R.string.post);
-                poemLayout.addView(bPost);
+                bPost.setVisibility(View.VISIBLE);
                 bPost.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onPostClicked();
                     }
                 });
+            } else {
+                bPost.setVisibility(View.GONE);
             }
-        } else {
-            Log.i(TAG, "Bundle is null");
         }
     }
 
@@ -114,7 +115,7 @@ public class PoemDetailsFragment extends Fragment {
             public void done(ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "Post has not been saved", e);
-                    Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Post could not be saved.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.i(TAG, "Post has been saved!");
                 }
@@ -125,16 +126,11 @@ public class PoemDetailsFragment extends Fragment {
         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, feedFragment).commit();
     }
 
-    private TextView createDateTextView(View view, Poem poem) {
-        TextView tvDate = new TextView(view.getContext());
+    private void createDateTextView(View view, Poem poem) {
         Date date = poem.getCreatedAt();
-        Log.i(TAG, "Created at: " + date);
-        Log.i(TAG, "Poem Created at: " + poem);
         DateFormat df = DateFormat.getDateInstance();
         String reportDate = df.format(date);
-        tvDate.setText(reportDate);
-        setLayoutFormat(tvDate, 30, 30, 20, 0, 0);
-        return tvDate;
+        tvDateDetails.setText(reportDate);
     }
 
     private void setLayoutFormat(TextView textview, int textSize, int left, int top, int right, int bottom) {
