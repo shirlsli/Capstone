@@ -117,12 +117,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Fragment confirmPoemFragment = new ConfirmPoemFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("Poem", poemLines);
-                    bundle.putString("PoemLine", poemLine);
-                    confirmPoemFragment.setArguments(bundle);
-                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
+                    bundleToConfirmScreen();
                 }
             });
             ivAdd = view.findViewById(R.id.ivAdd);
@@ -143,13 +138,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 @Override
                 public void onSwap(View firstView, int firstPosition,
                                    View secondView, int secondPosition) {
-                    int firstIndex = poemLines.indexOf(((TextView) firstView).getText().toString());
-                    int secondIndex = poemLines.indexOf(((TextView) secondView).getText().toString());
-                    if (firstIndex >= 0 && secondIndex >= 0) {
-                        String temp = poemLines.get(secondIndex);
-                        poemLines.set(secondIndex, poemLines.get(firstIndex));
-                        poemLines.set(firstIndex, temp);
-                    }
+                    swapPoemLines(firstView, secondView);
                 }
             });
             linesCount = "/16 lines";
@@ -161,34 +150,32 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         }
     }
 
-    public void createPoem() throws ParseException {
-        // brand new query for the current user
+    private void bundleToConfirmScreen() {
+        Fragment confirmPoemFragment = new ConfirmPoemFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("Poem", poemLines);
+        bundle.putString("PoemLine", poemLine);
+        confirmPoemFragment.setArguments(bundle);
+        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
+    }
+
+    private void swapPoemLines(View firstView, View secondView) {
+        int firstIndex = poemLines.indexOf(((TextView) firstView).getText().toString());
+        int secondIndex = poemLines.indexOf(((TextView) secondView).getText().toString());
+        if (firstIndex >= 0 && secondIndex >= 0) {
+            String temp = poemLines.get(secondIndex);
+            poemLines.set(secondIndex, poemLines.get(firstIndex));
+            poemLines.set(firstIndex, temp);
+        }
+    }
+
+    private void createPoem() throws ParseException {
         poemLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poemLines.size(); i++) {
-            TextView tvTemp = new TextView(getContext());
-            tvTemp.setText(poemLines.get(i));
-            setLayout(tvTemp);
-            if (!poemLines.get(i).equals(poemLine)) {
-                tvTemp.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            deletePoemLine(tvTemp, tvTemp.getText().toString());
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-            dragLinearLayout.addView(tvTemp);
-            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+            formatPoemLineTextView(poemLines.get(i));
         }
         if (poemLines.size() == 0) {
-            TextView tvTemp = new TextView(getContext());
-            tvTemp.setText(poemLine);
-            setLayout(tvTemp);
-            dragLinearLayout.addView(tvTemp);
-            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+            formatPoemLineTextView(poemLine);
             poemLines.add(poemLine);
         }
         String temp = poemLines.size() + linesCount;
@@ -196,20 +183,43 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    onAddClicked();
-                } catch (ExecutionException | InterruptedException e) {
-                    e.printStackTrace();
-                }
+                showBackArrow();
             }
         });
     }
 
-    private void onAddClicked() throws ExecutionException, InterruptedException {
-        showBackArrow();
+    private void formatPoemLineTextView(String poemLine) {
+        TextView tvTemp = new TextView(getContext());
+        tvTemp.setText(poemLine);
+        setLayout(tvTemp);
+        dragLinearLayout.addView(tvTemp);
+        dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+        if (!poemLine.equals(this.poemLine)) {
+            tvTemp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        deletePoemLine(tvTemp, tvTemp.getText().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     private void onSearchClicked() {
+        makeNewChip();
+        hideSoftKeyboard(requireActivity());
+        lottieAnimationView.setVisibility(View.VISIBLE);
+        if (allFriendsLines.size() > 0 && previousChipText.containsAll(chips)) {
+            lottieAnimationView.setVisibility(View.GONE);
+        } else {
+            runQuery();
+        }
+    }
+
+    private void makeNewChip() {
         if (chipGroup.getChildCount() < 44) {
             Chip chip = new Chip(getContext());
             chip.setText(etSearch.getText());
@@ -218,26 +228,23 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             // can set icon to show profile pic as well
             chip.setCloseIconVisible(true);
             chip.setCheckable(false);
+            chip.setClickable(false);
             chip.setOnCloseIconClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (chipGroup.getChildCount() == 1) {
+                    chipGroup.removeView(chip);
+                    chips.remove(chip.getText().toString());
+                    if (chipGroup.getChildCount() == 0) {
                         adapter.clear();
                         etSearch.setText("");
                         showSoftKeyboard(getActivity());
+                    } else {
+                        lottieAnimationView.setVisibility(View.VISIBLE);
+                        runQuery();
                     }
-                    chipGroup.removeView(chip);
-                    chips.remove(chip.getText().toString());
                 }
             });
             chipGroup.addView(chip);
-        }
-        hideSoftKeyboard(requireActivity());
-        lottieAnimationView.setVisibility(View.VISIBLE);
-        if (allFriendsLines.size() > 0 && previousChipText.containsAll(chips)) {
-            lottieAnimationView.setVisibility(View.GONE);
-        } else {
-            runQuery();
         }
     }
 
