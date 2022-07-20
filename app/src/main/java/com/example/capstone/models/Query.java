@@ -35,27 +35,29 @@ public class Query {
             @Override
             public void done(User currentUser, ParseException e) {
                 if (currentUser != null && currentUser.getFriends() != null) {
-                    if (userInput.size() > 0) {
-                        // query User with username: etSearch's input
-                        ParseQuery<ParseUser> userQuery = ParseQuery.getQuery(ParseUser.class);
-                        userQuery.whereContainedIn("username", userInput);
-                        userQuery.findInBackground(new FindCallback<ParseUser>() {
-                            @Override
-                            public void done(List<ParseUser> friends, ParseException e) {
-                                if (e != null) {
-                                    Log.e(TAG, friends.toString(), e);
-                                } else {
-                                    ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
-                                    poemLineQuery.include(Line.KEY_AUTHOR);
-                                    poemLineQuery.include(Line.KEY_POEM_LINE);
-                                    poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, currentUser.getFriends());
-                                    poemLineQuery.setLimit(20);
-                                    poemLineQuery.addDescendingOrder("createdAt");
-                                    poemLineQuery.findInBackground(new FindCallback<Line>() {
-                                        @Override
-                                        public void done(List<Line> objects, ParseException e) {
-                                            if (e != null) {
-                                                Log.e(TAG, objects.toString(), e);
+                    // query User with username: etSearch's input
+                    ParseQuery<ParseUser> userQuery = ParseQuery.getQuery(ParseUser.class);
+                    userQuery.whereContainedIn("username", userInput);
+                    userQuery.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> friends, ParseException e) {
+                            if (e != null) {
+                                Log.e(TAG, friends.toString(), e);
+                            } else {
+                                ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
+                                poemLineQuery.include(Line.KEY_AUTHOR);
+                                poemLineQuery.include(Line.KEY_POEM_LINE);
+                                poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, currentUser.getFriends());
+                                poemLineQuery.setLimit(20);
+                                poemLineQuery.addDescendingOrder("createdAt");
+                                poemLineQuery.findInBackground(new FindCallback<Line>() {
+                                    @Override
+                                    public void done(List<Line> objects, ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, objects.toString(), e);
+                                        } else {
+                                            if (userInput.size() == 0) {
+                                                prepareCallback(objects, callback);
                                             } else {
                                                 ParseQuery<Line> friendLineQuery = ParseQuery.getQuery(Line.class);
                                                 friendLineQuery.whereContainedIn(Line.KEY_AUTHOR, friends);
@@ -65,37 +67,26 @@ public class Query {
                                                 friendLineQuery.findInBackground(new FindCallback<Line>() {
                                                     @Override
                                                     public void done(List<Line> friendLines, ParseException e) {
-                                                        for (int i = 0; i < friendLines.size(); i++) {
-                                                            friendsLines.add(friendLines.get(i).getPoemLine());
-                                                        }
-                                                        callback.run();
+                                                        prepareCallback(friendLines, callback);
                                                     }
                                                 });
                                             }
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
-                        });
-                    } else {
-                        ParseQuery<Line> poemLineQuery = ParseQuery.getQuery(Line.class);
-                        poemLineQuery.include(Line.KEY_AUTHOR);
-                        poemLineQuery.include(Line.KEY_POEM_LINE);
-                        poemLineQuery.whereContainedIn(Line.KEY_AUTHOR, currentUser.getFriends());
-                        poemLineQuery.setLimit(20);
-                        poemLineQuery.addDescendingOrder("createdAt");
-                        poemLineQuery.findInBackground(new FindCallback<Line>() {
-                            @Override
-                            public void done(List<Line> friendLines, ParseException e) {
-                                for (int i = 0; i < friendLines.size(); i++) {
-                                    friendsLines.add(friendLines.get(i).getPoemLine());
-                                }
-                                callback.run();
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
             }
         });
     }
+
+    private void prepareCallback(List<Line> friendLines, Runnable callback) {
+        for (int i = 0; i < friendLines.size(); i++) {
+            friendsLines.add(friendLines.get(i).getPoemLine());
+        }
+        callback.run();
+    }
+
 }

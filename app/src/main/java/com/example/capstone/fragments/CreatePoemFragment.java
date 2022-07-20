@@ -130,6 +130,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             ivSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    makeNewChip();
                     onSearchClicked();
                 }
             });
@@ -184,6 +185,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             @Override
             public void onClick(View v) {
                 showBackArrow();
+                onSearchClicked();
+                runQuery();
             }
         });
     }
@@ -209,11 +212,12 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void onSearchClicked() {
-        makeNewChip();
+        rvFriendsLines.setVisibility(View.INVISIBLE);
         hideSoftKeyboard(requireActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
         if (allFriendsLines.size() > 0 && previousChipText.containsAll(chips)) {
             lottieAnimationView.setVisibility(View.GONE);
+            rvFriendsLines.setVisibility(View.VISIBLE);
         } else {
             runQuery();
         }
@@ -235,13 +239,10 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     chipGroup.removeView(chip);
                     chips.remove(chip.getText().toString());
                     if (chipGroup.getChildCount() == 0) {
-                        adapter.clear();
                         etSearch.setText("");
                         showSoftKeyboard(getActivity());
-                    } else {
-                        lottieAnimationView.setVisibility(View.VISIBLE);
-                        runQuery();
                     }
+                    runQuery();
                 }
             });
             chipGroup.addView(chip);
@@ -289,6 +290,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
         rvFriendsLines.setAdapter(adapter);
         lottieAnimationView.setVisibility(View.GONE);
+        rvFriendsLines.setVisibility(View.VISIBLE);
     }
 
     public void onEvent(String data) {
@@ -367,7 +369,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
                         Activity.INPUT_METHOD_SERVICE);
-        if(inputMethodManager.isAcceptingText()) {
+        View focusedView = activity.getCurrentFocus();
+        if(focusedView != null && inputMethodManager.isAcceptingText()) {
             inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),
                     0);
         }
