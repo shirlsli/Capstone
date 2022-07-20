@@ -239,7 +239,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private void makeNewChip() {
         if (chipGroup.getChildCount() < 44 && !etSearch.getText().toString().equals("")) {
             Chip chip = new Chip(getContext());
-            chip.setText(etSearch.getText());
+            chip.setText(etSearch.getText().toString());
             chips.add(etSearch.getText().toString());
             etSearch.setText("");
             // can set icon to show profile pic as well
