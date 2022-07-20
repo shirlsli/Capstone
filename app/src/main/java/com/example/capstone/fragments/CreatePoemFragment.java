@@ -234,7 +234,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         }
         hideSoftKeyboard(requireActivity());
         lottieAnimationView.setVisibility(View.VISIBLE);
-        if (allFriendsLines.size() > 0 && chips.containsAll(previousChipText)) {
+        if (allFriendsLines.size() > 0 && previousChipText.containsAll(chips)) {
             lottieAnimationView.setVisibility(View.GONE);
         } else {
             runQuery();
@@ -252,13 +252,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                             @Override
                             public void run() {
                                 if (adapter != null && !chips.containsAll(previousChipText)) {
-                                    previousChipText.removeAll(previousChipText);
-                                    previousChipText.addAll(chips);
                                     adapter.clear();
                                     adapter.addAll(query.getFriendsLines());
                                     lottieAnimationView.setVisibility(View.GONE);
                                 } else {
-                                    previousChipText.addAll(chips);
+                                    allFriendsLines.removeAll(allFriendsLines);
                                     allFriendsLines.addAll(query.getFriendsLines());
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
@@ -267,6 +265,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                         }
                                     });
                                 }
+                                previousChipText.removeAll(previousChipText);
+                                previousChipText.addAll(chips);
                             }
                         });
                     } catch (Exception e) {
