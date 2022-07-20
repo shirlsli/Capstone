@@ -63,6 +63,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private TextView tvInstructions;
     private ImageView ivSearch;
     private ChipGroup chipGroup;
+    private Chip allFriends;
     ArrayList<String> chips;
 
     private String mParam1;
@@ -171,6 +172,14 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void createPoem() throws ParseException {
+        allFriends = new Chip(getContext());
+        allFriends.setText("All Friends");
+        etSearch.setText("");
+        // can set icon to show profile pic as well
+        allFriends.setCloseIconVisible(false);
+        allFriends.setCheckable(false);
+        allFriends.setClickable(false);
+        chipGroup.addView(allFriends);
         poemLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poemLines.size(); i++) {
             formatPoemLineTextView(poemLines.get(i));
@@ -212,9 +221,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void onSearchClicked() {
-        rvFriendsLines.setVisibility(View.INVISIBLE);
-        hideSoftKeyboard(requireActivity());
-        lottieAnimationView.setVisibility(View.VISIBLE);
+        loadingScreen();
         if (allFriendsLines.size() > 0 && previousChipText.containsAll(chips)) {
             lottieAnimationView.setVisibility(View.GONE);
             rvFriendsLines.setVisibility(View.VISIBLE);
@@ -223,8 +230,14 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         }
     }
 
+    private void loadingScreen() {
+        rvFriendsLines.setVisibility(View.INVISIBLE);
+        hideSoftKeyboard(requireActivity());
+        lottieAnimationView.setVisibility(View.VISIBLE);
+    }
+
     private void makeNewChip() {
-        if (chipGroup.getChildCount() < 44) {
+        if (chipGroup.getChildCount() < 44 && !etSearch.getText().toString().equals("")) {
             Chip chip = new Chip(getContext());
             chip.setText(etSearch.getText());
             chips.add(etSearch.getText().toString());
@@ -241,11 +254,14 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     if (chipGroup.getChildCount() == 0) {
                         etSearch.setText("");
                         showSoftKeyboard(getActivity());
+                        chipGroup.addView(allFriends);
                     }
+                    loadingScreen();
                     runQuery();
                 }
             });
             chipGroup.addView(chip);
+            chipGroup.removeView(allFriends);
         }
     }
 
@@ -263,6 +279,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                     adapter.clear();
                                     adapter.addAll(query.getFriendsLines());
                                     lottieAnimationView.setVisibility(View.GONE);
+                                    rvFriendsLines.setVisibility(View.VISIBLE);
                                 } else {
                                     allFriendsLines.removeAll(allFriendsLines);
                                     allFriendsLines.addAll(query.getFriendsLines());
