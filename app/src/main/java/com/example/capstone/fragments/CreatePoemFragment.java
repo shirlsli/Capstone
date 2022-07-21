@@ -64,6 +64,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private ImageView ivSearch;
     private ChipGroup chipGroup;
     private Chip allFriends;
+    private Chip suggested;
     private ArrayList<String> chips;
     private ImageView ivCheck;
 
@@ -175,13 +176,10 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
 
     private void createPoem() throws ParseException {
         allFriends = new Chip(getContext());
-        allFriends.setText("All Friends");
+        formatChip(allFriends, "All Friends");
         etSearch.setText("");
-        // can set icon to show profile pic as well
-        allFriends.setCloseIconVisible(false);
-        allFriends.setCheckable(false);
-        allFriends.setClickable(false);
-        chipGroup.addView(allFriends);
+        suggested = new Chip(getContext());
+        formatChip(suggested, "Suggested");
         poemLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < poemLines.size(); i++) {
             formatPoemLineTextView(poemLines.get(i));
@@ -202,6 +200,13 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         });
     }
 
+    private void formatChip(Chip chip, String text) { // Stretch Goal: set icon to show profile pic as well
+        chip.setText(text);
+        chip.setCloseIconVisible(false);
+        chip.setCheckable(false);
+        chip.setClickable(false);
+    }
+
     private void formatPoemLineTextView(String poemLine) {
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine);
@@ -218,6 +223,13 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
+                }
+            });
+            tvTemp.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    return true;
                 }
             });
         }
@@ -280,12 +292,23 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                             public void run() {
                                 if (adapter != null && !chips.containsAll(previousChipText)) {
                                     adapter.clear();
-                                    adapter.addAll(query.getFriendsLines());
+                                    if (query.getFriendsLines().size() == 0) {
+                                        allFriendsLines.addAll(generatedLines);
+                                    } else {
+                                        adapter.addAll(query.getFriendsLines());
+                                    }
                                     lottieAnimationView.setVisibility(View.GONE);
                                     rvFriendsLines.setVisibility(View.VISIBLE);
                                 } else {
                                     allFriendsLines.removeAll(allFriendsLines);
-                                    allFriendsLines.addAll(query.getFriendsLines());
+                                    if (query.getFriendsLines().size() == 0) {
+                                        chipGroup.removeView(suggested);
+                                        chipGroup.addView(suggested);
+                                        allFriendsLines.addAll(generatedLines);
+                                    } else {
+                                        chipGroup.addView(allFriends);
+                                        allFriendsLines.addAll(query.getFriendsLines());
+                                    }
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
