@@ -23,12 +23,14 @@ import com.parse.ParseUser;
 public class FeedActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
+    public boolean activateTutorial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
 
+        activateTutorial = getIntent().getBooleanExtra("activateTutorial", false);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(getString(R.string.feed));
@@ -81,6 +83,10 @@ public class FeedActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean getActivateTutorial() {
+        return activateTutorial;
     }
 
 }

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.capstone.FeedActivity;
 import com.example.capstone.PostsAdapter;
 import com.example.capstone.R;
 import com.example.capstone.models.Poem;
@@ -25,6 +26,9 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import smartdevelop.ir.eram.showcaseviewlib.GuideView;
+import smartdevelop.ir.eram.showcaseviewlib.config.DismissType;
 
 public class FeedFragment extends Fragment {
 
@@ -39,6 +43,7 @@ public class FeedFragment extends Fragment {
     private RecyclerView rvPosts;
     private FloatingActionButton fabGenerate;
     private SwipeRefreshLayout swipeContainer;
+    private boolean activateTutorial;
     private static final String TAG = "FeedFragment";
 
     public FeedFragment() {
@@ -73,6 +78,7 @@ public class FeedFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         rvPosts = view.findViewById(R.id.rvPoems);
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(view.getContext(), allPosts);
@@ -89,15 +95,27 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+        FeedActivity feedActivity = (FeedActivity) getActivity();
+        activateTutorial = feedActivity.getActivateTutorial();
         fabGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment generateFragment = new GenerateFragment();
                 Bundle bundle = new Bundle();
+                bundle.putBoolean("activateTutorial", activateTutorial);
                 generateFragment.setArguments(bundle);
                 getParentFragmentManager().beginTransaction().replace(R.id.flContainer, generateFragment).addToBackStack( "generate_poem" ).commit();
             }
         });
+        if (activateTutorial) {
+            new GuideView.Builder(getContext())
+                    .setTitle("Creating Poem Lines and Poems")
+                    .setContentText("Tap here to generate a poem line\n and create a poem using your\n friends' poem lines!")
+                    .setTargetView(fabGenerate)
+                    .setDismissType(DismissType.targetView)
+                    .build()
+                    .show();
+        }
 
         rvPosts.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());

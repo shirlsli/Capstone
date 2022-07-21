@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import smartdevelop.ir.eram.showcaseviewlib.GuideView;
+import smartdevelop.ir.eram.showcaseviewlib.config.DismissType;
+import smartdevelop.ir.eram.showcaseviewlib.listener.GuideListener;
+
 public class GenerateFragment extends Fragment implements SearchAdapter.EventListener {
 
     private static final String ARG_PARAM1 = "param1";
@@ -55,6 +59,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private RecyclerView rvGeneratedLines;
     private LottieAnimationView lottieAnimationView;
     private ArrayList<String> generatedLines;
+    private boolean activateTutorial = false;
     private static final String TAG = "GenerateFragment";
 
 
@@ -96,11 +101,37 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            activateTutorial = bundle.getBoolean("activateTutorial");
+        }
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
         lottieAnimationView = view.findViewById(R.id.lottieLoad);
         rvGeneratedLines = view.findViewById(R.id.rvGeneratedLines);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
+        if (activateTutorial) {
+            new GuideView.Builder(getContext())
+                    .setTitle("Give us a prompt!")
+                    .setContentText("Enter a word, phrase, or sentence.")
+                    .setTargetView(etUserInput)
+                    .setDismissType(DismissType.targetView)
+                    .setGuideListener(new GuideListener() {
+                        @Override
+                        public void onDismiss(View view) {
+                            new GuideView.Builder(getContext())
+                                    .setTitle("Generate and proceed!")
+                                    .setContentText("After you generate a poem line, \n" +
+                                            "tap the forward arrow to proceed.")
+                                    .setTargetView(ivForwardArrow)
+                                    .setDismissType(DismissType.targetView)
+                                    .build()
+                                    .show();
+                        }
+                    })
+                    .build()
+                    .show();
+        }
         ivForwardArrow.setOnClickListener(new View.OnClickListener() {
             // need to identify if the word is a real word
             @Override
@@ -118,6 +149,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         if (etUserInput.getText().toString().length() > 0) {
             hideSoftKeyboard(getActivity());
             if (generatedLines != null) {
+                adapter.clear();
                 generatedLines = null;
             }
             lottieAnimationView.setVisibility(View.VISIBLE);
@@ -136,7 +168,13 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                                 public void run() {
                                     lottieAnimationView.setVisibility(View.GONE);
                                     ivForwardArrow.setVisibility(View.VISIBLE);
-                                    displayPoemLines(generatedLines);
+                                    allGeneratedLines = generatedLines.subList(1, generatedLines.size());
+                                    if (adapter != null) {
+                                        adapter.clear();
+                                        adapter.addAll(allGeneratedLines);
+                                    } else {
+                                        displayPoemLines(allGeneratedLines);
+                                    }
                                 }
                             });
                         }
@@ -158,9 +196,8 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         }
     }
 
-    private void displayPoemLines(ArrayList<String> generatedLines) {
-        allGeneratedLines = generatedLines.subList(1, generatedLines.size());
-        adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this, this);
+    private void displayPoemLines(List<String> generatedLines) {
+        adapter = new SearchAdapter(getView().getContext(), generatedLines, this, this);
         rvGeneratedLines.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvGeneratedLines.setLayoutManager(linearLayoutManager);
@@ -181,6 +218,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     bundle.putString("Line", line);
                     bundle.putString("Prompt", prompt);
                     bundle.putStringArrayList("GeneratedLines", generatedLines);
+                    bundle.putBoolean("activateTutorial", activateTutorial);
                     createPoemFragment.setArguments(bundle);
                     getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
                 }

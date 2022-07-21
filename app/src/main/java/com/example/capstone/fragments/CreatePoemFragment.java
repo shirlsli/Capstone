@@ -38,6 +38,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import smartdevelop.ir.eram.showcaseviewlib.GuideView;
+import smartdevelop.ir.eram.showcaseviewlib.config.DismissType;
+import smartdevelop.ir.eram.showcaseviewlib.listener.GuideListener;
+
 
 public class CreatePoemFragment extends Fragment implements SearchAdapter.EventListener {
 
@@ -60,7 +64,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private DragLinearLayout dragLinearLayout;
     private EditText etSearch;
     private LottieAnimationView lottieAnimationView;
-    private TextView tvInstructions;
     private ImageView ivSearch;
     private ChipGroup chipGroup;
     private Chip allFriends;
@@ -69,6 +72,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private ImageView ivCheck;
     private ArrayList<TextView> deletedLines;
     private boolean selectOn = false;
+    private boolean activateTutorial;
 
     private String mParam1;
     private String mParam2;
@@ -113,6 +117,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLines = bundle.getStringArrayList("Poem");
             poemLine = bundle.getString("Line");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
+            activateTutorial = bundle.getBoolean("activateTutorial");
             poemLayout = view.findViewById(R.id.poemLayout);
             lottieAnimationView = view.findViewById(R.id.lottieLoad);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
@@ -120,17 +125,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             chips = new ArrayList<>();
             previousChipText = new ArrayList<>();
             deletedLines = new ArrayList<>();
-            ivForwardArrow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    bundleToConfirmScreen();
-                }
-            });
             ivAdd = view.findViewById(R.id.ivAdd);
+
             ivBack = view.findViewById(R.id.ivMinus);
             tvLinesCount = view.findViewById(R.id.tvLinesCount);
             etSearch = view.findViewById(R.id.etSearch);
-            tvInstructions = view.findViewById(R.id.tvInstructions);
             ivSearch = view.findViewById(R.id.ivSearch);
             chipGroup = view.findViewById(R.id.chipGroup);
             ivCheck = view.findViewById(R.id.ivCheck);
@@ -155,7 +154,135 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            if (activateTutorial) {
+                tutorial();
+            }
+            ivForwardArrow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    bundleToConfirmScreen();
+                }
+            });
         }
+    }
+
+    private void tutorial() {
+        new GuideView.Builder(getContext())
+                .setTitle("Add poem lines!")
+                .setContentText("Add your friends' or suggested poem lines \n" +
+                        "to your poem by tapping the add button.")
+                .setTargetView(ivAdd)
+                .setDismissType(DismissType.targetView)
+                .setGuideListener(new GuideListener() {
+                    @Override
+                    public void onDismiss(View view) {
+                        new GuideView.Builder(getContext())
+                                .setTitle("Filter poem lines by friend(s)!")
+                                .setContentText("Type in your friend(s)'s username \n" +
+                                        "to spotlight their poem lines.")
+                                .setTargetView(etSearch)
+                                .setDismissType(DismissType.targetView)
+                                .setGuideListener(new GuideListener() {
+                                    @Override
+                                    public void onDismiss(View view) {
+                                        new GuideView.Builder(getContext())
+                                                .setTitle("Tap to filter!")
+                                                .setContentText("Tapping this will kickstart the filtering \n" +
+                                                        "and will add a tag with your friend(s)'s username.")
+                                                .setTargetView(ivSearch)
+                                                .setDismissType(DismissType.targetView)
+                                                .setGuideListener(new GuideListener() {
+                                                    @Override
+                                                    public void onDismiss(View view) {
+                                                        new GuideView.Builder(getContext())
+                                                                .setTitle("Our suggested poem lines for you!")
+                                                                .setContentText("Since you currently have no friends, \n" +
+                                                                        "we will provide you with suggested poem lines.")
+                                                                .setTargetView(suggested)
+                                                                .setDismissType(DismissType.targetView)
+                                                                .setGuideListener(new GuideListener() {
+                                                                    @Override
+                                                                    public void onDismiss(View view) {
+                                                                        new GuideView.Builder(getContext())
+                                                                                .setTitle("Tap or press to select a poem line!")
+                                                                                .setContentText("Tap to select a singular poem line and \n" +
+                                                                                        "press on a poem line to activate multi-selection mode. \n" +
+                                                                                        "Activating multi-selection mode will allow you\n" +
+                                                                                        "to select multiple lines in addition to the one you pressed.")
+                                                                                .setTargetView(rvFriendsLines.getChildAt(0))
+                                                                                .setDismissType(DismissType.targetView)
+                                                                                .setGuideListener(new GuideListener() {
+                                                                                    @Override
+                                                                                    public void onDismiss(View view) {
+                                                                                        new GuideView.Builder(getContext())
+                                                                                                .setTitle("Tap and drag to rearrange poem lines!")
+                                                                                                .setContentText("Tap and drag a singular poem line to \n" +
+                                                                                                        "rearrange the order of the lines in your poem.")
+                                                                                                .setTargetView(dragLinearLayout.getChildAt(0))
+                                                                                                .setDismissType(DismissType.targetView)
+                                                                                                .setGuideListener(new GuideListener() {
+                                                                                                    @Override
+                                                                                                    public void onDismiss(View view) {
+                                                                                                        new GuideView.Builder(getContext())
+                                                                                                                .setTitle("Tap or press to delete a poem line!")
+                                                                                                                .setContentText("Tap to delete a singular poem line and \n" +
+                                                                                                                        "press on a poem line to activate multi-deletion mode.\n" +
+                                                                                                                        "Activating multi-deletion mode will allow you\n" +
+                                                                                                                        "to delete multiple lines in addition to the one you pressed.")
+                                                                                                                .setTargetView(dragLinearLayout.getChildAt(1))
+                                                                                                                .setDismissType(DismissType.targetView)
+                                                                                                                .setGuideListener(new GuideListener() {
+                                                                                                                    @Override
+                                                                                                                    public void onDismiss(View view) {
+                                                                                                                        new GuideView.Builder(getContext())
+                                                                                                                                .setTitle("Maximum of 16 lines per poem!")
+                                                                                                                                .setContentText("The maximum amount of lines in \n" +
+                                                                                                                                        "a poem is 16 poem lines.")
+                                                                                                                                .setTargetView(tvLinesCount)
+                                                                                                                                .setDismissType(DismissType.targetView)
+                                                                                                                                .setGuideListener(new GuideListener() {
+                                                                                                                                    @Override
+                                                                                                                                    public void onDismiss(View view) {
+                                                                                                                                        new GuideView.Builder(getContext())
+                                                                                                                                                .setTitle("Tap the forward arrow to proceed!")
+                                                                                                                                                .setContentText("When you're done editing your poem, \n" +
+                                                                                                                                                        "tap the forward arrow to go to the Poem Confirmation Screen.")
+                                                                                                                                                .setTargetView(ivForwardArrow)
+                                                                                                                                                .setDismissType(DismissType.targetView)
+                                                                                                                                                .build()
+                                                                                                                                                .show();
+                                                                                                                                    }
+                                                                                                                                })
+                                                                                                                                .build()
+                                                                                                                                .show();
+                                                                                                                    }
+                                                                                                                })
+                                                                                                                .build()
+                                                                                                                .show();
+                                                                                                    }
+                                                                                                })
+                                                                                                .build()
+                                                                                                .show();
+                                                                                    }
+                                                                                })
+                                                                                .build()
+                                                                                .show();
+                                                                    }
+                                                                })
+                                                                .build()
+                                                                .show();
+                                                    }
+                                                })
+                                                .build()
+                                                .show();
+                                    }
+                                })
+                                .build()
+                                .show();
+                    }
+                })
+                .build()
+                .show();
     }
 
     private void bundleToConfirmScreen() {
@@ -163,6 +290,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("Poem", poemLines);
         bundle.putString("PoemLine", poemLine);
+        bundle.putBoolean("activateTutorial", activateTutorial);
         confirmPoemFragment.setArguments(bundle);
         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, confirmPoemFragment).addToBackStack( "generate_poem" ).commit();
     }
@@ -324,7 +452,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                 } else {
                                     allFriendsLines.removeAll(allFriendsLines);
                                     if (query.getFriendsLines().size() == 0) {
-                                        chipGroup.removeView(suggested);
+                                        chipGroup.removeAllViews();
                                         chipGroup.addView(suggested);
                                         allFriendsLines.addAll(generatedLines);
                                     } else {
@@ -454,7 +582,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private void showBackArrow() {
         poemLayout.setVisibility(View.GONE);
         ivAdd.setVisibility(View.GONE);
-        tvInstructions.setVisibility(View.GONE);
         etSearch.setVisibility(View.VISIBLE);
         ivBack.setVisibility(View.VISIBLE);
         rvFriendsLines.setVisibility(View.VISIBLE);
@@ -471,7 +598,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private void switchToAdd() {
         poemLayout.setVisibility(View.VISIBLE);
         rvFriendsLines.setVisibility(View.GONE);
-        tvInstructions.setVisibility(View.VISIBLE);
         etSearch.setVisibility(View.GONE);
         ivAdd.setVisibility(View.VISIBLE);
         ivBack.setVisibility(View.GONE);

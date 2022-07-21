@@ -24,6 +24,10 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 
+import smartdevelop.ir.eram.showcaseviewlib.GuideView;
+import smartdevelop.ir.eram.showcaseviewlib.config.DismissType;
+import smartdevelop.ir.eram.showcaseviewlib.config.Gravity;
+
 public class ConfirmPoemFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";

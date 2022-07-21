@@ -48,6 +48,7 @@ public class SignupActivity extends AppCompatActivity {
                         if (e == null) {
                             Log.i(TAG, "Sign up success!");
                             Intent intent = new Intent(SignupActivity.this, FeedActivity.class);
+                            intent.putExtra("activateTutorial", true);
                             startActivity(intent);
                             finish();
                         } else {
