@@ -1,5 +1,7 @@
 package com.example.capstone.models;
 
+import android.util.Log;
+
 import com.example.capstone.BuildConfig;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -51,6 +53,9 @@ public class OpenAIThread {
         splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
         editedLines.addAll(Arrays.asList(splitLines));
         editedLines.removeAll(Collections.singleton(""));
+        for (int i = 0; i < editedLines.size(); i++) {
+            Log.i("checking", editedLines.get(i));
+        }
         // Run callback
         callback.run();
     }

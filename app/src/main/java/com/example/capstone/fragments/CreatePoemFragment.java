@@ -64,7 +64,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private ImageView ivSearch;
     private ChipGroup chipGroup;
     private Chip allFriends;
-    ArrayList<String> chips;
+    private ArrayList<String> chips;
+    private ImageView ivCheck;
 
     private String mParam1;
     private String mParam2;
@@ -128,6 +129,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             tvInstructions = view.findViewById(R.id.tvInstructions);
             ivSearch = view.findViewById(R.id.ivSearch);
             chipGroup = view.findViewById(R.id.chipGroup);
+            ivCheck = view.findViewById(R.id.ivCheck);
             ivSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -203,6 +205,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private void formatPoemLineTextView(String poemLine) {
         TextView tvTemp = new TextView(getContext());
         tvTemp.setText(poemLine);
+        tvTemp.setTextColor(getResources().getColor(R.color.gray));
         setLayout(tvTemp);
         dragLinearLayout.addView(tvTemp);
         dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
@@ -304,40 +307,58 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private void setUpAdapter() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvFriendsLines.setLayoutManager(linearLayoutManager);
-        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this);
+        adapter = new SearchAdapter(getView().getContext(), allFriendsLines, this, this);
         rvFriendsLines.setAdapter(adapter);
         lottieAnimationView.setVisibility(View.GONE);
         rvFriendsLines.setVisibility(View.VISIBLE);
     }
 
-    public void onEvent(String data) {
-        selectFriendLine(data);
-    }
-
-    private void selectFriendLine(String line) {
-        if (poemLines.size() < 16) {
-            tvLinesCount.setTextColor(getResources().getColor(R.color.gray));
-            poemLines.add(line);
-            TextView tvTemp = new TextView(getContext());
-            tvTemp.setText(poemLines.get(poemLines.size() - 1));
-            tvTemp.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onEvent(ArrayList<String> data) {
+        if (adapter.getSelectOn()) {
+            ivSearch.setVisibility(View.GONE);
+            ivCheck.setVisibility(View.VISIBLE);
+            ivCheck.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        deletePoemLine(tvTemp, tvTemp.getText().toString());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    ivCheck.setVisibility(View.GONE);
+                    adapter.setSelectOn(false);
+                    selectFriendLine(data);
                 }
             });
-            setLayout(tvTemp);
-            dragLinearLayout.addView(tvTemp);
-            dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
-            String temp = poemLines.size() + linesCount;
-            tvLinesCount.setText(temp);
         } else {
-            tvLinesCount.setTextColor(getResources().getColor(R.color.purple_500));
+            ivSearch.setVisibility(View.VISIBLE);
+            selectFriendLine(data);
         }
+    }
+
+    private void selectFriendLine(ArrayList<String> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            if (poemLines.size() < 16) {
+                tvLinesCount.setTextColor(getResources().getColor(R.color.gray));
+                poemLines.add(lines.get(i));
+                TextView tvTemp = new TextView(getContext());
+                tvTemp.setText(poemLines.get(poemLines.size() - 1));
+                tvTemp.setTextColor(getResources().getColor(R.color.gray));
+                tvTemp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            deletePoemLine(tvTemp, tvTemp.getText().toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                setLayout(tvTemp);
+                dragLinearLayout.addView(tvTemp);
+                dragLinearLayout.setViewDraggable(tvTemp, tvTemp);
+            } else {
+                tvLinesCount.setTextColor(getResources().getColor(R.color.purple_500));
+            }
+        }
+        String temp = poemLines.size() + linesCount;
+        tvLinesCount.setText(temp);
         switchToAdd();
     }
 

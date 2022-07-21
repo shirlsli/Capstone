@@ -159,8 +159,8 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     }
 
     private void displayPoemLines(ArrayList<String> generatedLines) {
-        allGeneratedLines = generatedLines.subList(2, generatedLines.size());
-        adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this);
+        allGeneratedLines = generatedLines.subList(1, generatedLines.size());
+        adapter = new SearchAdapter(getView().getContext(), allGeneratedLines, this, this);
         rvGeneratedLines.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
         rvGeneratedLines.setLayoutManager(linearLayoutManager);
@@ -192,8 +192,8 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     }
 
     @Override
-    public void onEvent(String data) {
-        createPoemLine(data, new ArrayList<String>(allGeneratedLines));
+    public void onEvent(ArrayList<String> data) {
+        createPoemLine(data.get(0), new ArrayList<String>(allGeneratedLines));
     }
 
     @Override

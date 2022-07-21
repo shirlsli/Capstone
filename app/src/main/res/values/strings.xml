@@ -23,4 +23,5 @@
     <string name="search">Search</string>
     <string name="add_your_friends_lines_to_your_poem_by_clicking_the_add_button">Add your friends\' lines to your poem by clicking the add button!</string>
     <string name="filter_by_friend">Filter by friend</string>
+    <string name="check">Check</string>
 </resources>

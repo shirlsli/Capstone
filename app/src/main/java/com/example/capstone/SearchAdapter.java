@@ -1,49 +1,49 @@
 package com.example.capstone;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.example.capstone.fragments.CreatePoemFragment;
-import com.example.capstone.fragments.PoemDetailsFragment;
-import com.example.capstone.models.Poem;
-import com.example.capstone.models.Post;
-import com.parse.ParseFile;
-import com.parse.ParseUser;
-
-import java.util.EventListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
 
     private Context context;
     private List<String> friendsLines;
-    EventListener eventListener;
-    private static final String TAG = "SearchAdapter";
+    private ArrayList<String> selectedLines;
+    private boolean selectOn;
+    EventListener onClickEventListener;
+    EventListener onLongClickEventListener;
 
     public interface EventListener {
-        void onEvent(String data);
+        void onEvent(ArrayList<String> data);
     }
 
-    public SearchAdapter(Context context, List<String> friendsLines, EventListener eventListener) {
+    public boolean getSelectOn() {
+        return selectOn;
+    }
+
+    public void setSelectOn(boolean selectOn) {
+        this.selectOn = selectOn;
+    }
+
+    public SearchAdapter(Context context, List<String> friendsLines, EventListener eventListener, EventListener longClickEventListener) {
         this.context = context;
         this.friendsLines = friendsLines;
-        this.eventListener = eventListener;
+        this.onClickEventListener = eventListener;
+        this.onLongClickEventListener = longClickEventListener;
+        selectedLines = new ArrayList<>();
+        selectOn = false;
     }
 
     public void clear() {
@@ -74,29 +74,51 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return friendsLines.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private TextView tvFriendsLine;
 
         public ViewHolder(@NonNull View itemView) throws NullPointerException {
             super(itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             tvFriendsLine = itemView.findViewById(R.id.tvPoemLine);
         }
 
         public void bind(String friendsLine) {
             tvFriendsLine.setText(friendsLine);
+            tvFriendsLine.setTextColor(Color.parseColor("#404040"));
         }
 
         @Override
-        public void onClick(View v) {
+        public boolean onLongClick(View view) {
             int position = getAdapterPosition();
-            FragmentManager fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
+
+            if (position != RecyclerView.NO_POSITION) {
+                selectOn = true;
+                String text = friendsLines.get(position);
+                TextView tvSelected = view.findViewById(R.id.tvPoemLine);
+                tvSelected.setTextColor(Color.parseColor("#a6a6a6"));
+                selectedLines.add(text);
+                onLongClickEventListener.onEvent(selectedLines);
+            }
+            return true;
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
 
             if (position != RecyclerView.NO_POSITION) {
                 String text = friendsLines.get(position);
-                eventListener.onEvent(text);
-            }
+                TextView tvSelected = view.findViewById(R.id.tvPoemLine);
+                tvSelected.setTextColor(Color.parseColor("#a6a6a6"));
+                selectedLines.add(text);
+                if (!selectOn) {
+                    onClickEventListener.onEvent(selectedLines);
+                    selectedLines.removeAll(selectedLines);
+                }
+            } // delete multiple: check for onLongPress, allow them to tap selected lines, then press checkmark button
         }
     }
 }
