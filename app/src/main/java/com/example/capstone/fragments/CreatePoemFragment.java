@@ -23,6 +23,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Query;
+import com.example.capstone.models.User;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.jmedeisis.draglinearlayout.DragLinearLayout;
@@ -73,6 +74,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     private ArrayList<TextView> deletedLines;
     private boolean selectOn = false;
     private boolean activateTutorial;
+    private User user;
 
     private String mParam1;
     private String mParam2;
@@ -118,6 +120,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLine = bundle.getString("Line");
             generatedLines = bundle.getStringArrayList("GeneratedLines");
             activateTutorial = bundle.getBoolean("activateTutorial");
+            user = bundle.getParcelable("user");
             poemLayout = view.findViewById(R.id.poemLayout);
             lottieAnimationView = view.findViewById(R.id.lottieLoad);
             ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
@@ -435,7 +438,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             service.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Query query = new Query(chips);
+                    Query query = new Query(user, chips);
                     try {
                         query.call(new Runnable() {
                             @Override

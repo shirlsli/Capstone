@@ -32,6 +32,11 @@ import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.Poem;
+import com.example.capstone.models.User;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +65,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private LottieAnimationView lottieAnimationView;
     private ArrayList<String> generatedLines;
     private boolean activateTutorial = false;
+    private User user;
     private static final String TAG = "GenerateFragment";
 
 
@@ -207,6 +213,15 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         try {
             String prompt = etUserInput.getText().toString();
             etUserInput.setText(line);
+            ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+            currentUserQuery.include(User.KEY_FRIENDS);
+            currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+            currentUserQuery.getFirstInBackground(new GetCallback<User>() {
+                @Override
+                public void done(User currentUser, ParseException e) {
+                    user = currentUser;
+                }
+            });
             ivForwardArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -217,6 +232,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     bundle.putStringArrayList("Poem", poemLines);
                     bundle.putString("Line", line);
                     bundle.putString("Prompt", prompt);
+                    bundle.putParcelable("user", user);
                     bundle.putStringArrayList("GeneratedLines", generatedLines);
                     bundle.putBoolean("activateTutorial", activateTutorial);
                     createPoemFragment.setArguments(bundle);
