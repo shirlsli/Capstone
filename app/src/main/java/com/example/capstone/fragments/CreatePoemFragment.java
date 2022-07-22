@@ -237,36 +237,13 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             tvTemp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        deletedLines.add(tvTemp);
-                        if (!selectOn) {
-                            deletePoemLine(deletedLines);
-                        } else {
-                            tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    singularDelete(tvTemp);
                 }
             });
             tvTemp.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    selectOn = true;
-                    deletedLines.add(tvTemp);
-                    ivCheck.setVisibility(View.VISIBLE);
-                    ivCheck.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            try {
-                                deletePoemLine(deletedLines);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    ivAdd.setVisibility(View.GONE);
-                    tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
+                    multiDelete(tvTemp);
                     return true;
                 }
             });
@@ -405,36 +382,13 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 tvTemp.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try {
-                            deletedLines.add(tvTemp);
-                            if (!selectOn) {
-                                deletePoemLine(deletedLines);
-                            } else {
-                                tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        singularDelete(tvTemp);
                     }
                 });
                 tvTemp.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        selectOn = true;
-                        deletedLines.add(tvTemp);
-                        ivCheck.setVisibility(View.VISIBLE);
-                        ivCheck.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                try {
-                                    deletePoemLine(deletedLines);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                        ivAdd.setVisibility(View.GONE);
-                        tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
+                        multiDelete(tvTemp);
                         return true;
                     }
                 });
@@ -448,6 +402,38 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         switchToAdd();
+    }
+
+    private void singularDelete(TextView tvTemp) {
+        try {
+            deletedLines.add(tvTemp);
+            if (!selectOn) {
+                deletePoemLine(deletedLines);
+            } else {
+                tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void multiDelete(TextView tvTemp) {
+        selectOn = true;
+        deletedLines.add(tvTemp);
+        ivCheck.setVisibility(View.VISIBLE);
+        ivCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    deletePoemLine(deletedLines);
+                    selectOn = false;
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        ivAdd.setVisibility(View.GONE);
+        tvTemp.setTextColor(getResources().getColor(R.color.light_gray));
     }
 
     private void deletePoemLine(ArrayList<TextView> textViews) throws ParseException {
