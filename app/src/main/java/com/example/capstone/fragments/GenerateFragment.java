@@ -138,7 +138,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             @Override
             public void onClick(View v) {
                 try {
-                    generatePrompts(v);
+                    generatePrompts();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -146,7 +146,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         });
     }
 
-    public void generatePrompts(View view) throws InterruptedException {
+    public void generatePrompts() throws InterruptedException {
         if (etUserInput.getText().toString().length() > 0) {
             hideSoftKeyboard(getActivity());
             if (generatedLines != null) {
@@ -164,18 +164,22 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                         @Override
                         public void run() {
                             generatedLines = openAIThread.getGeneratedLines();
+                            allGeneratedLines = generatedLines.subList(1, generatedLines.size());
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    lottieAnimationView.setVisibility(View.GONE);
-                                    ivForwardArrow.setVisibility(View.VISIBLE);
-                                    allGeneratedLines = generatedLines.subList(1, generatedLines.size());
                                     if (adapter != null) {
                                         adapter.clear();
                                         adapter.addAll(allGeneratedLines);
                                     } else {
                                         displayPoemLines(allGeneratedLines);
                                     }
+                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
+                                    rvGeneratedLines.setLayoutManager(linearLayoutManager);
+                                    rvGeneratedLines.setAdapter(adapter);
+                                    lottieAnimationView.setVisibility(View.GONE);
+                                    rvGeneratedLines.setVisibility(View.VISIBLE);
+                                    ivForwardArrow.setVisibility(View.VISIBLE);
                                 }
                             });
                         }
@@ -198,10 +202,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     }
 
     private void displayPoemLines(List<String> generatedLines) {
-        adapter = new SearchAdapter(getView().getContext(), generatedLines, this, this);
-        rvGeneratedLines.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getView().getContext());
-        rvGeneratedLines.setLayoutManager(linearLayoutManager);
+        adapter = new SearchAdapter(getView().getContext(), generatedLines, this);
     }
 
     public void createPoemLine(String line, ArrayList<String> generatedLines) {

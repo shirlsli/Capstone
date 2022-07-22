@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.capstone.fragments.GenerateFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         this.friendsLines = friendsLines;
         this.onClickEventListener = eventListener;
         this.onLongClickEventListener = longClickEventListener;
+        selectedLines = new ArrayList<>();
+        selectOn = false;
+    }
+
+    public SearchAdapter(Context context, List<String> friendsLines, EventListener eventListener) {
+        this.context = context;
+        this.friendsLines = friendsLines;
+        this.onClickEventListener = eventListener;
         selectedLines = new ArrayList<>();
         selectOn = false;
     }
@@ -94,7 +104,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         public boolean onLongClick(View view) {
             int position = getAdapterPosition();
 
-            if (position != RecyclerView.NO_POSITION) {
+            if (position != RecyclerView.NO_POSITION && onLongClickEventListener != null) {
                 selectOn = true;
                 String text = friendsLines.get(position);
                 TextView tvSelected = view.findViewById(R.id.tvPoemLine);
@@ -118,7 +128,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                     onClickEventListener.onEvent(selectedLines);
                     selectedLines.removeAll(selectedLines);
                 }
-            } // delete multiple: check for onLongPress, allow them to tap selected lines, then press checkmark button
+            }
         }
     }
 }
