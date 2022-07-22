@@ -440,7 +440,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                         query.call(new Runnable() {
                             @Override
                             public void run() {
-                                if (adapter != null && !chips.containsAll(previousChipText)) {
+                                if (adapter != null && (!chips.containsAll(previousChipText) || previousChipText.isEmpty())) {
                                     adapter.clear();
                                     if (query.getFriendsLines().size() == 0) {
                                         allFriendsLines.addAll(generatedLines);
@@ -455,7 +455,8 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                         chipGroup.removeAllViews();
                                         chipGroup.addView(suggested);
                                         allFriendsLines.addAll(generatedLines);
-                                    } else {
+                                    } else if (chips.size() == 0) {
+                                        chipGroup.removeAllViews();
                                         chipGroup.addView(allFriends);
                                         allFriendsLines.addAll(query.getFriendsLines());
                                     }
@@ -463,11 +464,11 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                         @Override
                                         public void run() {
                                             setUpAdapter();
+                                            previousChipText.removeAll(previousChipText);
+                                            previousChipText.addAll(chips);
                                         }
                                     });
                                 }
-                                previousChipText.removeAll(previousChipText);
-                                previousChipText.addAll(chips);
                             }
                         });
                     } catch (Exception e) {
