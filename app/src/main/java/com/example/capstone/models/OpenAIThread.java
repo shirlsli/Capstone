@@ -50,14 +50,18 @@ public class OpenAIThread {
         List<CompletionChoice> choices = service.createCompletion("text-davinci-002", completionRequest).getChoices();
         generatedLines[0] = choices.get(0).toString();
         splitLines = generatedLines[0].split("\n");
-        splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
-        editedLines.addAll(Arrays.asList(splitLines));
-        editedLines.removeAll(Collections.singleton(""));
-        for (int i = 0; i < editedLines.size(); i++) {
-            Log.i("checking", editedLines.get(i));
-        }
+        formatLines();
         // Run callback
         callback.run();
+    }
+
+    private void formatLines() {
+        splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
+        editedLines.addAll(Arrays.asList(splitLines));
+        for (int i = 0; i < editedLines.size(); i++) {
+            editedLines.set(i, editedLines.get(i).replaceAll("\\p{P}", ""));
+        }
+        editedLines.removeAll(Collections.singleton(""));
     }
 
 }

@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.R;
@@ -147,7 +148,8 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     }
 
     public void generatePrompts() throws InterruptedException {
-        if (etUserInput.getText().toString().length() > 0) {
+        String prompt = etUserInput.getText().toString().replaceAll("[^a-zA-Z0-9]", "");
+        if (prompt.length() > 0) {
             hideSoftKeyboard(getActivity());
             if (generatedLines != null) {
                 adapter.clear();
@@ -186,7 +188,15 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     });
                 }
             });
+        } else {
+            showErrorMessage();
         }
+    }
+
+    private void showErrorMessage() {
+        Toast.makeText(getActivity(), "Please enter a legitimate word, phrase, or sentence!",
+                Toast.LENGTH_LONG).show();
+        etUserInput.setText("");
     }
 
     public static void hideSoftKeyboard(Activity activity) {
