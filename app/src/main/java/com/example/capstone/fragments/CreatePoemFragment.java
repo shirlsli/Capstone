@@ -121,36 +121,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             generatedLines = bundle.getStringArrayList("GeneratedLines");
             activateTutorial = bundle.getBoolean("activateTutorial");
             user = bundle.getParcelable("user");
-            poemLayout = view.findViewById(R.id.poemLayout);
-            lottieAnimationView = view.findViewById(R.id.lottieLoad);
-            ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
-            allFriendsLines = new ArrayList<>();
-            chips = new ArrayList<>();
-            previousChipText = new ArrayList<>();
-            deletedLines = new ArrayList<>();
-            ivAdd = view.findViewById(R.id.ivAdd);
-
-            ivBack = view.findViewById(R.id.ivMinus);
-            tvLinesCount = view.findViewById(R.id.tvLinesCount);
-            etSearch = view.findViewById(R.id.etSearch);
-            ivSearch = view.findViewById(R.id.ivSearch);
-            chipGroup = view.findViewById(R.id.chipGroup);
-            ivCheck = view.findViewById(R.id.ivCheck);
-            ivSearch.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    makeNewChip();
-                    onSearchClicked();
-                }
-            });
-            dragLinearLayout = (DragLinearLayout) view.findViewById(R.id.dragDropContainer);
-            dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
-                @Override
-                public void onSwap(View firstView, int firstPosition,
-                                   View secondView, int secondPosition) {
-                    swapPoemLines(firstView, secondView);
-                }
-            });
+            initialize(view);
             linesCount = "/16 lines";
             try {
                 createPoem();
@@ -167,6 +138,39 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 }
             });
         }
+    }
+
+    private void initialize(View view) {
+        poemLayout = view.findViewById(R.id.poemLayout);
+        lottieAnimationView = view.findViewById(R.id.lottieLoad);
+        ivForwardArrow = view.findViewById(R.id.ivForwardArrow2);
+        allFriendsLines = new ArrayList<>();
+        chips = new ArrayList<>();
+        previousChipText = new ArrayList<>();
+        deletedLines = new ArrayList<>();
+        ivAdd = view.findViewById(R.id.ivAdd);
+
+        ivBack = view.findViewById(R.id.ivMinus);
+        tvLinesCount = view.findViewById(R.id.tvLinesCount);
+        etSearch = view.findViewById(R.id.etSearch);
+        ivSearch = view.findViewById(R.id.ivSearch);
+        chipGroup = view.findViewById(R.id.chipGroup);
+        ivCheck = view.findViewById(R.id.ivCheck);
+        ivSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeNewChip();
+                onSearchClicked();
+            }
+        });
+        dragLinearLayout = view.findViewById(R.id.dragDropContainer);
+        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
+            @Override
+            public void onSwap(View firstView, int firstPosition,
+                               View secondView, int secondPosition) {
+                swapPoemLines(firstView, secondView);
+            }
+        });
     }
 
     private void bundleToConfirmScreen() {
