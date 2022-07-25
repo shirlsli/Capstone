@@ -200,26 +200,24 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
 
     public void generatePrompts() throws InterruptedException {
         String prompt = etUserInput.getText().toString();
-        if (prompt.contains("\"[^a-zA-Z0-9]\"")) {
-            invalidUserInput();
+        if (!prompt.contains(" ")) {
+            wordsInPrompt.add(prompt);
+        } else {
+            wordsInPrompt.addAll(Arrays.asList(prompt.split(" ")));
+        }
+        if (wordsInPrompt.size() > 0) {
+            if (!wordsInPrompt.contains("\"[^a-zA-Z0-9]\"")) {
+                beginGeneration(prompt);
+                for (int i = 0; i < wordsInPrompt.size(); i++) {
+                    DictionaryRequest dictionaryRequest = new DictionaryRequest(this);
+                    url = dictionaryEntries(wordsInPrompt.get(i));
+                    dictionaryRequest.execute(url);
+                }
+            }
             return;
         }
-        if (prompt.length() > 0) {
-            if (!prompt.contains(" ")) {
-                wordsInPrompt.add(prompt);
-            } else {
-                wordsInPrompt.addAll(Arrays.asList(prompt.split(" ")));
-            }
-            beginGeneration(prompt);
-            for (int i = 0; i < wordsInPrompt.size(); i++) {
-                DictionaryRequest dictionaryRequest = new DictionaryRequest(this);
-                url = dictionaryEntries(wordsInPrompt.get(i));
-                dictionaryRequest.execute(url);
-            }
-        } else {
-            showErrorMessage();
-            wordsInPrompt.removeAll(wordsInPrompt);
-        }
+        invalidUserInput();
+        wordsInPrompt.removeAll(wordsInPrompt);
     }
 
     private void callOpenAI(String prompt) {
