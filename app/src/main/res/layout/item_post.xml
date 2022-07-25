@@ -49,13 +49,15 @@
     <Button
         android:id="@+id/bFriend"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:text="@string/friend"
+        android:textSize="8sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tvAuthor"
         app:layout_constraintEnd_toStartOf="@+id/tvTimeStamp"
         app:layout_constraintStart_toEndOf="@+id/tvAuthor"
         app:layout_constraintTop_toTopOf="@+id/tvAuthor"
-        tools:visibility="visible" />
+        tools:ignore="TouchTargetSizeCheck"
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

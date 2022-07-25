@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,12 +25,14 @@ import com.example.capstone.models.Poem;
 import com.example.capstone.models.Post;
 import com.example.capstone.models.User;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -39,10 +42,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     private Context context;
     private List<Post> posts;
+    private User user;
 
     public PostsAdapter(Context context, List<Post> posts) {
         this.context = context;
         this.posts = posts;
+        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+        currentUserQuery.include(User.KEY_FRIENDS);
+        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        currentUserQuery.getFirstInBackground(new GetCallback<User>() {
+            @Override
+            public void done(User currentUser, ParseException e) {
+                user = currentUser;
+            }
+        });
     }
 
     public void clear() {
@@ -75,7 +88,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView tvPoem;
         private Button bFriend;
         private TextView tvTimeStamp;
-        private List<User> curUserFriends;
 
         public ViewHolder(@NonNull View itemView) throws NullPointerException {
             super(itemView);
@@ -92,17 +104,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Uri uri = Uri.parse(profile.getUrl());
             Glide.with(context).load(uri).centerCrop().transform(new RoundedCorners(360)).into(ivProfile);
             tvAuthor.setText(post.getAuthor().getUsername());
+            bFriend.setVisibility(View.GONE);
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                Log.i(TAG, ParseUser.getCurrentUser().getObjectId());
                 bFriend.setVisibility(View.VISIBLE);
-                bFriend.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onFriendClick();
+                for (int i = 0; i < user.getFriends().size(); i++) {
+                    if (user.getFriends().get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
+                        bFriend.setText("Unfriend");
+                    } else {
+                        bFriend.setText(R.string.friend);
                     }
-                });
+                    bFriend.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (bFriend.getText().toString().equals("Unfriend")) {
+                                onUnFriendClick();
+                            } else {
+                                onFriendClick();
+                            }
+                        }
+                    });
+                }
             }
-            Poem poem = (Poem) post.getPoem();
+            Poem poem = post.getPoem();
             String poemString = "";
             for (int i = 0; i < poem.getPoemLines().size(); i++) {
                 poemString += poem.getPoemLines().get(i).getPoemLine();
@@ -134,31 +157,66 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         private void onFriendClick() {
             int position = getAdapterPosition();
-            FragmentManager fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
             if (position != RecyclerView.NO_POSITION) {
                 Post post = posts.get(position);
-                ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
-                currentUserQuery.include(User.KEY_FRIENDS);
-                currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-                currentUserQuery.findInBackground(new FindCallback<User>() {
+                ParseQuery<User> friendQuery = ParseQuery.getQuery(User.class);
+                friendQuery.whereEqualTo("objectId", post.getAuthor().getObjectId());
+                friendQuery.getFirstInBackground(new GetCallback<User>() {
                     @Override
-                    public void done(List<User> objects, ParseException e) {
-                        if (e != null) {
-                            Log.e(TAG, "Friend not added", e);
-                        } else {
-                            objects.get(0).addFriends(post.getAuthor());
-                            Log.i(TAG, "Friend added!" + objects.get(0).getFriends());
-                            objects.get(0).saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e != null) {
-                                        Log.e(TAG, "New friend not saved :(", e);
-                                    } else {
-                                        Log.i(TAG, "New friend saved!");
-                                    }
-                                }
-                            });
+                    public void done(User friendUser, ParseException e) {
+                        String tempObjId = friendUser.getObjectId();
+                        for (int i = 0; i < user.getFriends().size(); i++) {
+                            if (user.getFriends().get(i).getObjectId().equals(tempObjId)) {
+                                return;
+                            }
                         }
+                        user.addFriends(friendUser);
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.e(TAG, "New friend not saved :(", e);
+                                } else {
+                                    Log.i(TAG, "New friend saved!");
+                                    bFriend.setText("Unfriend");
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        private void onUnFriendClick() {
+            int position = getAbsoluteAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Post post = posts.get(position);
+                ParseQuery<User> friendQuery = ParseQuery.getQuery(User.class);
+                friendQuery.whereEqualTo("objectId", post.getAuthor().getObjectId());
+                friendQuery.getFirstInBackground(new GetCallback<User>() {
+                    @Override
+                    public void done(User friendUser, ParseException e) {
+                        List<User> temp = user.getFriends();
+                        String tempObtId = friendUser.getObjectId();
+                        User userTemp = null;
+                        for (int i = 0; i < temp.size(); i++) {
+                            if (temp.get(i).getObjectId().equals(tempObtId)) {
+                                userTemp = temp.get(i);
+                            }
+                        }
+                        temp.remove(userTemp);
+                        user.put("friends", temp);
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.e(TAG, "Friend not removed D:", e);
+                                } else {
+                                    Log.i(TAG, "Friend was removed!");
+                                    bFriend.setText(R.string.friend);
+                                }
+                            }
+                        });
                     }
                 });
             }

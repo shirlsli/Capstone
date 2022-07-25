@@ -180,8 +180,9 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
 
     @Override
     public void onCallbackEvent(String result) {
-        if (results.size() == wordsInPrompt.size() - 1) {
-            for (int i = 0; i < results.size(); i++) {
+        results.add(result);
+        if (results.size() == wordsInPrompt.size()) {
+            for (int i = 0; i < results.size(); i++) { // some legit words are not included in dictionary
                 if (results.get(i).equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(i) + "?fields=definitions&strictMatch=true")) {
                     invalidUserInput();
                     return;
@@ -195,7 +196,6 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             wordsInPrompt.removeAll(wordsInPrompt);
             return;
         }
-        results.add(result);
     }
 
     public void generatePrompts() throws InterruptedException {
@@ -206,18 +206,21 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             wordsInPrompt.addAll(Arrays.asList(prompt.split(" ")));
         }
         if (wordsInPrompt.size() > 0) {
-            if (!wordsInPrompt.contains("\"[^a-zA-Z0-9]\"")) {
-                beginGeneration(prompt);
-                for (int i = 0; i < wordsInPrompt.size(); i++) {
+            for (int i = 0; i < wordsInPrompt.size(); i++) {
+                if (wordsInPrompt.get(i).contains("\"[^a-zA-Z0-9]\"")) {
+                    invalidUserInput();
+                    wordsInPrompt.removeAll(wordsInPrompt);
+                    return;
+                } else {
+                    beginGeneration(prompt);
                     DictionaryRequest dictionaryRequest = new DictionaryRequest(this);
                     url = dictionaryEntries(wordsInPrompt.get(i));
                     dictionaryRequest.execute(url);
                 }
             }
-            return;
+        } else {
+            invalidUserInput();
         }
-        invalidUserInput();
-        wordsInPrompt.removeAll(wordsInPrompt);
     }
 
     private void callOpenAI(String prompt) {

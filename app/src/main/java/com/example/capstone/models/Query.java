@@ -53,7 +53,7 @@ public class Query {
                                     Log.e(TAG, objects.toString(), e);
                                 } else {
                                     if (userInput.size() == 0) {
-                                        prepareCallback(objects, callback);
+                                        prepareCallback(objects, callback); // case: user inputted is not current user's friend
                                     } else {
                                         ParseQuery<Line> friendLineQuery = ParseQuery.getQuery(Line.class);
                                         friendLineQuery.whereContainedIn(Line.KEY_AUTHOR, friends);
@@ -73,7 +73,7 @@ public class Query {
                     }
                 }
             });
-        } else {
+        } else { // case: user does not exists
             ArrayList<Line> temp = new ArrayList<>();
             prepareCallback(temp, callback);
         }

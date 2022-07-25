@@ -10,6 +10,7 @@ import java.util.List;
 public class User extends ParseUser {
     public static final String KEY_FRIENDS = "friends";
     public static final String KEY_PROFILE_PIC = "profilePic";
+    public static final String KEY_USERNAME = "username";
 
     public List<User> getFriends() {
         return getList(KEY_FRIENDS);
@@ -22,4 +23,6 @@ public class User extends ParseUser {
     }
 
     public void setProfilePic(ParseFile profilePic) { put(KEY_PROFILE_PIC, profilePic); }
+
+    public String getUsername() { return getString(KEY_USERNAME); }
 }

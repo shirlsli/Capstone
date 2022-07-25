@@ -6,7 +6,7 @@
         <entry key="../../../../layout/custom_preview.xml" value="0.1621376811594203" />
         <entry key="app/src/main/res/drawable/ic_forward_arrow.xml" value="0.312" />
         <entry key="app/src/main/res/layout/activity_archive.xml" value="0.2520775623268698" />
-        <entry key="app/src/main/res/layout/activity_feed.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_feed.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_login2.xml" value="0.34057971014492755" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21175231933593752" />
@@ -20,7 +20,7 @@
         <entry key="app/src/main/res/layout/fragment_poem_details.xml" value="0.45" />
         <entry key="app/src/main/res/layout/item_line.xml" value="0.34322916666666664" />
         <entry key="app/src/main/res/layout/item_poem.xml" value="0.29393115942028986" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.375" />
         <entry key="app/src/main/res/layout/profile_pic.xml" value="0.1425925925925926" />
         <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.5847244262695312" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.34255523681640626" />
