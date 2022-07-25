@@ -1,7 +1,6 @@
 package com.example.capstone.fragments;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,28 +10,20 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.capstone.CallbackListener;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
-import com.example.capstone.models.Line;
 import com.example.capstone.models.OpenAIThread;
-import com.example.capstone.models.Poem;
 import com.example.capstone.models.User;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -42,6 +33,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,7 +41,7 @@ import smartdevelop.ir.eram.showcaseviewlib.GuideView;
 import smartdevelop.ir.eram.showcaseviewlib.config.DismissType;
 import smartdevelop.ir.eram.showcaseviewlib.listener.GuideListener;
 
-public class GenerateFragment extends Fragment implements SearchAdapter.EventListener {
+public class GenerateFragment extends Fragment implements SearchAdapter.EventListener, CallbackListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -67,6 +59,10 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private ArrayList<String> generatedLines;
     private boolean activateTutorial = false;
     private User user;
+    private String url;
+    private ArrayList<String> wordsInPrompt;
+    private CallbackListener listener;
+    private int promptIdx;
     private static final String TAG = "GenerateFragment";
 
 
@@ -112,6 +108,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         lottieAnimationView = view.findViewById(R.id.lottieLoad);
         rvGeneratedLines = view.findViewById(R.id.rvGeneratedLines);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
+        wordsInPrompt = new ArrayList<>();
         if (activateTutorial) {
             tutorial();
         }
@@ -151,41 +148,6 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                 .show();
     }
 
-    public void generatePrompts() throws InterruptedException {
-        String prompt = etUserInput.getText().toString().replaceAll("[^a-zA-Z0-9]", "");
-        if (prompt.length() > 0) {
-            beginGeneration(prompt);
-            ExecutorService service = Executors.newSingleThreadExecutor();
-            service.execute(new Runnable() {
-                @Override
-                public void run() {
-                    OpenAIThread openAIThread = new OpenAIThread(etUserInput.getText().toString());
-                    openAIThread.runCallback(new Runnable() {
-                        @Override
-                        public void run() {
-                            generatedLines = openAIThread.getGeneratedLines();
-                            allGeneratedLines = generatedLines.subList(1, generatedLines.size());
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (adapter != null) {
-                                        adapter.clear();
-                                        adapter.addAll(allGeneratedLines);
-                                    } else {
-                                        displayPoemLines(allGeneratedLines);
-                                    }
-                                    connectAdapterToRecyclerView();
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        } else {
-            showErrorMessage();
-        }
-    }
-
     private void beginGeneration(String prompt) {
         etUserInput.setText(prompt);
         hideSoftKeyboard(getActivity());
@@ -195,6 +157,81 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         }
         lottieAnimationView.setVisibility(View.VISIBLE);
         ivForwardArrow.setVisibility(View.GONE);
+    }
+
+    private String dictionaryEntries(String input) {
+        final String language = "en-gb";
+        final String word = input;
+        final String fields = "definitions";
+        final String strictMatch = "true";
+        final String word_id = word.toLowerCase();
+        return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id + "?" + "fields=" + fields + "&strictMatch=" + strictMatch;
+    }
+
+    @Override
+    public void onCallbackEvent(String result) {
+        if (result.equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(0) + "?fields=definitions&strictMatch=true")) {
+            showErrorMessage();
+        } else if (promptIdx == wordsInPrompt.size() - 1) {
+            String prompt = "";
+            for (int i = 0; i < wordsInPrompt.size(); i++) {
+                prompt = prompt + wordsInPrompt.get(i) + " ";
+            }
+            callOpenAI(prompt);
+            beginGeneration(prompt);
+            promptIdx++;
+        }
+    }
+
+    public void generatePrompts() throws InterruptedException {
+//        String prompt = etUserInput.getText().toString().replaceAll("[^a-zA-Z0-9]", "");
+        String prompt = etUserInput.getText().toString();
+        if (prompt.length() > 0) {
+            if (!prompt.contains(" ")) {
+                wordsInPrompt.add(prompt);
+            } else {
+                wordsInPrompt.addAll(Arrays.asList(prompt.split(" ")));
+            }
+            promptIdx = 0;
+            for (int i = 0; i < wordsInPrompt.size(); i++) {
+                DictionaryRequest dictionaryRequest = new DictionaryRequest(this);
+                url = dictionaryEntries(wordsInPrompt.get(i));
+                dictionaryRequest.execute(url);
+            }
+        } else {
+            showErrorMessage();
+            wordsInPrompt.removeAll(wordsInPrompt);
+            promptIdx = 0;
+        }
+    }
+
+    private void callOpenAI(String prompt) {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                OpenAIThread openAIThread = new OpenAIThread(prompt);
+                openAIThread.runCallback(new Runnable() {
+                    @Override
+                    public void run() {
+                        generatedLines = openAIThread.getGeneratedLines();
+                        allGeneratedLines = generatedLines.subList(1, generatedLines.size());
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (adapter != null) {
+                                    adapter.clear();
+                                    adapter.addAll(allGeneratedLines);
+                                } else {
+                                    displayPoemLines(allGeneratedLines);
+                                }
+                                connectAdapterToRecyclerView();
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private void connectAdapterToRecyclerView() {
@@ -279,4 +316,5 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         super.onStop();
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
+
 }
