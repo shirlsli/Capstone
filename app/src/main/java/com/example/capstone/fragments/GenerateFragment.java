@@ -56,13 +56,14 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     protected List<String> allGeneratedLines;
     private RecyclerView rvGeneratedLines;
     private LottieAnimationView lottieAnimationView;
+    private LottieAnimationView lottieAnimationViewConfused;
     private ArrayList<String> generatedLines;
     private boolean activateTutorial = false;
     private User user;
     private String url;
     private ArrayList<String> wordsInPrompt;
     private CallbackListener listener;
-    private int promptIdx;
+    private ArrayList<String> results = new ArrayList<>();
     private static final String TAG = "GenerateFragment";
 
 
@@ -106,6 +107,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         etUserInput = view.findViewById(R.id.etUserInput);
         etUserInput.setVisibility(View.VISIBLE);
         lottieAnimationView = view.findViewById(R.id.lottieLoad);
+        lottieAnimationViewConfused = view.findViewById(R.id.lottieLoadConfused);
         rvGeneratedLines = view.findViewById(R.id.rvGeneratedLines);
         ivForwardArrow = view.findViewById(R.id.ivForwardArrow);
         wordsInPrompt = new ArrayList<>();
@@ -155,44 +157,60 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             adapter.clear();
             generatedLines = null;
         }
+        lottieAnimationViewConfused.setVisibility(View.GONE);
         lottieAnimationView.setVisibility(View.VISIBLE);
         ivForwardArrow.setVisibility(View.GONE);
     }
 
     private String dictionaryEntries(String input) {
         final String language = "en-gb";
-        final String word = input;
         final String fields = "definitions";
         final String strictMatch = "true";
-        final String word_id = word.toLowerCase();
+        final String word_id = input.toLowerCase();
         return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id + "?" + "fields=" + fields + "&strictMatch=" + strictMatch;
+    }
+
+    private void invalidUserInput() {
+        lottieAnimationView.setVisibility(View.GONE);
+        lottieAnimationViewConfused.setVisibility(View.VISIBLE);
+        showErrorMessage();
+        ivForwardArrow.setVisibility(View.VISIBLE);
+        wordsInPrompt.removeAll(wordsInPrompt);
     }
 
     @Override
     public void onCallbackEvent(String result) {
-        if (result.equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(0) + "?fields=definitions&strictMatch=true")) {
-            showErrorMessage();
-        } else if (promptIdx == wordsInPrompt.size() - 1) {
+        if (results.size() == wordsInPrompt.size() - 1) {
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(i) + "?fields=definitions&strictMatch=true")) {
+                    invalidUserInput();
+                    return;
+                }
+            }
             String prompt = "";
             for (int i = 0; i < wordsInPrompt.size(); i++) {
                 prompt = prompt + wordsInPrompt.get(i) + " ";
             }
             callOpenAI(prompt);
-            beginGeneration(prompt);
-            promptIdx++;
+            wordsInPrompt.removeAll(wordsInPrompt);
+            return;
         }
+        results.add(result);
     }
 
     public void generatePrompts() throws InterruptedException {
-//        String prompt = etUserInput.getText().toString().replaceAll("[^a-zA-Z0-9]", "");
         String prompt = etUserInput.getText().toString();
+        if (prompt.contains("\"[^a-zA-Z0-9]\"")) {
+            invalidUserInput();
+            return;
+        }
         if (prompt.length() > 0) {
             if (!prompt.contains(" ")) {
                 wordsInPrompt.add(prompt);
             } else {
                 wordsInPrompt.addAll(Arrays.asList(prompt.split(" ")));
             }
-            promptIdx = 0;
+            beginGeneration(prompt);
             for (int i = 0; i < wordsInPrompt.size(); i++) {
                 DictionaryRequest dictionaryRequest = new DictionaryRequest(this);
                 url = dictionaryEntries(wordsInPrompt.get(i));
@@ -201,7 +219,6 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         } else {
             showErrorMessage();
             wordsInPrompt.removeAll(wordsInPrompt);
-            promptIdx = 0;
         }
     }
 

@@ -214,7 +214,6 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             public void onClick(View v) {
                 showBackArrow();
                 onSearchClicked();
-                runQuery();
             }
         });
     }
@@ -371,7 +370,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
         }
     }
 
-    private void selectFriendLine(ArrayList<String> lines) {
+    private void selectFriendLine(@NonNull ArrayList<String> lines) {
         for (int i = 0; i < lines.size(); i++) {
             if (poemLines.size() < 16) {
                 tvLinesCount.setTextColor(getResources().getColor(R.color.gray));
@@ -399,6 +398,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 tvLinesCount.setTextColor(getResources().getColor(R.color.purple_500));
             }
         }
+        lines.removeAll(lines);
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         switchToAdd();
@@ -441,6 +441,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLines.remove(textViews.get(i).getText().toString());
             dragLinearLayout.removeDragView(textViews.get(i));
         }
+        textViews.removeAll(textViews);
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         ivCheck.setVisibility(View.GONE);
