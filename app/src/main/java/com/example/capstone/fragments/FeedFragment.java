@@ -146,9 +146,6 @@ public class FeedFragment extends Fragment {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                for (Post post : posts) {
-                    Log.i(TAG, "Post: " + post.getPoem() + ", username: " + post.getAuthor().getUsername());
-                }
                 allPosts.addAll(posts);
 //                rvPosts.smoothScrollToPosition(0);
                 adapter.notifyDataSetChanged();

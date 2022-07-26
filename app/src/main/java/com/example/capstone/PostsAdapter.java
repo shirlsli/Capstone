@@ -107,6 +107,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bFriend.setVisibility(View.GONE);
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                 bFriend.setVisibility(View.VISIBLE);
+                Log.i(TAG, "Friends: " + user.getFriends());
                 for (int i = 0; i < user.getFriends().size(); i++) {
                     if (user.getFriends().get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
                         bFriend.setText("Unfriend");
