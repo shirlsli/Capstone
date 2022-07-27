@@ -58,10 +58,14 @@ public class OpenAIThread {
     private void formatLines() {
         splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
         editedLines.addAll(Arrays.asList(splitLines));
-        for (int i = 0; i < editedLines.size(); i++) {
-            editedLines.set(i, editedLines.get(i).replaceAll("\\p{P}", ""));
-        }
         editedLines.removeAll(Collections.singleton(""));
+        for (int i = 2; i < editedLines.size(); i++) {
+            String temp = editedLines.get(i);
+            char punc = temp.charAt(temp.length() - 1);
+            if (!Character.isLetterOrDigit(punc)) {
+                editedLines.set(i, temp.substring(0, temp.length() - 1));
+            }
+        }
     }
 
 }

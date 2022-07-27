@@ -165,7 +165,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     private String dictionaryEntries(String input) {
         final String language = "en-gb";
         final String fields = "definitions";
-        final String strictMatch = "true";
+        final String strictMatch = "false";
         final String word_id = input.toLowerCase();
         return "https://od-api.oxforddictionaries.com:443/api/v2/entries/" + language + "/" + word_id + "?" + "fields=" + fields + "&strictMatch=" + strictMatch;
     }

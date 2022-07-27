@@ -6,9 +6,8 @@
     <string name="password">Password</string>
     <string name="username">Username</string>
     <string name="logout">Logout</string>
-    <string name="enter_a_word_describing_your_day">Enter a word describing your day</string>
+    <string name="enter_a_word_describing_your_day">Enter a word, phrase, or sentence</string>
     <string name="generate">Generate</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="archive">Archive</string>
     <string name="publish">Publish</string>

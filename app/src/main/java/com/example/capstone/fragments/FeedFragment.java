@@ -81,49 +81,57 @@ public class FeedFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        rvPosts = view.findViewById(R.id.rvPoems);
-        allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(view.getContext(), allPosts);
-        fabGenerate = view.findViewById(R.id.fabGenerate);
-
-        swipeContainer = view.findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
+        currentUserQuery.include(User.KEY_FRIENDS);
+        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        currentUserQuery.getFirstInBackground(new GetCallback<User>() {
             @Override
-            public void onRefresh() {
-                fetchTimelineAsync(0);
+            public void done(User currentUser, ParseException e) {
+                User user = currentUser;
+                rvPosts = view.findViewById(R.id.rvPoems);
+                allPosts = new ArrayList<>();
+                adapter = new PostsAdapter(view.getContext(), allPosts, user);
+                fabGenerate = view.findViewById(R.id.fabGenerate);
+
+                swipeContainer = view.findViewById(R.id.swipeContainer);
+                swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        fetchTimelineAsync(0);
+                    }
+                });
+                swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                        android.R.color.holo_green_light,
+                        android.R.color.holo_orange_light,
+                        android.R.color.holo_red_light);
+                FeedActivity feedActivity = (FeedActivity) getActivity();
+                activateTutorial = feedActivity.getActivateTutorial();
+                fabGenerate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Fragment generateFragment = new GenerateFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("activateTutorial", activateTutorial);
+                        generateFragment.setArguments(bundle);
+                        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, generateFragment).addToBackStack( "generate_poem" ).commit();
+                    }
+                });
+                if (activateTutorial) {
+                    new GuideView.Builder(getContext())
+                            .setTitle("Creating Poem Lines and Poems")
+                            .setContentText("Tap here to generate a poem line\n and create a poem using your\n friends' poem lines!")
+                            .setTargetView(fabGenerate)
+                            .setDismissType(DismissType.targetView)
+                            .build()
+                            .show();
+                }
+
+                rvPosts.setAdapter(adapter);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
+                rvPosts.setLayoutManager(linearLayoutManager);
+                queryPosts();
             }
         });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        FeedActivity feedActivity = (FeedActivity) getActivity();
-        activateTutorial = feedActivity.getActivateTutorial();
-        fabGenerate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment generateFragment = new GenerateFragment();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("activateTutorial", activateTutorial);
-                generateFragment.setArguments(bundle);
-                getParentFragmentManager().beginTransaction().replace(R.id.flContainer, generateFragment).addToBackStack( "generate_poem" ).commit();
-            }
-        });
-        if (activateTutorial) {
-            new GuideView.Builder(getContext())
-                    .setTitle("Creating Poem Lines and Poems")
-                    .setContentText("Tap here to generate a poem line\n and create a poem using your\n friends' poem lines!")
-                    .setTargetView(fabGenerate)
-                    .setDismissType(DismissType.targetView)
-                    .build()
-                    .show();
-        }
-
-        rvPosts.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
-        rvPosts.setLayoutManager(linearLayoutManager);
-        queryPosts();
     }
 
     public void fetchTimelineAsync(int page) {

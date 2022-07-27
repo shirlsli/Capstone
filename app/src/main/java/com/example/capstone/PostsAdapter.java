@@ -44,18 +44,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private List<Post> posts;
     private User user;
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts, User user) {
         this.context = context;
         this.posts = posts;
-        ParseQuery<User> currentUserQuery = ParseQuery.getQuery(User.class);
-        currentUserQuery.include(User.KEY_FRIENDS);
-        currentUserQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        currentUserQuery.getFirstInBackground(new GetCallback<User>() {
-            @Override
-            public void done(User currentUser, ParseException e) {
-                user = currentUser;
-            }
-        });
+        this.user = user;
     }
 
     public void clear() {
@@ -107,7 +99,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bFriend.setVisibility(View.GONE);
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                 bFriend.setVisibility(View.VISIBLE);
-                Log.i(TAG, "Friends: " + user.getFriends());
                 for (int i = 0; i < user.getFriends().size(); i++) {
                     if (user.getFriends().get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
                         bFriend.setText("Unfriend");
