@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -299,23 +300,27 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                 @Override
                 public void onClick(View v) {
                     // goes to Create Poem Fragment
-                    ArrayList<String> poemLines = new ArrayList<>();
-                    Fragment createPoemFragment = new CreatePoemFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("Poem", poemLines);
-                    bundle.putString("Line", line);
-                    bundle.putString("Prompt", prompt);
-                    bundle.putParcelable("user", user);
-                    bundle.putStringArrayList("GeneratedLines", generatedLines);
-                    bundle.putBoolean("activateTutorial", activateTutorial);
-                    createPoemFragment.setArguments(bundle);
-                    getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
+                    bundleToCreatePoem(prompt, line);
                 }
             });
             Log.i(TAG, "poem line creation success! " + poemLine);
         } catch (Exception exception) {
             Log.e(TAG, "poem line creation failed :(", exception);
         }
+    }
+
+    private void bundleToCreatePoem(String prompt, String line) {
+        ArrayList<String> poemLines = new ArrayList<>();
+        Fragment createPoemFragment = new CreatePoemFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("Poem", poemLines);
+        bundle.putString("Line", line);
+        bundle.putString("Prompt", prompt);
+        bundle.putParcelable("user", user);
+        bundle.putStringArrayList("GeneratedLines", generatedLines);
+        bundle.putBoolean("activateTutorial", activateTutorial);
+        createPoemFragment.setArguments(bundle);
+        getParentFragmentManager().beginTransaction().replace(R.id.flContainer, createPoemFragment).addToBackStack( "generate_poem" ).commit();
     }
 
     @Override

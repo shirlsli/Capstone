@@ -277,7 +277,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             }
             if (!temp.contains(etSearch.getText().toString())) {
                 etSearch.setTextColor(getResources().getColor(R.color.red));
-                Toast.makeText(getActivity(), "It seems like you're not friends with this user.",
+                Toast.makeText(getActivity(), "It seems like you're not friends with this user or this user does not exist.",
                         Toast.LENGTH_LONG).show();
             } else {
                 Chip chip = new Chip(getContext());
