@@ -175,7 +175,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         lottieAnimationViewConfused.setVisibility(View.VISIBLE);
         showErrorMessage();
         ivForwardArrow.setVisibility(View.VISIBLE);
-        wordsInPrompt.removeAll(wordsInPrompt);
+        wordsInPrompt.clear();
     }
 
     @Override
@@ -193,8 +193,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                 prompt = prompt + wordsInPrompt.get(i) + " ";
             }
             callOpenAI(prompt);
-            wordsInPrompt.removeAll(wordsInPrompt);
-            return;
+            wordsInPrompt.clear();
         }
     }
 
@@ -209,7 +208,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
             for (int i = 0; i < wordsInPrompt.size(); i++) {
                 if (wordsInPrompt.get(i).contains("\"[^a-zA-Z0-9]\"")) {
                     invalidUserInput();
-                    wordsInPrompt.removeAll(wordsInPrompt);
+                    wordsInPrompt.clear();
                     return;
                 } else {
                     beginGeneration(prompt);

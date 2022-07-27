@@ -126,7 +126,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 selectedLines.add(text);
                 if (!selectOn) {
                     onClickEventListener.onEvent(selectedLines);
-                    selectedLines.removeAll(selectedLines);
+                    selectedLines.clear();
                 }
             }
         }

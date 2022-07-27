@@ -317,7 +317,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                                 lottieAnimationView.setVisibility(View.GONE);
                                                 rvFriendsLines.setVisibility(View.VISIBLE);
                                             } else {
-                                                allFriendsLines.removeAll(allFriendsLines);
+                                                allFriendsLines.clear();
                                                 if (query.getFriendsLines().size() == 0) {
                                                     chipGroup.removeAllViews();
                                                     chipGroup.addView(suggested);
@@ -329,7 +329,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                                 }
                                                 setUpAdapter();
                                             }
-                                            previousChipText.removeAll(previousChipText);
+                                            previousChipText.clear();
                                             previousChipText.addAll(chips);
                                         }
                                     });
@@ -398,7 +398,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                 tvLinesCount.setTextColor(getResources().getColor(R.color.purple_500));
             }
         }
-        lines.removeAll(lines);
+        lines.clear();
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         switchToAdd();
@@ -441,7 +441,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
             poemLines.remove(textViews.get(i).getText().toString());
             dragLinearLayout.removeDragView(textViews.get(i));
         }
-        textViews.removeAll(textViews);
+        textViews.clear();
         String temp = poemLines.size() + linesCount;
         tvLinesCount.setText(temp);
         ivCheck.setVisibility(View.GONE);
