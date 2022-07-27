@@ -42,12 +42,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     private Context context;
     private List<Post> posts;
+    private List<User> friends;
     private User user;
 
-    public PostsAdapter(Context context, List<Post> posts, User user) {
+    public PostsAdapter(Context context, List<Post> posts, User user, List<User> friends) {
         this.context = context;
         this.posts = posts;
         this.user = user;
+        this.friends = friends;
     }
 
     public void clear() {
@@ -99,23 +101,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bFriend.setVisibility(View.GONE);
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                 bFriend.setVisibility(View.VISIBLE);
-                for (int i = 0; i < user.getFriends().size(); i++) {
-                    if (user.getFriends().get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
+                for (int i = 0; i < friends.size(); i++) {
+                    if (friends.get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
                         bFriend.setText("Unfriend");
+                        break;
                     } else {
                         bFriend.setText(R.string.friend);
                     }
-                    bFriend.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (bFriend.getText().toString().equals("Unfriend")) {
-                                onUnFriendClick();
-                            } else {
-                                onFriendClick();
-                            }
-                        }
-                    });
                 }
+                bFriend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (bFriend.getText().toString().equals("Unfriend")) {
+                            onUnFriendClick();
+                        } else {
+                            onFriendClick();
+                        }
+                    }
+                });
             }
             Poem poem = post.getPoem();
             String poemString = "";
@@ -157,8 +160,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     @Override
                     public void done(User friendUser, ParseException e) {
                         String tempObjId = friendUser.getObjectId();
-                        for (int i = 0; i < user.getFriends().size(); i++) {
-                            if (user.getFriends().get(i).getObjectId().equals(tempObjId)) {
+                        for (int i = 0; i < friends.size(); i++) {
+                            if (friends.get(i).getObjectId().equals(tempObjId)) {
                                 return;
                             }
                         }

@@ -90,7 +90,8 @@ public class FeedFragment extends Fragment {
                 User user = currentUser;
                 rvPosts = view.findViewById(R.id.rvPoems);
                 allPosts = new ArrayList<>();
-                adapter = new PostsAdapter(view.getContext(), allPosts, user);
+                List<User> friends = user.getFriends();
+                adapter = new PostsAdapter(view.getContext(), allPosts, user, friends);
                 fabGenerate = view.findViewById(R.id.fabGenerate);
 
                 swipeContainer = view.findViewById(R.id.swipeContainer);
