@@ -2,6 +2,7 @@ package com.example.capstone.models;
 
 import android.util.Log;
 
+import com.airbnb.lottie.L;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -53,7 +54,7 @@ public class Query {
                                     Log.e(TAG, objects.toString(), e);
                                 } else {
                                     if (userInput.size() == 0) {
-                                        prepareCallback(objects, callback); // case: user inputted is not current user's friend
+                                        prepareCallback(objects, callback); // case: no friends
                                     } else {
                                         ParseQuery<Line> friendLineQuery = ParseQuery.getQuery(Line.class);
                                         friendLineQuery.whereContainedIn(Line.KEY_AUTHOR, friends);
@@ -73,7 +74,7 @@ public class Query {
                     }
                 }
             });
-        } else { // case: user does not exists
+        } else { // case: current user does not exists
             ArrayList<Line> temp = new ArrayList<>();
             prepareCallback(temp, callback);
         }

@@ -1,6 +1,8 @@
 package com.example.capstone.fragments;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.capstone.R;
@@ -266,31 +269,42 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
     }
 
     private void makeNewChip() {
-        if (chipGroup.getChildCount() < 44 && !etSearch.getText().toString().equals("")) {
-            Chip chip = new Chip(getContext());
-            chip.setText(etSearch.getText().toString());
-            chips.add(etSearch.getText().toString());
-            etSearch.setText("");
-            // can set icon to show profile pic as well
-            chip.setCloseIconVisible(true);
-            chip.setCheckable(false);
-            chip.setClickable(false);
-            chip.setOnCloseIconClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    chipGroup.removeView(chip);
-                    chips.remove(chip.getText().toString());
-                    if (chipGroup.getChildCount() == 0) {
-                        etSearch.setText("");
-                        showSoftKeyboard(getActivity());
-                        chipGroup.addView(allFriends);
+        etSearch.setTextColor(getResources().getColor(R.color.gray));
+        if (chipGroup.getChildCount() < 44 && !etSearch.getText().toString().equals("") && !chips.contains(etSearch.getText().toString())) {
+            ArrayList<String> temp = new ArrayList<>();
+            for (int i = 0; i < user.getFriends().size(); i++) {
+                temp.add(user.getFriends().get(i).getUsername());
+            }
+            if (!temp.contains(etSearch.getText().toString())) {
+                etSearch.setTextColor(getResources().getColor(R.color.red));
+                Toast.makeText(getActivity(), "It seems like you're not friends with this user.",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Chip chip = new Chip(getContext());
+                chip.setText(etSearch.getText().toString());
+                chips.add(etSearch.getText().toString());
+                etSearch.setText("");
+                // can set icon to show profile pic as well
+                chip.setCloseIconVisible(true);
+                chip.setCheckable(false);
+                chip.setClickable(false);
+                chip.setOnCloseIconClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        chipGroup.removeView(chip);
+                        chips.remove(chip.getText().toString());
+                        if (chipGroup.getChildCount() == 0) {
+                            etSearch.setText("");
+                            showSoftKeyboard(getActivity());
+                            chipGroup.addView(allFriends);
+                        }
+                        loadingScreen();
+                        runQuery();
                     }
-                    loadingScreen();
-                    runQuery();
-                }
-            });
-            chipGroup.addView(chip);
-            chipGroup.removeView(allFriends);
+                });
+                chipGroup.addView(chip);
+                chipGroup.removeView(allFriends);
+            }
         }
     }
 
@@ -318,7 +332,7 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                                 rvFriendsLines.setVisibility(View.VISIBLE);
                                             } else {
                                                 allFriendsLines.clear();
-                                                if (query.getFriendsLines().size() == 0) {
+                                                if (user.getFriends().size() == 0) {
                                                     chipGroup.removeAllViews();
                                                     chipGroup.addView(suggested);
                                                     allFriendsLines.addAll(generatedLines);

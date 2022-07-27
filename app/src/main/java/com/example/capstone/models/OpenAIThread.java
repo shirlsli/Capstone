@@ -59,7 +59,7 @@ public class OpenAIThread {
         splitLines[splitLines.length - 1] = splitLines[splitLines.length - 1].split(",")[0];
         editedLines.addAll(Arrays.asList(splitLines));
         editedLines.removeAll(Collections.singleton(""));
-        for (int i = 2; i < editedLines.size(); i++) {
+        for (int i = 1; i < editedLines.size(); i++) {
             String temp = editedLines.get(i);
             char punc = temp.charAt(temp.length() - 1);
             if (!Character.isLetterOrDigit(punc)) {
