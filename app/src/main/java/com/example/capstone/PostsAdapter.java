@@ -101,13 +101,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bFriend.setVisibility(View.GONE);
             if (!post.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                 bFriend.setVisibility(View.VISIBLE);
-                for (int i = 0; i < friends.size(); i++) {
-                    if (friends.get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
-                        bFriend.setText("Unfriend");
-                        break;
-                    } else {
-                        bFriend.setText(R.string.friend);
+                if (friends != null) {
+                    for (int i = 0; i < friends.size(); i++) {
+                        if (friends.get(i).getObjectId().equals(post.getAuthor().getObjectId())) {
+                            bFriend.setText("Unfriend");
+                            break;
+                        } else {
+                            bFriend.setText(R.string.friend);
+                        }
                     }
+                } else {
+                    bFriend.setText(R.string.friend);
                 }
                 bFriend.setOnClickListener(new View.OnClickListener() {
                     @Override

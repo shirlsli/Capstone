@@ -332,10 +332,10 @@ public class CreatePoemFragment extends Fragment implements SearchAdapter.EventL
                                                 rvFriendsLines.setVisibility(View.VISIBLE);
                                             } else {
                                                 allFriendsLines.clear();
-                                                if (user.getFriends().size() == 0) {
+                                                if (user.getFriends() == null || user.getFriends().size() == 0) {
                                                     chipGroup.removeAllViews();
                                                     chipGroup.addView(suggested);
-                                                    allFriendsLines.addAll(generatedLines);
+                                                    allFriendsLines.addAll(generatedLines.subList(1, generatedLines.size()));
                                                 } else if (chips.size() == 0) {
                                                     chipGroup.removeAllViews();
                                                     chipGroup.addView(allFriends);

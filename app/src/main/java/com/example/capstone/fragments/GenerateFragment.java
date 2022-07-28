@@ -142,7 +142,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                                 .setContentText("After you generate a poem line, \n" +
                                         "tap the forward arrow to proceed.")
                                 .setTargetView(ivForwardArrow)
-                                .setDismissType(DismissType.targetView)
+                                .setDismissType(DismissType.outside)
                                 .build()
                                 .show();
                     }

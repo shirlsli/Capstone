@@ -123,6 +123,9 @@ public class PoemDetailsFragment extends Fragment {
         });
 
         Fragment feedFragment = new FeedFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("activateTutorial", false);
+        feedFragment.setArguments(bundle);
         getParentFragmentManager().beginTransaction().replace(R.id.flContainer, feedFragment).commit();
     }
 

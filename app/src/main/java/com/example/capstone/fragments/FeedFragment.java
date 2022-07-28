@@ -87,6 +87,13 @@ public class FeedFragment extends Fragment {
         currentUserQuery.getFirstInBackground(new GetCallback<User>() {
             @Override
             public void done(User currentUser, ParseException e) {
+                Bundle bundle = getArguments();
+                if (bundle != null) {
+                    activateTutorial = bundle.getBoolean("activateTutorial");
+                } else {
+                    FeedActivity feedActivity = (FeedActivity) getActivity();
+                    activateTutorial = feedActivity.getActivateTutorial();
+                }
                 User user = currentUser;
                 rvPosts = view.findViewById(R.id.rvPoems);
                 allPosts = new ArrayList<>();
@@ -105,8 +112,6 @@ public class FeedFragment extends Fragment {
                         android.R.color.holo_green_light,
                         android.R.color.holo_orange_light,
                         android.R.color.holo_red_light);
-                FeedActivity feedActivity = (FeedActivity) getActivity();
-                activateTutorial = feedActivity.getActivateTutorial();
                 fabGenerate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
