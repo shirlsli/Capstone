@@ -29,8 +29,7 @@ public class OpenAIThread {
         return editedLines;
     }
 
-    public void runCallback(Runnable callback)
-    {
+    public void runCallback(Runnable callback) {
         OpenAiService service = new OpenAiService(BuildConfig.OPENAI_API_KEY);
 
         System.out.println("\nGetting da vinci engine...");
