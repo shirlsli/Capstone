@@ -253,6 +253,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                                     beginGeneration(labels.get(0).getText());
                                     callOpenAI(labels.get(0).getText());
                                 } else {
+                                    rvGeneratedLines.setVisibility(View.GONE);
                                     invalidUserInput();
                                 }
                                 for (int i = 0; i < labels.size(); i++) {

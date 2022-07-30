@@ -89,7 +89,7 @@ public class PoemDetailsFragment extends Fragment {
                     TextView tvBlank = new TextView(getContext());
                     poemLayout.addView(tvBlank);
                 }
-                setLayoutFormat(tvNewLine, 16, 0, 20, 0, 0);
+                setLayoutFormat(tvNewLine, 12, 0, 20, 0, 0);
                 poemLayout.addView(tvNewLine);
             }
             if (fromFeed == null) {
