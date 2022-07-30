@@ -73,5 +73,7 @@ dependencies {
     implementation 'com.github.mreram:showcaseview:1.4.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.google.cloud:google-cloud-vision:3.0.1'
+    implementation 'com.google.mlkit:image-labeling:17.0.7'
+    def camerax_version = "1.2.0-alpha04"
+    implementation "androidx.camera:camera-camera2:${camerax_version}"
 }

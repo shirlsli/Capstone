@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.ImageProxy;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,14 +36,6 @@ import com.example.capstone.SearchAdapter;
 import com.example.capstone.models.GoogleCloudVisionAPI;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.User;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.LocalizedObjectAnnotation;
-import com.google.protobuf.ByteString;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -230,38 +223,23 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     e.printStackTrace();
                 }
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                byte[] bitmapBytes = stream.toByteArray();
-                callGoogleCloudVisionAPI(bitmapBytes);
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//                byte[] bitmapBytes = stream.toByteArray();
+                callGoogleCloudVisionAPI(takenImage);
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void callGoogleCloudVisionAPI(byte[] bitmapBytes) {
+    private void callGoogleCloudVisionAPI(Bitmap takenImage) {
         ExecutorService service = Executors.newSingleThreadExecutor();
         service.execute(new Runnable() {
             @Override
             public void run() {
-                GoogleCloudVisionAPI googleCloudVisionAPI = new GoogleCloudVisionAPI(ByteString.copyFrom(bitmapBytes));
-                googleCloudVisionAPI.runCallback(new Runnable() {
-                    @Override
-                    public void run() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                etUserInput.setText(googleCloudVisionAPI.getObjects().get(0));
-                                try {
-                                    generatePrompts();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
-                });
+                GoogleCloudVisionAPI googleCloudVisionAPI = new GoogleCloudVisionAPI(takenImage);
+                googleCloudVisionAPI.analyze((ImageProxy) takenImage);
             }
         });
     }
