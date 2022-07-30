@@ -4,11 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageProxy;
 import androidx.core.content.FileProvider;
@@ -19,8 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -33,9 +40,15 @@ import com.example.capstone.BitmapScaler;
 import com.example.capstone.CallbackListener;
 import com.example.capstone.R;
 import com.example.capstone.SearchAdapter;
-import com.example.capstone.models.GoogleCloudVisionAPI;
 import com.example.capstone.models.OpenAIThread;
 import com.example.capstone.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -48,6 +61,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -223,25 +237,40 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
                     e.printStackTrace();
                 }
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                takenImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//                byte[] bitmapBytes = stream.toByteArray();
-                callGoogleCloudVisionAPI(takenImage);
+                InputImage image = InputImage.fromBitmap(takenImage, 270);
+
+                ImageLabelerOptions options =
+                        new ImageLabelerOptions.Builder()
+                                .setConfidenceThreshold(0.8f)
+                                .build();
+                ImageLabeler labeler = ImageLabeling.getClient(options);
+                labeler.process(image)
+                        .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                            @Override
+                            public void onSuccess(List<ImageLabel> labels) {
+                                Log.i(TAG, "Successfully labeled photo");
+                                if (labels.size() > 0) {
+                                    beginGeneration(labels.get(0).getText());
+                                    callOpenAI(labels.get(0).getText());
+                                } else {
+                                    invalidUserInput();
+                                }
+                                for (int i = 0; i < labels.size(); i++) {
+                                    Log.i(TAG, "Labels: " + labels.get(i).getText());
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Failed to label photo", e);
+                                invalidUserInput();
+                            }
+                        });
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void callGoogleCloudVisionAPI(Bitmap takenImage) {
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                GoogleCloudVisionAPI googleCloudVisionAPI = new GoogleCloudVisionAPI(takenImage);
-                googleCloudVisionAPI.analyze((ImageProxy) takenImage);
-            }
-        });
     }
 
     private File getPhotoFileUri(String photoFileName) {
@@ -371,7 +400,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
     }
 
     private void showErrorMessage() {
-        Toast.makeText(getActivity(), "Please enter a legitimate word, phrase, or sentence!",
+        Toast.makeText(getActivity(), "Sorry, couldn't quite understand your input!",
                 Toast.LENGTH_LONG).show();
         etUserInput.setText("");
     }

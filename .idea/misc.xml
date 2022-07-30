@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1621376811594203" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_camera.xml" value="0.201" />
         <entry key="app/src/main/res/drawable/ic_forward_arrow.xml" value="0.312" />
         <entry key="app/src/main/res/layout/activity_archive.xml" value="0.2520775623268698" />
         <entry key="app/src/main/res/layout/activity_feed.xml" value="0.25" />
