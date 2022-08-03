@@ -323,7 +323,7 @@ public class GenerateFragment extends Fragment implements SearchAdapter.EventLis
         results.add(result);
         if (results.size() == wordsInPrompt.size()) {
             for (int i = 0; i < results.size(); i++) { // some legit words are not included in dictionary
-                if (results.get(i).equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(i) + "?fields=definitions&strictMatch=true")) {
+                if (results.get(i).equals("https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/" + wordsInPrompt.get(i) + "?fields=&strictMatch=false")) {
                     invalidUserInput();
                     return;
                 }
